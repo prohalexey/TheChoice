@@ -28,6 +28,9 @@ final class jsonTest extends TestCase
         require './Rules/DepositCount.php';
     }
 
+    /**
+     * @test
+     */
     public function checkRuleTest()
     {
         $operatorTypeMap = [
