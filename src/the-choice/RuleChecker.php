@@ -6,7 +6,7 @@ use TheChoice\Contracts\ContextFactoryInterface;
 
 class RuleChecker
 {
-    private $_contextFactory = [];
+    private $_contextFactory;
 
     public function __construct(ContextFactoryInterface $contextFactory)
     {

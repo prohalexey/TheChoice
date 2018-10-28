@@ -12,6 +12,10 @@ final class Collection
 
     public function __construct($type)
     {
+        if ($type !== self::TYPE_OR && $type !== self::TYPE_AND) {
+            throw new \InvalidArgumentException(sprintf('Invalid collection type. Must be "or" or "and". "%s" given', $type));
+        }
+
         $this->_type = $type;
     }
 
