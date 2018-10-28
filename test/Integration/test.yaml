@@ -1,0 +1,27 @@
+rules:
+  - # or collection
+    - # and collection
+      description: "User has 2 or more deposits"
+      rule: "depositCount"
+      operator: "greaterThanOrEqual"
+      value: 2
+    - # and collection
+      rules:
+        - # or collection
+          - # and collection
+            description: "User has 2 or more deposits"
+            rule: "withdrawalCount"
+            operator: "equal"
+            value: 0
+        - # or collection
+          - # and collection
+            description: "User had a VIP status"
+            rule: "hasVipStatus"
+            operator: "equal"
+            value: true
+  - # or collection
+    - # and collection
+      description: "User don't have 3 or less visits"
+      rule: "visitCount"
+      operator: "lowerThanOrEqual"
+      value: 3
