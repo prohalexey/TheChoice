@@ -1,8 +1,8 @@
 <?php
 
-use TheChoice\Contracts\ContextInterface;
+use TheChoice\Contracts\RuleContextInterface;
 
-class VisitCount implements ContextInterface
+class VisitCount implements RuleContextInterface
 {
     public function getValue()
     {

@@ -1,0 +1,75 @@
+{
+  "node": "assert",
+  "if": {
+    "node": "rule",
+    "rule": "depositCount",
+    "operator": "greaterThanOrEqual",
+    "value": 2
+  },
+  "then": {
+    "node": "assert",
+    "if": {
+      "node": "collection",
+      "type": "or",
+      "elements": [
+        {
+          "node": "rule",
+          "rule": "withdrawalCount",
+          "operator": "equal",
+          "value": 0
+        },
+        {
+          "node": "rule",
+          "rule": "hasVipStatus",
+          "operator": "equal",
+          "value": true
+        }
+      ]
+    },
+    "then": {
+      "node": "action",
+      "action": "actionName1"
+    },
+    "else": {
+      "node": "assert",
+      "if": {
+        "node": "collection",
+        "type": "and",
+        "elements": [
+          {
+            "node": "rule",
+            "rule": "withdrawalCount",
+            "operator": "equal",
+            "value": 0
+          },
+          {
+            "node": "collection",
+            "type": "or",
+            "elements": [
+              {
+                "node": "rule",
+                "rule": "withdrawalCount",
+                "operator": "equal",
+                "value": 0
+              },
+              {
+                "node": "rule",
+                "rule": "hasVipStatus",
+                "operator": "equal",
+                "value": true
+              }
+            ]
+          }
+        ]
+      },
+      "then": {
+        "node": "action",
+        "action": "actionName2"
+      }
+    }
+  },
+  "else": {
+    "node": "action",
+    "action": "actionName3"
+  }
+}

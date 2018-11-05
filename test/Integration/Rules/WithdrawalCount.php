@@ -1,8 +1,8 @@
 <?php
 
-use TheChoice\Contracts\ContextInterface;
+use TheChoice\Contracts\RuleContextInterface;
 
-class WithdrawalCount implements ContextInterface
+class WithdrawalCount implements RuleContextInterface
 {
     public function getValue()
     {

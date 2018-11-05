@@ -2,10 +2,10 @@
 
 use TheChoice\Contracts\RuleContextInterface;
 
-class DepositCount implements RuleContextInterface
+class UtmSource implements RuleContextInterface
 {
     public function getValue()
     {
-        return 2;
+        return 'ab';
     }
 }

@@ -1,0 +1,4 @@
+node: "rule"
+rule: "depositCount"
+operator: "lowerThan"
+value: 4

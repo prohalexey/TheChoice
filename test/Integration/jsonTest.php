@@ -3,63 +3,152 @@
 use \PHPUnit\Framework\TestCase;
 
 use TheChoice\ {
-    OperatorFactory,
-    RuleCollectionBuilder,
-    JsonRuleCollectionBuilder,
-    RuleChecker,
-    ContextFactory,
-
-    Operators\Equal,
-    Operators\GreaterThan,
-    Operators\GreaterThanOrEqual,
-    Operators\LowerThan,
-    Operators\LowerThanOrEqual
+    Factory\ActionContextFactory,
+    Factory\RuleContextFactory,
+    Factory\OperatorFactory,
+    TreeProcessor,
+    Builder\JsonBuilder
 };
 
 final class jsonTest extends TestCase
 {
+    /**
+     * @var JsonBuilder
+     */
+    private $parser;
+
+    /**
+     * @var TreeProcessor
+     */
+    private $treeProcessor;
+
     public function setUp()
     {
         parent::setUp();
 
-        require './Rules/VisitCount.php';
-        require './Rules/HasVipStatus.php';
-        require './Rules/WithdrawalCount.php';
-        require './Rules/DepositCount.php';
+        require_once './Rules/VisitCount.php';
+        require_once './Rules/HasVipStatus.php';
+        require_once './Rules/InGroup.php';
+        require_once './Rules/WithdrawalCount.php';
+        require_once './Rules/DepositCount.php';
+        require_once './Rules/UtmSource.php';
+
+        $this->parser = new JsonBuilder(new OperatorFactory());
+
+        $ruleContextFactory = new RuleContextFactory([
+            'visitCount' => VisitCount::class,
+            'hasVipStatus' => HasVipStatus::class,
+            'inGroup' => InGroup::class,
+            'withdrawalCount' => WithdrawalCount::class,
+            'depositCount' => DepositCount::class,
+            'utmSource' => UtmSource::class,
+        ]);
+
+        $actionContextFactory = new ActionContextFactory([
+
+        ]);
+
+        $this->treeProcessor = new TreeProcessor($ruleContextFactory, $actionContextFactory);
     }
 
     /**
      * @test
      */
-    public function checkRuleTest()
+    public function OneNodeWithRuleArrayContainTest()
     {
-        $operatorTypeMap = [
-            'equal' => Equal::class,
-            'greaterThan' => GreaterThan::class,
-            'greaterThanOrEqual' => GreaterThanOrEqual::class,
-            'lowerThan' => LowerThan::class,
-            'lowerThanOrEqual' => LowerThanOrEqual::class,
-        ];
-        $operatorFactory = new OperatorFactory($operatorTypeMap);
+        $node = $this->parser->parseFile('Json/testOneNodeWithRuleArrayContain.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
 
-        $treeBuilder = new RuleCollectionBuilder($operatorFactory);
-        $parser = new JsonRuleCollectionBuilder($treeBuilder);
+    /**
+     * @test
+     */
+    public function oneNodeWithRuleArrayNotContainTest()
+    {
+        $node = $this->parser->parseFile('Json/testOneNodeWithRuleArrayNotContain.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
 
-        $json = file_get_contents('test.json');
-        $collection = $parser->parse($json);
+    /**
+     * @test
+     */
+    public function oneNodeWithRuleEqualTest()
+    {
+        $node = $this->parser->parseFile('Json/testOneNodeWithRuleEqual.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
 
-        $contexts = [
-            'visitCount' => VisitCount::class,
-            'hasVipStatus' => HasVipStatus::class,
-            'withdrawalCount' => WithdrawalCount::class,
-            'depositCount' => DepositCount::class,
-        ];
+    /**
+     * @test
+     */
+    public function oneNodeWithRuleGreaterThanTest()
+    {
+        $node = $this->parser->parseFile('Json/testOneNodeWithRuleGreaterThan.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
 
-        $contextFactory = new ContextFactory($contexts);
+    /**
+     * @test
+     */
+    public function oneNodeWithRuleGreaterThanOrEqualTest()
+    {
+        $node = $this->parser->parseFile('Json/testOneNodeWithRuleGreaterThanOrEqual.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
 
-        $ruleChecker = new RuleChecker($contextFactory);
-        $result = $ruleChecker->assert($collection);
+    /**
+     * @test
+     */
+    public function oneNodeWithRuleLowerThanTest()
+    {
+        $node = $this->parser->parseFile('Json/testOneNodeWithRuleLowerThan.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
 
+
+    /**
+     * @test
+     */
+    public function oneNodeWithRuleLowerThanOrEqualTest()
+    {
+        $node = $this->parser->parseFile('Json/testOneNodeWithRuleLowerThanOrEqual.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function oneNodeWithRuleNotEqualTest()
+    {
+        $node = $this->parser->parseFile('Json/testOneNodeWithRuleNotEqual.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function oneNodeWithRuleStringContainTest()
+    {
+        $node = $this->parser->parseFile('Json/testOneNodeWithRuleStringContain.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function oneNodeWithRuleStringNotContainTest()
+    {
+        $node = $this->parser->parseFile('Json/testOneNodeWithRuleStringNotContain.json');
+        $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
 }

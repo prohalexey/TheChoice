@@ -2,9 +2,9 @@
 
 namespace TheChoice;
 
-use TheChoice\Contracts\ContextInterface;
+use TheChoice\Contracts\RuleContextInterface;
 
-class CallableContext implements ContextInterface
+final class CallableRuleContext implements RuleContextInterface
 {
     private $rule;
 

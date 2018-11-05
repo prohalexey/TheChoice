@@ -2,7 +2,7 @@
 
 namespace TheChoice\Operators;
 
-use TheChoice\Contracts\ContextInterface;
+use TheChoice\Contracts\RuleContextInterface;
 use TheChoice\Contracts\OperatorInterface;
 
 class GreaterThanOrEqual implements OperatorInterface
@@ -28,7 +28,7 @@ class GreaterThanOrEqual implements OperatorInterface
         return $this->_value;
     }
 
-    public function assert(ContextInterface $context): bool
+    public function assert(RuleContextInterface $context): bool
     {
         return $context->getValue() >= $this->getValue();
     }

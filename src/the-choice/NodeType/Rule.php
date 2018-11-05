@@ -1,13 +1,13 @@
 <?php
 
-namespace TheChoice;
+namespace TheChoice\NodeType;
 
 use TheChoice\Contracts\OperatorInterface;
 
-class Rule
+final class Rule
 {
     private $_operator;
-    private $_ruleType = '';
+    private $_ruleType;
     private $_description = '';
 
     public function __construct(OperatorInterface $operator, string $ruleType)

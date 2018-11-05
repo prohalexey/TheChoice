@@ -2,10 +2,10 @@
 
 use TheChoice\Contracts\RuleContextInterface;
 
-class DepositCount implements RuleContextInterface
+class InGroup implements RuleContextInterface
 {
     public function getValue()
     {
-        return 2;
+        return 'testgroup';
     }
 }

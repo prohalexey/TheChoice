@@ -1,8 +1,8 @@
 <?php
 
-use TheChoice\Contracts\ContextInterface;
+use TheChoice\Contracts\RuleContextInterface;
 
-class HasVipStatus implements ContextInterface
+class HasVipStatus implements RuleContextInterface
 {
     public function getValue()
     {

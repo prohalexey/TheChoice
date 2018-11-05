@@ -8,5 +8,5 @@ interface OperatorInterface
 
     public function getValue();
 
-    public function assert(ContextInterface $context): bool;
+    public function assert(RuleContextInterface $context): bool;
 }

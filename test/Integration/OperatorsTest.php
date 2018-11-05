@@ -3,7 +3,7 @@
 use \PHPUnit\Framework\TestCase;
 
 use TheChoice\ {
-    Contracts\ContextInterface,
+    Contracts\RuleContextInterface,
 
     Operators\Equal,
     Operators\NotEqual,
@@ -141,7 +141,7 @@ final class OperatorsTest extends TestCase
 
     private function getContext($value)
     {
-        return new class($value) implements ContextInterface
+        return new class($value) implements RuleContextInterface
         {
             private $value;
 

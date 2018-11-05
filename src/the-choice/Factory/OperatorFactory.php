@@ -1,11 +1,23 @@
 <?php
 
-namespace TheChoice;
+namespace TheChoice\Factory;
 
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+
 use TheChoice\Contracts\OperatorFactoryInterface;
 use TheChoice\Contracts\OperatorInterface;
+
+use TheChoice\Operators\ArrayContain;
+use TheChoice\Operators\ArrayNotContain;
+use TheChoice\Operators\Equal;
+use TheChoice\Operators\GreaterThan;
+use TheChoice\Operators\GreaterThanOrEqual;
+use TheChoice\Operators\LowerThan;
+use TheChoice\Operators\LowerThanOrEqual;
+use TheChoice\Operators\NotEqual;
+use TheChoice\Operators\StringContain;
+use TheChoice\Operators\StringNotContain;
 
 class OperatorFactory implements OperatorFactoryInterface
 {
@@ -14,9 +26,32 @@ class OperatorFactory implements OperatorFactoryInterface
     /** @var ContainerInterface */
     private $container;
 
-    public function __construct(array $typeMap)
+    public function __construct()
     {
-        $this->_typeMap = $typeMap;
+        $this->_typeMap = [
+            'arrayContain' => ArrayContain::class,
+            'arrayNotContain' => ArrayNotContain::class,
+            'equal' => Equal::class,
+            'notEqual' => NotEqual::class,
+            'greaterThan' => GreaterThan::class,
+            'greaterThanOrEqual' => GreaterThanOrEqual::class,
+            'lowerThan' => LowerThan::class,
+            'lowerThanOrEqual' => LowerThanOrEqual::class,
+            'stringContain' => StringContain::class,
+            'stringNotContain' => StringNotContain::class,
+        ];
+    }
+
+    public function registerOperator(string $type, string $operator)
+    {
+        $this->_typeMap[$type] = $operator;
+        return $this;
+    }
+
+    public function unregisterOperator(string $type)
+    {
+        unset($this->_typeMap[$type]);
+        return $this;
     }
 
     public function setContainer(ContainerInterface $container)

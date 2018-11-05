@@ -2,7 +2,7 @@
 
 namespace TheChoice\Contracts;
 
-interface ContextInterface
+interface RuleContextInterface
 {
     public function getValue();
 }

@@ -1,0 +1,6 @@
+{
+  "node": "rule",
+  "rule": "depositCount",
+  "operator": "lowerThanOrEqual",
+  "value": 2
+}
