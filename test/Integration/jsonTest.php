@@ -33,6 +33,9 @@ final class jsonTest extends TestCase
         require_once './Rules/DepositCount.php';
         require_once './Rules/UtmSource.php';
 
+        require_once './Actions/Action1.php';
+        require_once './Actions/Action2.php';
+
         $this->parser = new JsonBuilder(new OperatorFactory());
 
         $ruleContextFactory = new RuleContextFactory([
@@ -45,7 +48,8 @@ final class jsonTest extends TestCase
         ]);
 
         $actionContextFactory = new ActionContextFactory([
-
+            'action1' => Action1::class,
+            'action2' => Action2::class,
         ]);
 
         $this->treeProcessor = new TreeProcessor($ruleContextFactory, $actionContextFactory);
@@ -148,6 +152,106 @@ final class jsonTest extends TestCase
     public function oneNodeWithRuleStringNotContainTest()
     {
         $node = $this->parser->parseFile('Json/testOneNodeWithRuleStringNotContain.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function oneNodeWithActionResultTrueTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeActionResultTrue.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function oneNodeWithActionResultFalseTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeActionResultFalse.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeAssertThenCaseTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeAssertThenCase.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeAssertElseCaseTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeAssertElseCase.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeAndCollectionAllFalseTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeAndCollectionAllFalse.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeAndCollectionOneFalseTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeAndCollectionOneFalse.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeAndCollectionAllTrueTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeAndCollectionAllTrue.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeOrCollectionAllFalseTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeOrCollectionAllFalse.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeOrCollectionOneFalseTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeOrCollectionOneTrue.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeOrCollectionAllTrueTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeOrCollectionAllTrue.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }

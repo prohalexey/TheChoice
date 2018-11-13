@@ -1,6 +1,6 @@
 {
   "node": "rule",
-  "rule": "depositCount",
+  "rule": "utmSource",
   "operator": "stringContain",
   "value": "abc"
 }

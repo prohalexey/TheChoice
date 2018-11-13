@@ -33,6 +33,9 @@ final class yamlTest extends TestCase
         require_once './Rules/DepositCount.php';
         require_once './Rules/UtmSource.php';
 
+        require_once './Actions/Action1.php';
+        require_once './Actions/Action2.php';
+
         $this->parser = new YamlBuilder(new OperatorFactory());
 
         $ruleContextFactory = new RuleContextFactory([
@@ -45,7 +48,8 @@ final class yamlTest extends TestCase
         ]);
 
         $actionContextFactory = new ActionContextFactory([
-
+            'action1' => Action1::class,
+            'action2' => Action2::class,
         ]);
 
         $this->treeProcessor = new TreeProcessor($ruleContextFactory, $actionContextFactory);
@@ -148,6 +152,106 @@ final class yamlTest extends TestCase
     public function oneNodeWithRuleStringNotContainTest()
     {
         $node = $this->parser->parseFile('Yaml/testOneNodeWithRuleStringNotContain.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+    
+    /**
+     * @test
+     */
+    public function oneNodeWithActionResultTrueTest()
+    {
+        $node = $this->parser->parseFile('Yaml/testNodeActionResultTrue.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function oneNodeWithActionResultFalseTest()
+    {
+        $node = $this->parser->parseFile('Yaml/testNodeActionResultFalse.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeAssertThenCaseTest()
+    {
+        $node = $this->parser->parseFile('Yaml/testNodeAssertThenCase.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeAssertElseCaseTest()
+    {
+        $node = $this->parser->parseFile('Yaml/testNodeAssertElseCase.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeAndCollectionAllFalseTest()
+    {
+        $node = $this->parser->parseFile('Yaml/testNodeAndCollectionAllFalse.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeAndCollectionOneFalseTest()
+    {
+        $node = $this->parser->parseFile('Yaml/testNodeAndCollectionOneFalse.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeAndCollectionAllTrueTest()
+    {
+        $node = $this->parser->parseFile('Yaml/testNodeAndCollectionAllTrue.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeOrCollectionAllFalseTest()
+    {
+        $node = $this->parser->parseFile('Yaml/testNodeOrCollectionAllFalse.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeOrCollectionOneFalseTest()
+    {
+        $node = $this->parser->parseFile('Yaml/testNodeOrCollectionOneTrue.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeOrCollectionAllTrueTest()
+    {
+        $node = $this->parser->parseFile('Yaml/testNodeOrCollectionAllTrue.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }

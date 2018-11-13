@@ -6,6 +6,6 @@ class UtmSource implements RuleContextInterface
 {
     public function getValue()
     {
-        return 'ab';
+        return 'abcd';
     }
 }

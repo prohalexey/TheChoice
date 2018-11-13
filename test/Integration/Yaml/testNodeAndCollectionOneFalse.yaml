@@ -1,0 +1,15 @@
+node: collection
+type: and
+elements:
+  -
+    node: rule
+    rule: withdrawalCount
+    operator: equal
+    value: 5
+  -
+    node: rule
+    rule: inGroup
+    operator: arrayContain
+    value:
+      - testgroup
+      - testgroup2
