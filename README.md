@@ -9,128 +9,102 @@ JSON configuration
 
 ```JSON
 {
-  "rules":
-  [
-    [
+  "node": "condition",
+  "if": {
+    "node": "collection",
+    "type": "and",
+    "elements": [
       {
-        "description": "User has 2 or more deposits",
-        "rule": "depositCount",
-        "operator": "greaterThanOrEqual",
-        "value": 2
+        "node": "rule",
+        "rule": "withdrawalCount",
+        "operator": "equal",
+        "value": 0
       },
       {
-        "rules":
-        [
-          [
-            {
-              "description": "User has 2 or more deposits",
-              "rule": "withdrawalCount",
-              "operator": "equal",
-              "value": 0
-            }
-          ],
-          [
-            {
-              "description": "User had a VIP status",
-              "rule": "hasVipStatus",
-              "operator": "equal",
-              "value": true
-            }
-          ]
+        "node": "rule",
+        "rule": "inGroup",
+        "operator": "arrayContain",
+        "value": [
+          "testgroup",
+          "testgroup2"
         ]
       }
-    ],
-    [
-      {
-        "description": "User don't have 3 or less visits",
-        "rule": "visitCount",
-        "operator": "lowerThanOrEqual",
-        "value": 3
-      }
     ]
-  ]
+  },
+  "then": {
+    "node": "action",
+    "action": "action1"
+  },
+  "else": {
+    "node": "action",
+    "action": "action2"
+  }
 }
 ```
 
 YAML configuration
 
 ```YAML
-rules:
-  - # or
-    - # and
-      description: "User has 2 or more deposits"
-      rule: "depositCount"
-      operator: "greaterThanOrEqual"
-      value: 2
-    - # and
-      rules:
-        - # or collection
-          - # and collection
-            description: "User has 2 or more deposits"
-            rule: "withdrawalCount"
-            operator: "equal"
-            value: 0
-        - # or
-          - # and
-            description: "User had a VIP status"
-            rule: "hasVipStatus"
-            operator: "equal"
-            value: true
-  - # or
-    - # and
-      description: "User don't have 3 or less visits"
-      rule: "visitCount"
-      operator: "lowerThanOrEqual"
-      value: 3
+node: condition
+if:
+  node: collection
+  type: and
+  elements:
+  - node: rule
+    rule: withdrawalCount
+    operator: equal
+    value: 0
+  - node: rule
+    rule: inGroup
+    operator: arrayContain
+    value:
+      - testgroup
+      - testgroup2
+then:
+  node: action
+  action: action1
+else:
+  node: action
+  action: action2
 ```
 
 
-And in the PHP code you need to (You can use PSR-11 container to resolve operators or just class names)
+And in the PHP code you need to (You can use PSR-11 container to resolve objects, callable or just class names)
 
-1. Define `OperatorFactory`
-
-```PHP
-$operatorTypeMap = [
-    'equal' => Equal::class,
-    'greaterThan' => GreaterThan::class,
-    'greaterThanOrEqual' => GreaterThanOrEqual::class,
-    'lowerThan' => LowerThan::class,
-    'lowerThanOrEqual' => LowerThanOrEqual::class,
-];
-$operatorFactory = new OperatorFactory($operatorTypeMap);
-```
-
-2. Define `ContextFactory` (You can use PSR-11 container to resolve context objects, callable as a context and just class names)
+1. Define contexts
 
 ```PHP
-$contexts = [
+$ruleContextFactory = new RuleContextFactory([
     'visitCount' => VisitCount::class,
     'hasVipStatus' => HasVipStatus::class,
+    'inGroup' => InGroup::class,
     'withdrawalCount' => WithdrawalCount::class,
     'depositCount' => DepositCount::class,
-];
-$contextFactory = new ContextFactory($contexts);
+    'utmSource' => UtmSource::class,
+]);
 ```
 
-3. Load rule tree
+2. Define actions (You can use PSR-11 container to resolve objects, callable as a context and just class names)
 
 ```PHP
-$collectionBuilder = new RuleCollectionBuilder($operatorFactory);
-$parser = new JsonRuleCollectionBuilder($collectionBuilder);
-$json = file_get_contents('test.json');
-$collection = $parser->parse($json);
+$actionContextFactory = new ActionContextFactory([
+    'action1' => Action1::class,
+    'action2' => Action2::class,
+    'actionBreak' => ActionBreak::class,
+]);
 ```
 
-4. Set context to rule checker
+3. Create tree processor
 
 ```PHP
-$ruleChecker = new RuleChecker($contextFactory);
+$this->treeProcessor = new TreeProcessor($ruleContextFactory, $actionContextFactory);
 ```
 
-5. Make an assertion
+4. Load rules from a file or other sources and process them
 
 ```PHP
-$result = $ruleChecker->assert($collection);
+$node = $this->parser->parseFile('Json/testOneNodeWithRuleGreaterThan.json');
+$result = $this->treeProcessor->process($node);
 ```
 
 For more usages please see tests.
