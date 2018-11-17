@@ -5,6 +5,11 @@ Small "Business Rule Engine" on PHP
 
 You can write rules in JSON or YAML format and store them into files or in the some database.
 
+Installation
+```
+composer require prohalexey/the-choice
+```
+
 JSON configuration
 
 ```JSON
