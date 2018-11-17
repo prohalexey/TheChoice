@@ -1,5 +1,5 @@
 {
-  "node": "assert",
+  "node": "condition",
   "if": {
     "node": "rule",
     "rule": "depositCount",
@@ -7,7 +7,7 @@
     "value": 2
   },
   "then": {
-    "node": "assert",
+    "node": "condition",
     "if": {
       "node": "collection",
       "type": "or",
@@ -31,7 +31,7 @@
       "action": "actionName1"
     },
     "else": {
-      "node": "assert",
+      "node": "condition",
       "if": {
         "node": "collection",
         "type": "and",

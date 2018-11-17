@@ -2,7 +2,7 @@
 
 namespace TheChoice\NodeType;
 
-final class Assert
+final class Condition
 {
     private $_if;
     private $_then;

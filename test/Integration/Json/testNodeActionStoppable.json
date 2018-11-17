@@ -1,0 +1,39 @@
+{
+  "node": "condition",
+  "if": {
+    "node": "collection",
+    "type": "and",
+    "elements": [
+      {
+        "node": "rule",
+        "rule": "withdrawalCount",
+        "operator": "equal",
+        "value": 0
+      },
+      {
+        "node": "rule",
+        "rule": "inGroup",
+        "operator": "arrayContain",
+        "value": [
+          "testgroup",
+          "testgroup2"
+        ]
+      }
+    ]
+  },
+  "then": {
+    "node": "collection",
+    "type": "and",
+    "elements": [
+      {
+        "node": "action",
+        "action": "actionBreak",
+        "break": "always"
+      },
+      {
+        "node": "action",
+        "action": "action2"
+      }
+    ]
+  }
+}

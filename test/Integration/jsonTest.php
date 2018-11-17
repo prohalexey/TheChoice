@@ -35,6 +35,7 @@ final class jsonTest extends TestCase
 
         require_once './Actions/Action1.php';
         require_once './Actions/Action2.php';
+        require_once './Actions/ActionBreak.php';
 
         $this->parser = new JsonBuilder(new OperatorFactory());
 
@@ -50,6 +51,7 @@ final class jsonTest extends TestCase
         $actionContextFactory = new ActionContextFactory([
             'action1' => Action1::class,
             'action2' => Action2::class,
+            'actionBreak' => ActionBreak::class,
         ]);
 
         $this->treeProcessor = new TreeProcessor($ruleContextFactory, $actionContextFactory);
@@ -179,9 +181,19 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function nodeAssertThenCaseTest()
+    public function oneNodeWithActionStoppableTest()
     {
-        $node = $this->parser->parseFile('Json/testNodeAssertThenCase.json');
+        $node = $this->parser->parseFile('Json/testNodeActionStoppable.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertEquals(5, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeConditionThenCaseTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeConditionThenCase.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -189,9 +201,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function nodeAssertElseCaseTest()
+    public function nodeConditionElseCaseTest()
     {
-        $node = $this->parser->parseFile('Json/testNodeAssertElseCase.json');
+        $node = $this->parser->parseFile('Json/testNodeConditionElseCase.json');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -252,6 +264,16 @@ final class jsonTest extends TestCase
     public function nodeOrCollectionAllTrueTest()
     {
         $node = $this->parser->parseFile('Json/testNodeOrCollectionAllTrue.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function combined1Test()
+    {
+        $node = $this->parser->parseFile('Json/testCombined1.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }

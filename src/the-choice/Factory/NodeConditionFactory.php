@@ -3,15 +3,15 @@
 namespace TheChoice\Factory;
 
 use TheChoice\Contracts\BuilderInterface;
-use TheChoice\NodeType\Assert;
+use TheChoice\NodeType\Condition;
 
-class NodeAssertFactory
+class NodeConditionFactory
 {
-    public function build(BuilderInterface $builder, array &$structure): Assert
+    public function build(BuilderInterface $builder, array &$structure): Condition
     {
         self::validate($structure);
 
-        $node = new Assert(
+        $node = new Condition(
             $builder->build($structure['if']),
             $builder->build($structure['then']),
             $structure['else'] ? $builder->build($structure['else']) : null
@@ -33,7 +33,7 @@ class NodeAssertFactory
 
         foreach ($keysThatMustBePresent as $key) {
             if (!array_key_exists($key, $structure)) {
-                throw new \LogicException(sprintf('The "%s" property is absent in node type "assert"!', $key));
+                throw new \LogicException(sprintf('The "%s" property is absent in node type "condition"!', $key));
             }
         }
     }

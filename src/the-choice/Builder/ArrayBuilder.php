@@ -3,7 +3,7 @@
 namespace TheChoice\Builder;
 
 use TheChoice\Factory\NodeActionFactory;
-use TheChoice\Factory\NodeAssertFactory;
+use TheChoice\Factory\NodeConditionFactory;
 use TheChoice\Factory\NodeCollectionFactory;
 use TheChoice\Factory\NodeRuleFactory;
 
@@ -13,14 +13,14 @@ use TheChoice\Contracts\BuilderInterface;
 class ArrayBuilder implements BuilderInterface
 {
     private $_nodeActionFactory;
-    private $_nodeAssertFactory;
+    private $_nodeConditionFactory;
     private $_nodeCollectionFactory;
     private $_nodeRuleFactory;
 
     public function __construct(OperatorFactoryInterface $operatorFactory)
     {
         $this->_nodeActionFactory = new NodeActionFactory();
-        $this->_nodeAssertFactory = new NodeAssertFactory();
+        $this->_nodeConditionFactory = new NodeConditionFactory();
         $this->_nodeCollectionFactory = new NodeCollectionFactory();
         $this->_nodeRuleFactory = new NodeRuleFactory($operatorFactory);
     }
@@ -35,8 +35,8 @@ class ArrayBuilder implements BuilderInterface
             return $this->_nodeActionFactory->build($this, $structure);
         }
 
-        if ($structure['node'] === 'assert') {
-            return $this->_nodeAssertFactory->build($this, $structure);
+        if ($structure['node'] === 'condition') {
+            return $this->_nodeConditionFactory->build($this, $structure);
         }
 
         if ($structure['node'] === 'collection') {

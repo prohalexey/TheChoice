@@ -6,7 +6,7 @@ use TheChoice\Contracts\ActionContextFactoryInterface;
 use TheChoice\Contracts\RuleContextFactoryInterface;
 use TheChoice\NodeType\Action;
 use TheChoice\NodeType\AndCollection;
-use TheChoice\NodeType\Assert;
+use TheChoice\NodeType\Condition;
 use TheChoice\NodeType\OrCollection;
 use TheChoice\NodeType\Rule;
 
@@ -44,8 +44,8 @@ class TreeProcessor
             return $this->processRule($node);
         }
 
-        if ($node instanceof Assert) {
-            return $this->processAssert($node);
+        if ($node instanceof Condition) {
+            return $this->processCondition($node);
         }
 
         if ($node instanceof Action) {
@@ -55,8 +55,10 @@ class TreeProcessor
         throw new \InvalidArgumentException(sprintf('Unknown node type "%s"', \gettype($node)));
     }
 
-    private function processAndCollection(AndCollection $node): bool
+    private function processAndCollection(AndCollection $node)
     {
+        $result = true;
+
         foreach ($node->all() as $item) {
             $result = $this->process($item);
 
@@ -64,11 +66,14 @@ class TreeProcessor
                 return false;
             }
         }
-        return true;
+
+        return $result;
     }
 
-    private function processOrCollection(OrCollection $node): bool
+    private function processOrCollection(OrCollection $node)
     {
+        $result = false;
+
         foreach ($node->all() as $item) {
             $result = $this->process($item);
 
@@ -77,7 +82,7 @@ class TreeProcessor
             }
         }
 
-        return false;
+        return $result;
     }
 
     private function processRule(Rule $node): bool
@@ -87,7 +92,7 @@ class TreeProcessor
         return $node->getOperator()->assert($context);
     }
 
-    private function processAssert(Assert $node)
+    private function processCondition(Condition $node)
     {
         if ($this->process($node->getIf())) {
             return $this->process($node->getThen());

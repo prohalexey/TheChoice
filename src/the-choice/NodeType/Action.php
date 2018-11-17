@@ -45,6 +45,6 @@ final class Action
 
     public function isStoppable(): bool
     {
-        return null === $this->_stoppableType;
+        return null !== $this->_stoppableType;
     }
 }

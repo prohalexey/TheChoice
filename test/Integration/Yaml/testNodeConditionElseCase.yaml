@@ -1,9 +1,9 @@
-node: assert
+node: condition
 if:
   node: rule
   rule: depositCount
   operator: greaterThanOrEqual
-  value: 2
+  value: 3
 then:
   node: action
   action: action1
