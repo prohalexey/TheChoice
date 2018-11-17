@@ -1,5 +1,7 @@
 <?php
 
+namespace TheChoice\Tests\Integration\Actions;
+
 use \TheChoice\Contracts\ActionContextInterface;
 
 class ActionBreak implements ActionContextInterface

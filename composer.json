@@ -19,7 +19,8 @@
     },
     "autoload": {
         "psr-4": {
-            "TheChoice\\": "src/the-choice/"
+            "TheChoice\\": "src/the-choice/",
+            "TheChoice\\Tests\\Integration\\": "test/Integration/"
         }
     }
 }

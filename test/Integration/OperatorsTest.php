@@ -1,5 +1,7 @@
 <?php
 
+namespace TheChoice\Tests\Integration;
+
 use \PHPUnit\Framework\TestCase;
 
 use TheChoice\ {

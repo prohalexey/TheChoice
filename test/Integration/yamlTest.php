@@ -1,5 +1,7 @@
 <?php
 
+namespace TheChoice\Tests\Integration;
+
 use \PHPUnit\Framework\TestCase;
 
 use TheChoice\ {
@@ -8,6 +10,19 @@ use TheChoice\ {
     Factory\OperatorFactory,
     TreeProcessor,
     Builder\YamlBuilder
+};
+
+use TheChoice\Tests\Integration\ {
+    Rules\VisitCount,
+    Rules\HasVipStatus,
+    Rules\InGroup,
+    Rules\WithdrawalCount,
+    Rules\DepositCount,
+    Rules\UtmSource,
+
+    Actions\Action1,
+    Actions\Action2,
+    Actions\ActionBreak
 };
 
 final class yamlTest extends TestCase
@@ -25,17 +40,6 @@ final class yamlTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-
-        require_once './Rules/VisitCount.php';
-        require_once './Rules/HasVipStatus.php';
-        require_once './Rules/InGroup.php';
-        require_once './Rules/WithdrawalCount.php';
-        require_once './Rules/DepositCount.php';
-        require_once './Rules/UtmSource.php';
-
-        require_once './Actions/Action1.php';
-        require_once './Actions/Action2.php';
-        require_once './Actions/ActionBreak.php';
 
         $this->parser = new YamlBuilder(new OperatorFactory());
 
