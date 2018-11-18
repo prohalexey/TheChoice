@@ -4,19 +4,8 @@ namespace TheChoice\Tests\Integration;
 
 use \PHPUnit\Framework\TestCase;
 
-use TheChoice\ {
-    Contracts\RuleContextInterface,
-
-    Operators\Equal,
-    Operators\NotEqual,
-    Operators\GreaterThan,
-    Operators\GreaterThanOrEqual,
-    Operators\LowerThan,
-    Operators\LowerThanOrEqual,
-    Operators\StringContain,
-    Operators\StringNotContain,
-    Operators\ArrayContain,
-    Operators\ArrayNotContain
+use TheChoice\{
+    Contracts\RuleContextInterface, Operators\Equal, Operators\NotEqual, Operators\GreaterThan, Operators\GreaterThanOrEqual, Operators\LowerThan, Operators\LowerThanOrEqual, Operators\NumericInRange, Operators\StringContain, Operators\StringNotContain, Operators\ArrayContain, Operators\ArrayNotContain
 };
 
 final class OperatorsTest extends TestCase
@@ -98,10 +87,12 @@ final class OperatorsTest extends TestCase
      */
     public function StringContainTest()
     {
-        self::assertTrue((new StringContain('test'))->assert($this->getContext('test')));
-        self::assertTrue((new StringContain('test'))->assert($this->getContext('atest')));
-        self::assertTrue((new StringContain('test'))->assert($this->getContext('testa')));
-        self::assertFalse((new StringContain('test'))->assert($this->getContext('aa')));
+        $operator = new StringContain('test');
+
+        self::assertTrue($operator->assert($this->getContext('test')));
+        self::assertTrue($operator->assert($this->getContext('atest')));
+        self::assertTrue($operator->assert($this->getContext('testa')));
+        self::assertFalse($operator->assert($this->getContext('aa')));
     }
 
     /**
@@ -109,10 +100,12 @@ final class OperatorsTest extends TestCase
      */
     public function StringNotContainTest()
     {
-        self::assertFalse((new StringNotContain('test'))->assert($this->getContext('test')));
-        self::assertFalse((new StringNotContain('test'))->assert($this->getContext('atest')));
-        self::assertFalse((new StringNotContain('test'))->assert($this->getContext('testa')));
-        self::assertTrue((new StringNotContain('test'))->assert($this->getContext('aa')));
+        $operator = new StringNotContain('test');
+
+        self::assertFalse($operator->assert($this->getContext('test')));
+        self::assertFalse($operator->assert($this->getContext('atest')));
+        self::assertFalse($operator->assert($this->getContext('testa')));
+        self::assertTrue($operator->assert($this->getContext('aa')));
     }
 
     /**
@@ -120,12 +113,14 @@ final class OperatorsTest extends TestCase
      */
     public function ArrayContainTest()
     {
-        self::assertTrue((new ArrayContain([1, 2, 3, 'a']))->assert($this->getContext(1)));
-        self::assertTrue((new ArrayContain([1, 2, 3, 'a']))->assert($this->getContext(2)));
-        self::assertTrue((new ArrayContain([1, 2, 3, 'a']))->assert($this->getContext(3)));
-        self::assertTrue((new ArrayContain([1, 2, 3, 'a']))->assert($this->getContext('a')));
-        self::assertFalse((new ArrayContain([1, 2, 3, 'a']))->assert($this->getContext('b')));
-        self::assertFalse((new ArrayContain([1, 2, 3, 'a']))->assert($this->getContext(4)));
+        $operator = new ArrayContain([1, 2, 3, 'a']);
+
+        self::assertTrue($operator->assert($this->getContext(1)));
+        self::assertTrue($operator->assert($this->getContext(2)));
+        self::assertTrue($operator->assert($this->getContext(3)));
+        self::assertTrue($operator->assert($this->getContext('a')));
+        self::assertFalse($operator->assert($this->getContext('b')));
+        self::assertFalse($operator->assert($this->getContext(4)));
     }
 
     /**
@@ -133,12 +128,33 @@ final class OperatorsTest extends TestCase
      */
     public function ArrayNotContainTest()
     {
-        self::assertFalse((new ArrayNotContain([1, 2, 3, 'a']))->assert($this->getContext(1)));
-        self::assertFalse((new ArrayNotContain([1, 2, 3, 'a']))->assert($this->getContext(2)));
-        self::assertFalse((new ArrayNotContain([1, 2, 3, 'a']))->assert($this->getContext(3)));
-        self::assertFalse((new ArrayNotContain([1, 2, 3, 'a']))->assert($this->getContext('a')));
-        self::assertTrue((new ArrayNotContain([1, 2, 3, 'a']))->assert($this->getContext('b')));
-        self::assertTrue((new ArrayNotContain([1, 2, 3, 'a']))->assert($this->getContext(4)));
+        $operator = new ArrayNotContain([1, 2, 3, 'a']);
+
+        self::assertFalse($operator->assert($this->getContext(1)));
+        self::assertFalse($operator->assert($this->getContext(2)));
+        self::assertFalse($operator->assert($this->getContext(3)));
+        self::assertFalse($operator->assert($this->getContext('a')));
+        self::assertTrue($operator->assert($this->getContext('b')));
+        self::assertTrue($operator->assert($this->getContext(4)));
+    }
+
+    /**
+     * @test
+     */
+    public function ArrayNumericInRangeTest()
+    {
+        $operator = new NumericInRange([1 ,5]);
+
+        self::assertTrue($operator->assert($this->getContext(1)));
+        self::assertTrue($operator->assert($this->getContext(3)));
+        self::assertTrue($operator->assert($this->getContext(5)));
+        self::assertFalse($operator->assert($this->getContext(0)));
+        self::assertFalse($operator->assert($this->getContext(6)));
+        self::assertTrue($operator->assert($this->getContext(1)));
+        self::assertTrue($operator->assert($this->getContext(3)));
+        self::assertTrue($operator->assert($this->getContext(5)));
+        self::assertFalse($operator->assert($this->getContext(0)));
+        self::assertFalse($operator->assert($this->getContext(6)));
     }
 
     private function getContext($value)

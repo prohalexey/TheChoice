@@ -16,6 +16,7 @@ use TheChoice\Operators\GreaterThanOrEqual;
 use TheChoice\Operators\LowerThan;
 use TheChoice\Operators\LowerThanOrEqual;
 use TheChoice\Operators\NotEqual;
+use TheChoice\Operators\NumericInRange;
 use TheChoice\Operators\StringContain;
 use TheChoice\Operators\StringNotContain;
 
@@ -39,6 +40,7 @@ class OperatorFactory implements OperatorFactoryInterface
             'lowerThanOrEqual' => LowerThanOrEqual::class,
             'stringContain' => StringContain::class,
             'stringNotContain' => StringNotContain::class,
+            'numericInRange' => NumericInRange::class,
         ];
     }
 
