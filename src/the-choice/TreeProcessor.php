@@ -61,7 +61,7 @@ class TreeProcessor
     {
         $result = true;
 
-        foreach ($node->all() as $item) {
+        foreach ($node->sort()->all() as $item) {
             $result = $this->process($item);
 
             if ($result === false) {
@@ -76,7 +76,7 @@ class TreeProcessor
     {
         $result = false;
 
-        foreach ($node->all() as $item) {
+        foreach ($node->sort()->all() as $item) {
             $result = $this->process($item);
 
             if ($result === true) {

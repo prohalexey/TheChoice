@@ -3,12 +3,14 @@
 namespace TheChoice\NodeType;
 
 use TheChoice\Contracts\OperatorInterface;
+use TheChoice\Contracts\Sortable;
 
-final class Rule
+final class Rule implements Sortable
 {
     private $_operator;
     private $_ruleType;
     private $_description = '';
+    private $_priority;
 
     public function __construct(OperatorInterface $operator, string $ruleType)
     {
@@ -19,6 +21,12 @@ final class Rule
     public function setDescription(string $description)
     {
         $this->_description = $description;
+        return $this;
+    }
+
+    public function setPriority(int $priority)
+    {
+        $this->_priority = $priority;
         return $this;
     }
 
@@ -35,5 +43,10 @@ final class Rule
     public function getDescription(): string
     {
         return $this->_description;
+    }
+
+    public function getSortableValue()
+    {
+        return $this->_priority;
     }
 }

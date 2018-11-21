@@ -2,13 +2,16 @@
 
 namespace TheChoice\NodeType;
 
-final class Action
+use TheChoice\Contracts\Sortable;
+
+final class Action implements Sortable
 {
     const STOP_ALWAYS = 'always';
 
     private $_action;
     private $_description = '';
     private $_stoppableType;
+    private $_priority;
 
     public function __construct(string $action)
     {
@@ -31,6 +34,12 @@ final class Action
         return $this->_description;
     }
 
+    public function setPriority(int $priority)
+    {
+        $this->_priority = $priority;
+        return $this;
+    }
+
     public function getStoppableType()
     {
         return $this->_stoppableType;
@@ -46,5 +55,10 @@ final class Action
     public function isStoppable(): bool
     {
         return null !== $this->_stoppableType;
+    }
+
+    public function getSortableValue()
+    {
+        return $this->_priority;
     }
 }

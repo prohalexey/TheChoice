@@ -17,6 +17,10 @@ class NodeActionFactory
             $node->setDescription($structure['description']);
         }
 
+        if (self::nodeHasPriority($structure)) {
+            $node->setPriority((int)$structure['priority']);
+        }
+
         if (self::isNodeStoppable($structure)) {
             $node->setStoppableType(Action::STOP_ALWAYS);
         }
@@ -45,5 +49,10 @@ class NodeActionFactory
     private static function isNodeStoppable(array &$structure): bool
     {
         return array_key_exists('break', $structure) && \is_string($structure['break']);
+    }
+
+    private static function nodeHasPriority(array &$structure): bool
+    {
+        return array_key_exists('priority', $structure) && (\is_string($structure['priority'] || \is_numeric($structure['priority'])));
     }
 }

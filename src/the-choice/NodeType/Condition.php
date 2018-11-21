@@ -2,12 +2,15 @@
 
 namespace TheChoice\NodeType;
 
-final class Condition
+use TheChoice\Contracts\Sortable;
+
+final class Condition implements Sortable
 {
     private $_if;
     private $_then;
     private $_else;
     private $_description = '';
+    private $_priority;
 
     public function __construct($if, $then, $else = null)
     {
@@ -19,6 +22,12 @@ final class Condition
     public function setDescription(string $description)
     {
         $this->_description = $description;
+        return $this;
+    }
+
+    public function setPriority(int $priority)
+    {
+        $this->_priority = $priority;
         return $this;
     }
 
@@ -40,5 +49,10 @@ final class Condition
     public function getElse()
     {
         return $this->_else;
+    }
+
+    public function getSortableValue()
+    {
+        return $this->_priority;
     }
 }

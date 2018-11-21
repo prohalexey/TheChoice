@@ -21,6 +21,10 @@ class NodeConditionFactory
             $node->setDescription($structure['description']);
         }
 
+        if (self::nodeHasPriority($structure)) {
+            $node->setPriority((int)$structure['priority']);
+        }
+
         return $node;
     }
 
@@ -41,5 +45,10 @@ class NodeConditionFactory
     private static function nodeHasDescription(array &$structure): bool
     {
         return array_key_exists('description', $structure) && \is_string($structure['description']);
+    }
+
+    private static function nodeHasPriority(array &$structure): bool
+    {
+        return array_key_exists('priority', $structure) && (\is_string($structure['priority'] || \is_numeric($structure['priority'])));
     }
 }
