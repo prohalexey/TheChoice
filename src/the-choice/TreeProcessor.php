@@ -17,6 +17,8 @@ class TreeProcessor
 
     private $_forcedStopResult;
 
+    private $_processedRules = [];
+
     public function __construct(
         RuleContextFactoryInterface $ruleContextFactory,
         ActionContextFactoryInterface $actionContextFactory
@@ -87,9 +89,21 @@ class TreeProcessor
 
     private function processRule(Rule $node): bool
     {
-        $context = $this->_ruleContextFactory->createContextFromRuleNode($node);
+        $operator = $node->getOperator();
+        $operatorValue = $operator->getValue();
 
-        return $node->getOperator()->assert($context);
+        $hash = vsprintf('%s_%s_%s', [
+            $node->getRuleType(),
+            \get_class($operator),
+            \is_array($operatorValue) || \is_object($operatorValue) ? md5(serialize($operatorValue)) : $operatorValue,
+        ]);
+
+        if (!isset($this->_processedRules[$hash])) {
+            $context = $this->_ruleContextFactory->createContextFromRuleNode($node);
+            $this->_processedRules[$hash] = $node->getOperator()->assert($context);
+        }
+
+        return $this->_processedRules[$hash];
     }
 
     private function processCondition(Condition $node)
