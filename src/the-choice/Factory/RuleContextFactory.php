@@ -12,7 +12,10 @@ class RuleContextFactory extends AbstractContextFactory implements RuleContextFa
     {
         $ruleType = $rule->getRuleType();
 
-        return $this->getContext($ruleType);
+        $context = $this->getContext($ruleType);
+        $context = $this->setParamsToObject($context, $rule->getParams());
+
+        return $context;
     }
 
     protected function checkType($context)

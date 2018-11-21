@@ -12,7 +12,10 @@ class ActionContextFactory extends AbstractContextFactory implements ActionConte
     {
         $actionType = $action->getAction();
 
-        return $this->getContext($actionType);
+        $context = $this->getContext($actionType);
+        $context = $this->setParamsToObject($context, $action->getParams());
+
+        return $context;
     }
 
     protected function checkType($context)

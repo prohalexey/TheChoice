@@ -1,0 +1,9 @@
+node: "action"
+action: "actionWithParams"
+params:
+  a: 1
+  b: "test"
+  c:
+    - 2
+    - 3
+    - 4

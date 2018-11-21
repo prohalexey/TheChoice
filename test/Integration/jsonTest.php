@@ -19,10 +19,12 @@ use TheChoice\Tests\Integration\ {
     Rules\WithdrawalCount,
     Rules\DepositCount,
     Rules\UtmSource,
+    Rules\ContextWithParams,
 
     Actions\Action1,
     Actions\Action2,
-    Actions\ActionBreak
+    Actions\ActionBreak,
+    Actions\ActionWithParams
 };
 
 final class jsonTest extends TestCase
@@ -50,12 +52,14 @@ final class jsonTest extends TestCase
             'withdrawalCount' => WithdrawalCount::class,
             'depositCount' => DepositCount::class,
             'utmSource' => UtmSource::class,
+            'contextWithParams' => ContextWithParams::class,
         ]);
 
         $actionContextFactory = new ActionContextFactory([
             'action1' => Action1::class,
             'action2' => Action2::class,
             'actionBreak' => ActionBreak::class,
+            'actionWithParams' => ActionWithParams::class,
         ]);
 
         $this->treeProcessor = new TreeProcessor($ruleContextFactory, $actionContextFactory);
@@ -87,6 +91,16 @@ final class jsonTest extends TestCase
     public function oneNodeWithRuleEqualTest()
     {
         $node = $this->parser->parseFile('Json/testOneNodeWithRuleEqual.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function oneNodeWithRuleEqualAndContextWithParamsTest()
+    {
+        $node = $this->parser->parseFile('Json/testOneNodeWithRuleEqualAndContextWithParams.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -180,6 +194,16 @@ final class jsonTest extends TestCase
         $node = $this->parser->parseFile('Json/testNodeActionResultFalse.json');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
+    }
+
+    /**
+     * @test
+     */
+    public function oneNodeWithActionWithParamsTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeActionWithParams.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
     }
 
     /**

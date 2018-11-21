@@ -55,6 +55,30 @@ abstract class AbstractContextFactory
 
     abstract protected function checkType($context);
 
+    protected function setParamsToObject($object, array $params)
+    {
+        if (!\is_object($object)) {
+            throw new \InvalidArgumentException(sprintf('Params can be set to objects only, %s given', \gettype($object)));
+        }
+
+        foreach ($params as $paramName => $paramValue) {
+            $commonSetterName = sprintf('set%s', ucfirst($paramName));
+            if (method_exists($object, $commonSetterName)) {
+                $object->{$commonSetterName}($paramValue);
+            } elseif (property_exists($object, $paramName)) {
+                $object->{$paramName} = $paramValue;
+            } else {
+                trigger_error(vsprintf('Object %s doesn\'t have public property %s or %s setter', [
+                    \get_class($object),
+                    $paramName,
+                    $commonSetterName
+                ]));
+            }
+        }
+
+        return $object;
+    }
+
     private function getContextFromString(string $context)
     {
         if (null !== $this->container) {

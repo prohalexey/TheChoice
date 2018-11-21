@@ -12,6 +12,7 @@ final class Action implements Sortable
     private $_description = '';
     private $_stoppableType;
     private $_priority;
+    private $_params = [];
 
     public function __construct(string $action)
     {
@@ -60,5 +61,15 @@ final class Action implements Sortable
     public function getSortableValue()
     {
         return $this->_priority;
+    }
+
+    public function setParams(array $params)
+    {
+        $this->_params = $params;
+    }
+
+    public function getParams()
+    {
+        return $this->_params;
     }
 }

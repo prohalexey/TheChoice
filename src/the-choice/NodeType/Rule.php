@@ -11,6 +11,7 @@ final class Rule implements Sortable
     private $_ruleType;
     private $_description = '';
     private $_priority;
+    private $_params = [];
 
     public function __construct(OperatorInterface $operator, string $ruleType)
     {
@@ -48,5 +49,15 @@ final class Rule implements Sortable
     public function getSortableValue()
     {
         return $this->_priority;
+    }
+
+    public function setParams(array $params)
+    {
+        $this->_params = $params;
+    }
+
+    public function getParams()
+    {
+        return $this->_params;
     }
 }

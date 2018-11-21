@@ -21,6 +21,10 @@ class NodeActionFactory
             $node->setPriority((int)$structure['priority']);
         }
 
+        if (self::nodeHasParams($structure)) {
+            $node->setParams($structure['params']);
+        }
+
         if (self::isNodeStoppable($structure)) {
             $node->setStoppableType(Action::STOP_ALWAYS);
         }
@@ -54,5 +58,10 @@ class NodeActionFactory
     private static function nodeHasPriority(array &$structure): bool
     {
         return array_key_exists('priority', $structure) && (\is_string($structure['priority'] || \is_numeric($structure['priority'])));
+    }
+
+    private static function nodeHasParams(array &$structure): bool
+    {
+        return array_key_exists('params', $structure) && \is_array($structure['params']);
     }
 }
