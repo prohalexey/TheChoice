@@ -5,26 +5,24 @@ namespace TheChoice\Tests\Integration;
 use \PHPUnit\Framework\TestCase;
 
 use TheChoice\ {
-    Factory\ActionContextFactory,
-    Factory\RuleContextFactory,
+    Factory\ContextFactory,
     Factory\OperatorFactory,
     TreeProcessor,
     Builder\JsonBuilder
 };
 
-use TheChoice\Tests\Integration\ {
-    Rules\VisitCount,
-    Rules\HasVipStatus,
-    Rules\InGroup,
-    Rules\WithdrawalCount,
-    Rules\DepositCount,
-    Rules\UtmSource,
-    Rules\ContextWithParams,
-
-    Actions\Action1,
-    Actions\Action2,
-    Actions\ActionBreak,
-    Actions\ActionWithParams
+use TheChoice\Tests\Integration\Contexts\ {
+    VisitCount,
+    HasVipStatus,
+    InGroup,
+    WithdrawalCount,
+    DepositCount,
+    UtmSource,
+    ContextWithParams,
+    Action1,
+    Action2,
+    ActionBreak,
+    ActionWithParams
 };
 
 final class jsonTest extends TestCase
@@ -45,32 +43,29 @@ final class jsonTest extends TestCase
 
         $this->parser = new JsonBuilder(new OperatorFactory());
 
-        $ruleContextFactory = new RuleContextFactory([
-            'visitCount' => VisitCount::class,
-            'hasVipStatus' => HasVipStatus::class,
-            'inGroup' => InGroup::class,
-            'withdrawalCount' => WithdrawalCount::class,
-            'depositCount' => DepositCount::class,
-            'utmSource' => UtmSource::class,
-            'contextWithParams' => ContextWithParams::class,
-        ]);
-
-        $actionContextFactory = new ActionContextFactory([
-            'action1' => Action1::class,
-            'action2' => Action2::class,
-            'actionBreak' => ActionBreak::class,
-            'actionWithParams' => ActionWithParams::class,
-        ]);
-
-        $this->treeProcessor = new TreeProcessor($ruleContextFactory, $actionContextFactory);
+        $this->treeProcessor = (new TreeProcessor())->setContextFactory(
+            new ContextFactory([
+                'visitCount' => VisitCount::class,
+                'hasVipStatus' => HasVipStatus::class,
+                'inGroup' => InGroup::class,
+                'withdrawalCount' => WithdrawalCount::class,
+                'depositCount' => DepositCount::class,
+                'utmSource' => UtmSource::class,
+                'contextWithParams' => ContextWithParams::class,
+                'action1' => Action1::class,
+                'action2' => Action2::class,
+                'actionBreak' => ActionBreak::class,
+                'actionWithParams' => ActionWithParams::class,
+            ])
+        );
     }
 
     /**
      * @test
      */
-    public function OneNodeWithRuleArrayContainTest()
+    public function NodeContextWithOperatorArrayContainTest()
     {
-        $node = $this->parser->parseFile('Json/testOneNodeWithRuleArrayContain.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithOperatorArrayContain.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -78,9 +73,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithRuleArrayNotContainTest()
+    public function nodeContextWithOperatorArrayNotContainTest()
     {
-        $node = $this->parser->parseFile('Json/testOneNodeWithRuleArrayNotContain.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithOperatorArrayNotContain.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -88,9 +83,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithRuleEqualTest()
+    public function nodeContextWithOperatorEqualTest()
     {
-        $node = $this->parser->parseFile('Json/testOneNodeWithRuleEqual.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithOperatorEqual.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -98,9 +93,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithRuleEqualAndContextWithParamsTest()
+    public function nodeContextWithOperatorEqualAndContextWithParamsTest()
     {
-        $node = $this->parser->parseFile('Json/testOneNodeWithRuleEqualAndContextWithParams.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithOperatorEqualAndContextWithParams.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -108,9 +103,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithRuleGreaterThanTest()
+    public function nodeContextWithOperatorGreaterThanTest()
     {
-        $node = $this->parser->parseFile('Json/testOneNodeWithRuleGreaterThan.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithOperatorGreaterThan.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -118,9 +113,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithRuleGreaterThanOrEqualTest()
+    public function nodeContextWithOperatorGreaterThanOrEqualTest()
     {
-        $node = $this->parser->parseFile('Json/testOneNodeWithRuleGreaterThanOrEqual.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithOperatorGreaterThanOrEqual.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -128,9 +123,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithRuleLowerThanTest()
+    public function nodeContextWithOperatorLowerThanTest()
     {
-        $node = $this->parser->parseFile('Json/testOneNodeWithRuleLowerThan.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithOperatorLowerThan.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -139,9 +134,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithRuleLowerThanOrEqualTest()
+    public function nodeContextWithOperatorLowerThanOrEqualTest()
     {
-        $node = $this->parser->parseFile('Json/testOneNodeWithRuleLowerThanOrEqual.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithOperatorLowerThanOrEqual.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -149,9 +144,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithRuleNotEqualTest()
+    public function nodeContextWithOperatorNotEqualTest()
     {
-        $node = $this->parser->parseFile('Json/testOneNodeWithRuleNotEqual.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithOperatorNotEqual.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -159,9 +154,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithRuleStringContainTest()
+    public function nodeContextWithOperatorStringContainTest()
     {
-        $node = $this->parser->parseFile('Json/testOneNodeWithRuleStringContain.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithOperatorStringContain.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -169,9 +164,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithRuleStringNotContainTest()
+    public function nodeContextWithOperatorStringNotContainTest()
     {
-        $node = $this->parser->parseFile('Json/testOneNodeWithRuleStringNotContain.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithOperatorStringNotContain.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -179,7 +174,7 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithActionResultTrueTest()
+    public function nodeContextWithActionResultTrueTest()
     {
         $node = $this->parser->parseFile('Json/testNodeActionResultTrue.json');
         $result = $this->treeProcessor->process($node);
@@ -189,7 +184,7 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithActionResultFalseTest()
+    public function nodeContextWithActionResultFalseTest()
     {
         $node = $this->parser->parseFile('Json/testNodeActionResultFalse.json');
         $result = $this->treeProcessor->process($node);
@@ -199,7 +194,7 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithActionWithParamsTest()
+    public function nodeContextWithActionWithParamsTest()
     {
         $node = $this->parser->parseFile('Json/testNodeActionWithParams.json');
         $result = $this->treeProcessor->process($node);
@@ -209,7 +204,7 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function oneNodeWithActionStoppableTest()
+    public function nodeContextWithActionStoppableTest()
     {
         $node = $this->parser->parseFile('Json/testNodeActionStoppable.json');
         $result = $this->treeProcessor->process($node);

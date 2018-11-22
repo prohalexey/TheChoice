@@ -1,4 +1,4 @@
 {
-  "node": "action",
-  "action": "action1"
+  "node": "context",
+  "contextName": "action1"
 }

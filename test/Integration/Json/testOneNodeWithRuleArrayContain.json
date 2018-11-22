@@ -1,6 +1,0 @@
-{
-  "node": "rule",
-  "rule": "inGroup",
-  "operator": "arrayContain",
-  "value": ["testgroup", "testgroup2"]
-}

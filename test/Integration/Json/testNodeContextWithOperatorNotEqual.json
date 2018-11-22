@@ -1,0 +1,6 @@
+{
+  "node": "context",
+  "contextName": "depositCount",
+  "operator": "notEqual",
+  "value": 3
+}

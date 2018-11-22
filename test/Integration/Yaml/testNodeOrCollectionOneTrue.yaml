@@ -2,13 +2,13 @@ node: collection
 type: or
 elements:
   -
-    node: rule
-    rule: withdrawalCount
+    node: context
+    contextName: withdrawalCount
     operator: equal
     value: 5
   -
-    node: rule
-    rule: inGroup
+    node: context
+    contextName: inGroup
     operator: arrayContain
     value:
       - testgroup

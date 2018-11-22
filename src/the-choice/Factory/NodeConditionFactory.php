@@ -3,9 +3,10 @@
 namespace TheChoice\Factory;
 
 use TheChoice\Contracts\BuilderInterface;
+use TheChoice\Contracts\NodeFactoryInterface;
 use TheChoice\NodeType\Condition;
 
-class NodeConditionFactory
+class NodeConditionFactory implements NodeFactoryInterface
 {
     public function build(BuilderInterface $builder, array &$structure): Condition
     {

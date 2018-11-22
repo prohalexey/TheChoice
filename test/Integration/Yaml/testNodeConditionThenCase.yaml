@@ -1,12 +1,12 @@
 node: condition
 if:
-  node: rule
-  rule: depositCount
+  node: context
+  contextName: depositCount
   operator: greaterThanOrEqual
   value: 2
 then:
-  node: action
-  action: action1
+  node: context
+  contextName: action1
 else:
-  node: action
-  action: action2
+  node: context
+  contextName: action2

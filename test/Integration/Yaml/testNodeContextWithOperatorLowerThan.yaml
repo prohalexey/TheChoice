@@ -1,0 +1,4 @@
+node: context
+contextName: depositCount
+operator: lowerThan
+value: 4

@@ -1,2 +1,2 @@
-node: "action"
-action: "action2"
+node: context
+contextName: action2

@@ -5,7 +5,7 @@ namespace TheChoice\Tests\Integration;
 use \PHPUnit\Framework\TestCase;
 
 use TheChoice\{
-    Contracts\RuleContextInterface, Operators\Equal, Operators\NotEqual, Operators\GreaterThan, Operators\GreaterThanOrEqual, Operators\LowerThan, Operators\LowerThanOrEqual, Operators\NumericInRange, Operators\StringContain, Operators\StringNotContain, Operators\ArrayContain, Operators\ArrayNotContain
+    Contracts\ContextInterface, Operators\Equal, Operators\NotEqual, Operators\GreaterThan, Operators\GreaterThanOrEqual, Operators\LowerThan, Operators\LowerThanOrEqual, Operators\NumericInRange, Operators\StringContain, Operators\StringNotContain, Operators\ArrayContain, Operators\ArrayNotContain
 };
 
 final class OperatorsTest extends TestCase
@@ -159,7 +159,7 @@ final class OperatorsTest extends TestCase
 
     private function getContext($value)
     {
-        return new class($value) implements RuleContextInterface
+        return new class($value) implements ContextInterface
         {
             private $value;
 

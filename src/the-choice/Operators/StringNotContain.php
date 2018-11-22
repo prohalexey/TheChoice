@@ -2,7 +2,7 @@
 
 namespace TheChoice\Operators;
 
-use TheChoice\Contracts\RuleContextInterface;
+use TheChoice\Contracts\ContextInterface;
 use TheChoice\Contracts\OperatorInterface;
 
 class StringNotContain implements OperatorInterface
@@ -28,7 +28,7 @@ class StringNotContain implements OperatorInterface
         return $this->_value;
     }
 
-    public function assert(RuleContextInterface $context): bool
+    public function assert(ContextInterface $context): bool
     {
         return mb_strpos($context->getValue(), $this->getValue()) === false;
     }

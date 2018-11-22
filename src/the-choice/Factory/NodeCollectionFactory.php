@@ -3,10 +3,11 @@
 namespace TheChoice\Factory;
 
 use TheChoice\Contracts\BuilderInterface;
+use TheChoice\Contracts\NodeFactoryInterface;
 use TheChoice\NodeType\AndCollection;
 use TheChoice\NodeType\OrCollection;
 
-class NodeCollectionFactory
+class NodeCollectionFactory implements NodeFactoryInterface
 {
     public function build(BuilderInterface $builder, array &$structure)
     {

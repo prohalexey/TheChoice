@@ -1,0 +1,6 @@
+{
+  "node": "context",
+  "contextName": "depositCount",
+  "operator": "lowerThanOrEqual",
+  "value": 2
+}

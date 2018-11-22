@@ -1,0 +1,6 @@
+{
+  "node": "context",
+  "contextName": "inGroup",
+  "operator": "arrayContain",
+  "value": ["testgroup", "testgroup2"]
+}

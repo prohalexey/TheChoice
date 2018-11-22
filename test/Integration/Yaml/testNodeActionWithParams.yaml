@@ -1,8 +1,8 @@
-node: "action"
-action: "actionWithParams"
+node: context
+contextName: actionWithParams
 params:
   a: 1
-  b: "test"
+  b: test
   c:
     - 2
     - 3

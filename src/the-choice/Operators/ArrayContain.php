@@ -2,7 +2,7 @@
 
 namespace TheChoice\Operators;
 
-use TheChoice\Contracts\RuleContextInterface;
+use TheChoice\Contracts\ContextInterface;
 use TheChoice\Contracts\OperatorInterface;
 
 class ArrayContain implements OperatorInterface
@@ -34,7 +34,7 @@ class ArrayContain implements OperatorInterface
         return $this->_value;
     }
 
-    public function assert(RuleContextInterface $context): bool
+    public function assert(ContextInterface $context): bool
     {
         return \in_array($context->getValue(), $this->getValue(), true);
     }

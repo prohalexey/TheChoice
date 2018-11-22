@@ -1,8 +1,8 @@
 {
   "node": "condition",
   "if": {
-    "node": "rule",
-    "rule": "depositCount",
+    "node": "context",
+    "contextName": "depositCount",
     "operator": "greaterThanOrEqual",
     "value": 2
   },
@@ -13,22 +13,22 @@
       "type": "or",
       "elements": [
         {
-          "node": "rule",
-          "rule": "withdrawalCount",
+          "node": "context",
+          "contextName": "withdrawalCount",
           "operator": "equal",
           "value": 0
         },
         {
-          "node": "rule",
-          "rule": "hasVipStatus",
+          "node": "context",
+          "contextName": "hasVipStatus",
           "operator": "equal",
           "value": true
         }
       ]
     },
     "then": {
-      "node": "action",
-      "action": "actionName1"
+      "node": "context",
+      "contextName": "actionName1"
     },
     "else": {
       "node": "condition",
@@ -37,8 +37,8 @@
         "type": "and",
         "elements": [
           {
-            "node": "rule",
-            "rule": "withdrawalCount",
+            "node": "context",
+            "contextName": "withdrawalCount",
             "operator": "equal",
             "value": 0
           },
@@ -47,14 +47,14 @@
             "type": "or",
             "elements": [
               {
-                "node": "rule",
-                "rule": "withdrawalCount",
+                "node": "context",
+                "contextName": "withdrawalCount",
                 "operator": "equal",
                 "value": 0
               },
               {
-                "node": "rule",
-                "rule": "hasVipStatus",
+                "node": "context",
+                "contextName": "hasVipStatus",
                 "operator": "equal",
                 "value": true
               }
@@ -63,13 +63,13 @@
         ]
       },
       "then": {
-        "node": "action",
-        "action": "actionName2"
+        "node": "context",
+        "contextName": "actionName2"
       }
     }
   },
   "else": {
-    "node": "action",
-    "action": "actionName3"
+    "node": "context",
+    "contextName": "actionName3"
   }
 }

@@ -1,0 +1,6 @@
+{
+  "node": "context",
+  "contextName": "inGroup",
+  "operator": "arrayNotContain",
+  "value": ["testgroup2", "testgroup3"]
+}

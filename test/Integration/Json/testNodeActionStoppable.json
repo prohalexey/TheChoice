@@ -5,14 +5,14 @@
     "type": "and",
     "elements": [
       {
-        "node": "rule",
-        "rule": "withdrawalCount",
+        "node": "context",
+        "contextName": "withdrawalCount",
         "operator": "equal",
         "value": 0
       },
       {
-        "node": "rule",
-        "rule": "inGroup",
+        "node": "context",
+        "contextName": "inGroup",
         "operator": "arrayContain",
         "value": [
           "testgroup",
@@ -26,13 +26,13 @@
     "type": "and",
     "elements": [
       {
-        "node": "action",
-        "action": "actionBreak",
+        "node": "context",
+        "contextName": "actionBreak",
         "break": "always"
       },
       {
-        "node": "action",
-        "action": "action2"
+        "node": "context",
+        "contextName": "action2"
       }
     ]
   }

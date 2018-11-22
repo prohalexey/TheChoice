@@ -1,4 +1,0 @@
-node: "rule"
-rule: "depositCount"
-operator: "equal"
-value: 2

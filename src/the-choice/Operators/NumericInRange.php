@@ -2,7 +2,7 @@
 
 namespace TheChoice\Operators;
 
-use TheChoice\Contracts\RuleContextInterface;
+use TheChoice\Contracts\ContextInterface;
 use TheChoice\Contracts\OperatorInterface;
 
 class NumericInRange implements OperatorInterface
@@ -20,14 +20,14 @@ class NumericInRange implements OperatorInterface
     {
         if (!\is_array($value)) {
             throw new \InvalidArgumentException(
-                sprintf('Value passed to NumericInRange is not an array, %s given', \gettype($value))
+                sprintf('Value passed to NumericInRange operator is not an array, %s given', \gettype($value))
             );
         }
 
         $argsCount = \count($value);
         if ($argsCount !== 2) {
             throw new \InvalidArgumentException(
-                sprintf('NumericInRange rule accept exact 2 args. %d given', $argsCount)
+                sprintf('NumericInRange operator accept exact 2 args. %d given', $argsCount)
             );
         }
 
@@ -41,7 +41,7 @@ class NumericInRange implements OperatorInterface
         return $this->_value;
     }
 
-    public function assert(RuleContextInterface $context): bool
+    public function assert(ContextInterface $context): bool
     {
         $contextValue = $context->getValue();
 

@@ -2,30 +2,24 @@
 
 namespace TheChoice;
 
-use TheChoice\Contracts\ActionContextFactoryInterface;
-use TheChoice\Contracts\RuleContextFactoryInterface;
-use TheChoice\NodeType\Action;
+use TheChoice\Factory\ContextFactory;
 use TheChoice\NodeType\AndCollection;
 use TheChoice\NodeType\Condition;
 use TheChoice\NodeType\OrCollection;
-use TheChoice\NodeType\Rule;
+use TheChoice\NodeType\Context;
 
 class TreeProcessor
 {
-    private $_ruleContextFactory;
-    private $_actionContextFactory;
+    /** @var ContextFactory */
+    private $_contextFactory;
+    private $_processedContext = [];
 
     private $_forcedStopResult;
 
-    private $_processedRules = [];
-
-    public function __construct(
-        RuleContextFactoryInterface $ruleContextFactory,
-        ActionContextFactoryInterface $actionContextFactory
-    )
+    public function setContextFactory(ContextFactory $contextFactory)
     {
-        $this->_ruleContextFactory = $ruleContextFactory;
-        $this->_actionContextFactory = $actionContextFactory;
+        $this->_contextFactory = $contextFactory;
+        return $this;
     }
 
     public function process($node)
@@ -42,16 +36,12 @@ class TreeProcessor
             return $this->processOrCollection($node);
         }
 
-        if ($node instanceof Rule) {
-            return $this->processRule($node);
+        if ($node instanceof Context) {
+            return $this->processContext($node);
         }
 
         if ($node instanceof Condition) {
             return $this->processCondition($node);
-        }
-
-        if ($node instanceof Action) {
-            return $this->processAction($node);
         }
 
         throw new \InvalidArgumentException(sprintf('Unknown node type "%s"', \gettype($node)));
@@ -87,23 +77,46 @@ class TreeProcessor
         return $result;
     }
 
-    private function processRule(Rule $node): bool
+    private function processContext(Context $node): bool
     {
-        $operator = $node->getOperator();
-        $operatorValue = $operator->getValue();
-
-        $hash = vsprintf('%s_%s_%s', [
-            $node->getRuleType(),
-            \get_class($operator),
-            \is_array($operatorValue) || \is_object($operatorValue) ? md5(serialize($operatorValue)) : $operatorValue,
-        ]);
-
-        if (!isset($this->_processedRules[$hash])) {
-            $context = $this->_ruleContextFactory->createContextFromRuleNode($node);
-            $this->_processedRules[$hash] = $node->getOperator()->assert($context);
+        if (null === $this->_contextFactory) {
+            throw new \RuntimeException('Context factory not configured');
         }
 
-        return $this->_processedRules[$hash];
+        $hash = [
+            $node->getContextName(),
+        ];
+
+        $operator = $node->getOperator();
+        if (null !== $operator) {
+            $operatorValue = $operator->getValue();
+
+            $hash[] = \get_class($operator);
+            $hash[] = \is_array($operatorValue) || \is_object($operatorValue) ? md5(serialize($operatorValue)) : $operatorValue;
+        }
+
+        $params = $node->getParams();
+        if (null !== $params) {
+            $hash[] = md5(serialize($params));
+        }
+
+        $hash = implode('', $hash);
+
+        if (!isset($this->_processedContext[$hash])) {
+            $context = $this->_contextFactory->createContextFromContextNode($node);
+            if (null !== $operator) {
+                $this->_processedContext[$hash] = $operator->assert($context);
+            } else {
+                $this->_processedContext[$hash] = $context->getValue();
+            }
+
+            if ($node->isStoppable()) {
+                $this->_forcedStopResult = $this->_processedContext[$hash];
+                return $this->_forcedStopResult;
+            }
+        }
+
+        return $this->_processedContext[$hash];
     }
 
     private function processCondition(Condition $node)
@@ -118,17 +131,5 @@ class TreeProcessor
         }
 
         return false;
-    }
-
-    private function processAction(Action $node)
-    {
-        $action = $this->_actionContextFactory->createContextFromActionNode($node);
-
-        if ($node->isStoppable()){
-            $this->_forcedStopResult = $action->process();
-            return $this->_forcedStopResult;
-        }
-
-        return $action->process();
     }
 }

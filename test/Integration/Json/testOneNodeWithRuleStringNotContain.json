@@ -1,6 +1,0 @@
-{
-  "node": "rule",
-  "rule": "depositCount",
-  "operator": "stringNotContain",
-  "value": "def"
-}
