@@ -37,6 +37,8 @@ final class yamlTest extends TestCase
      */
     private $treeProcessor;
 
+    private $testFilesDir;
+
     public function setUp()
     {
         parent::setUp();
@@ -58,6 +60,11 @@ final class yamlTest extends TestCase
                 'actionWithParams' => ActionWithParams::class,
             ])
         );
+
+        $this->testFilesDir = '';
+        if (basename(getcwd()) === 'TheChoice') {
+            $this->testFilesDir = './test/Integration/';
+        }
     }
 
     /**
@@ -65,7 +72,7 @@ final class yamlTest extends TestCase
      */
     public function NodeContextWithOperatorArrayContainTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithOperatorArrayContain.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorArrayContain.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -75,7 +82,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithOperatorArrayNotContainTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithOperatorArrayNotContain.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorArrayNotContain.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -85,7 +92,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithOperatorEqualTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithOperatorEqual.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorEqual.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -95,7 +102,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithOperatorEqualAndContextWithParamsTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithOperatorEqualAndContextWithParams.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorEqualAndContextWithParams.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -105,7 +112,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithOperatorGreaterThanTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithOperatorGreaterThan.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorGreaterThan.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -115,7 +122,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithOperatorGreaterThanOrEqualTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithOperatorGreaterThanOrEqual.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorGreaterThanOrEqual.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -125,7 +132,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithOperatorLowerThanTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithOperatorLowerThan.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorLowerThan.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -136,7 +143,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithOperatorLowerThanOrEqualTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithOperatorLowerThanOrEqual.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorLowerThanOrEqual.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -146,7 +153,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithOperatorNotEqualTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithOperatorNotEqual.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorNotEqual.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -156,7 +163,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithOperatorStringContainTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithOperatorStringContain.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorStringContain.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -166,7 +173,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithOperatorStringNotContainTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithOperatorStringNotContain.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorStringNotContain.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -176,7 +183,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextResultTrueTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextResultTrue.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextResultTrue.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -186,7 +193,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextResultFalseTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextResultFalse.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextResultFalse.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -196,7 +203,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithParamsTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithParams.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithParams.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -206,7 +213,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithModifiersTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithModifiers.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithModifiers.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertSame(4, $result);
     }
@@ -216,7 +223,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextWithModifiersAndOperatorTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextWithModifiersAndOperator.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithModifiersAndOperator.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -226,7 +233,7 @@ final class yamlTest extends TestCase
      */
     public function nodeContextStoppableTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeContextStoppable.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextStoppable.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertSame(5, $result);
     }
@@ -236,7 +243,7 @@ final class yamlTest extends TestCase
      */
     public function nodeConditionThenCaseTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeConditionThenCase.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeConditionThenCase.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -246,7 +253,7 @@ final class yamlTest extends TestCase
      */
     public function nodeConditionElseCaseTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeConditionElseCase.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeConditionElseCase.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -256,7 +263,7 @@ final class yamlTest extends TestCase
      */
     public function nodeAndCollectionAllFalseTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeAndCollectionAllFalse.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeAndCollectionAllFalse.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -266,7 +273,7 @@ final class yamlTest extends TestCase
      */
     public function nodeAndCollectionOneFalseTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeAndCollectionOneFalse.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeAndCollectionOneFalse.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -276,7 +283,7 @@ final class yamlTest extends TestCase
      */
     public function nodeAndCollectionAllTrueTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeAndCollectionAllTrue.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeAndCollectionAllTrue.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -286,7 +293,7 @@ final class yamlTest extends TestCase
      */
     public function nodeOrCollectionAllFalseTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeOrCollectionAllFalse.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeOrCollectionAllFalse.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -296,7 +303,7 @@ final class yamlTest extends TestCase
      */
     public function nodeOrCollectionOneFalseTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeOrCollectionOneTrue.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeOrCollectionOneTrue.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -306,7 +313,7 @@ final class yamlTest extends TestCase
      */
     public function nodeOrCollectionAllTrueTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeOrCollectionAllTrue.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeOrCollectionAllTrue.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -316,7 +323,7 @@ final class yamlTest extends TestCase
      */
     public function combined1Test()
     {
-        $node = $this->parser->parseFile('Yaml/testCombined1.yaml');
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testCombined1.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
