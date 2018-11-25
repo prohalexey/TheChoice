@@ -18,7 +18,7 @@ then:
   type: and
   elements:
   - node: context
-    contextName: actionBreak
+    contextName: actionReturnInt
     break: always
   - node: context
     contextName: action2

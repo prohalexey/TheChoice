@@ -21,7 +21,7 @@ use TheChoice\Tests\Integration\Contexts\ {
     ContextWithParams,
     Action1,
     Action2,
-    ActionBreak,
+    ActionReturnInt,
     ActionWithParams
 };
 
@@ -54,7 +54,7 @@ final class jsonTest extends TestCase
                 'contextWithParams' => ContextWithParams::class,
                 'action1' => Action1::class,
                 'action2' => Action2::class,
-                'actionBreak' => ActionBreak::class,
+                'actionReturnInt' => ActionReturnInt::class,
                 'actionWithParams' => ActionWithParams::class,
             ])
         );
@@ -174,9 +174,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function nodeContextWithActionResultTrueTest()
+    public function nodeContextResultTrueTest()
     {
-        $node = $this->parser->parseFile('Json/testNodeActionResultTrue.json');
+        $node = $this->parser->parseFile('Json/testNodeContextResultTrue.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -184,9 +184,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function nodeContextWithActionResultFalseTest()
+    public function nodeContextResultFalseTest()
     {
-        $node = $this->parser->parseFile('Json/testNodeActionResultFalse.json');
+        $node = $this->parser->parseFile('Json/testNodeContextResultFalse.json');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -194,9 +194,9 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function nodeContextWithActionWithParamsTest()
+    public function nodeContextWithParamsTest()
     {
-        $node = $this->parser->parseFile('Json/testNodeActionWithParams.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithParams.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -204,11 +204,31 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
-    public function nodeContextWithActionStoppableTest()
+    public function nodeContextWithModifiersTest()
     {
-        $node = $this->parser->parseFile('Json/testNodeActionStoppable.json');
+        $node = $this->parser->parseFile('Json/testNodeContextWithModifiers.json');
         $result = $this->treeProcessor->process($node);
-        self::assertEquals(5, $result);
+        self::assertSame(4, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeContextWithModifiersAndOperatorTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeContextWithModifiersAndOperator.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeContextStoppableTest()
+    {
+        $node = $this->parser->parseFile('Json/testNodeContextStoppable.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertSame(5, $result);
     }
 
     /**

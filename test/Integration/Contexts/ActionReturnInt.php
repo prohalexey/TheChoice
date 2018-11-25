@@ -4,7 +4,7 @@ namespace TheChoice\Tests\Integration\Contexts;
 
 use \TheChoice\Contracts\ContextInterface;
 
-class ActionBreak implements ContextInterface
+class ActionReturnInt implements ContextInterface
 {
     public function getValue()
     {

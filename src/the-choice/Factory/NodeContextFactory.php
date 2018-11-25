@@ -44,6 +44,10 @@ class NodeContextFactory implements NodeFactoryInterface
             $node->setParams($structure['params']);
         }
 
+        if (self::nodeHasModifiers($structure)) {
+            $node->setModifiers($structure['modifiers']);
+        }
+
         if (self::isNodeStoppable($structure)) {
             $node->setStoppableType(Context::STOP_ALWAYS);
         }
@@ -64,6 +68,11 @@ class NodeContextFactory implements NodeFactoryInterface
     private static function nodeHasParams(array &$structure): bool
     {
         return array_key_exists('params', $structure) && \is_array($structure['params']);
+    }
+
+    private static function nodeHasModifiers(array &$structure): bool
+    {
+        return array_key_exists('modifiers', $structure) && \is_array($structure['modifiers']);
     }
 
     private static function isNodeStoppable(array &$structure): bool

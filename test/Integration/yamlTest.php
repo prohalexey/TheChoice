@@ -21,7 +21,7 @@ use TheChoice\Tests\Integration\Contexts\ {
     ContextWithParams,
     Action1,
     Action2,
-    ActionBreak,
+    ActionReturnInt,
     ActionWithParams
 };
 
@@ -54,7 +54,7 @@ final class yamlTest extends TestCase
                 'contextWithParams' => ContextWithParams::class,
                 'action1' => Action1::class,
                 'action2' => Action2::class,
-                'actionBreak' => ActionBreak::class,
+                'actionReturnInt' => ActionReturnInt::class,
                 'actionWithParams' => ActionWithParams::class,
             ])
         );
@@ -174,9 +174,9 @@ final class yamlTest extends TestCase
     /**
      * @test
      */
-    public function nodeContextWithActionResultTrueTest()
+    public function nodeContextResultTrueTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeActionResultTrue.yaml');
+        $node = $this->parser->parseFile('Yaml/testNodeContextResultTrue.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -184,9 +184,9 @@ final class yamlTest extends TestCase
     /**
      * @test
      */
-    public function nodeContextWithActionResultFalseTest()
+    public function nodeContextResultFalseTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeActionResultFalse.yaml');
+        $node = $this->parser->parseFile('Yaml/testNodeContextResultFalse.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -194,9 +194,9 @@ final class yamlTest extends TestCase
     /**
      * @test
      */
-    public function nodeContextWithActionWithParamsTest()
+    public function nodeContextWithParamsTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeActionWithParams.yaml');
+        $node = $this->parser->parseFile('Yaml/testNodeContextWithParams.yaml');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -204,11 +204,31 @@ final class yamlTest extends TestCase
     /**
      * @test
      */
-    public function nodeContextWithActionStoppableTest()
+    public function nodeContextWithModifiersTest()
     {
-        $node = $this->parser->parseFile('Yaml/testNodeActionStoppable.yaml');
+        $node = $this->parser->parseFile('Yaml/testNodeContextWithModifiers.yaml');
         $result = $this->treeProcessor->process($node);
-        self::assertEquals(5, $result);
+        self::assertSame(4, $result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeContextWithModifiersAndOperatorTest()
+    {
+        $node = $this->parser->parseFile('Yaml/testNodeContextWithModifiersAndOperator.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeContextStoppableTest()
+    {
+        $node = $this->parser->parseFile('Yaml/testNodeContextStoppable.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertSame(5, $result);
     }
 
     /**

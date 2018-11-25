@@ -16,9 +16,9 @@ class ContextFactory
     /** @var ContainerInterface */
     private $container;
 
-    public function __construct(array $actions)
+    public function __construct(array $contexts)
     {
-        $this->_contextMap = $actions;
+        $this->_contextMap = $contexts;
     }
 
     public function setContainer(ContainerInterface $container)

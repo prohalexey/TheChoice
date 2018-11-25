@@ -95,7 +95,7 @@ $ruleContextFactory = new RuleContextFactory([
 $actionContextFactory = new ActionContextFactory([
     'action1' => Action1::class,
     'action2' => Action2::class,
-    'actionBreak' => ActionBreak::class,
+    'actionReturnInt' => ActionBreak::class,
 ]);
 ```
 

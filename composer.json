@@ -8,7 +8,8 @@
         }
     ],
     "require": {
-        "php": ">=7"
+        "php": ">=7",
+        "chriskonnertz/string-calc": "^1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^5.7",

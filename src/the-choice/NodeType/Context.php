@@ -15,6 +15,7 @@ final class Context implements Sortable
     private $_priority;
     private $_params = [];
     private $_stoppableType;
+    private $_modifiers = [];
 
     public function getDescription(): string
     {
@@ -81,7 +82,7 @@ final class Context implements Sortable
         return null !== $this->_stoppableType;
     }
 
-    public function getParams()
+    public function getParams(): array
     {
         return $this->_params;
     }
@@ -89,5 +90,25 @@ final class Context implements Sortable
     public function setParams(array $params)
     {
         $this->_params = $params;
+    }
+
+    public function getModifiers()
+    {
+        return $this->_modifiers;
+    }
+
+    public function setModifiers(array $modifiers)
+    {
+        if ($this->checkModifiers($modifiers) === false) {
+            throw new \InvalidArgumentException('Context modifier must be string type');
+        }
+        $this->_modifiers = $modifiers;
+    }
+
+    private function checkModifiers(array $modifiers): bool
+    {
+        return array_reduce($modifiers, function ($carry, $modifier) {
+            return $carry && \is_string($modifier);
+        }, true);
     }
 }

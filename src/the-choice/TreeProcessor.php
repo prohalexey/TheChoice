@@ -2,6 +2,7 @@
 
 namespace TheChoice;
 
+use ChrisKonnertz\StringCalc\StringCalc;
 use TheChoice\Factory\ContextFactory;
 use TheChoice\NodeType\AndCollection;
 use TheChoice\NodeType\Condition;
@@ -10,11 +11,18 @@ use TheChoice\NodeType\Context;
 
 class TreeProcessor
 {
+    private $stringCalc;
+
     /** @var ContextFactory */
     private $_contextFactory;
     private $_processedContext = [];
 
     private $_forcedStopResult;
+
+    public function __construct()
+    {
+        $this->stringCalc = new StringCalc();
+    }
 
     public function setContextFactory(ContextFactory $contextFactory)
     {
@@ -77,7 +85,7 @@ class TreeProcessor
         return $result;
     }
 
-    private function processContext(Context $node): bool
+    private function processContext(Context $node)
     {
         if (null === $this->_contextFactory) {
             throw new \RuntimeException('Context factory not configured');
@@ -87,6 +95,11 @@ class TreeProcessor
             $node->getContextName(),
         ];
 
+        $params = $node->getParams();
+        if (\count($params) > 0) {
+            $hash[] = md5(serialize($params));
+        }
+
         $operator = $node->getOperator();
         if (null !== $operator) {
             $operatorValue = $operator->getValue();
@@ -95,28 +108,44 @@ class TreeProcessor
             $hash[] = \is_array($operatorValue) || \is_object($operatorValue) ? md5(serialize($operatorValue)) : $operatorValue;
         }
 
-        $params = $node->getParams();
-        if (null !== $params) {
-            $hash[] = md5(serialize($params));
+        $modifiers = $node->getModifiers();
+        if (\count($modifiers) > 0) {
+            $hash[] = md5(serialize($modifiers));
         }
 
         $hash = implode('', $hash);
 
         if (!isset($this->_processedContext[$hash])) {
             $context = $this->_contextFactory->createContextFromContextNode($node);
+
             if (null !== $operator) {
+                if (\count($modifiers) > 0) {
+                    $context = new CallableContext(function () use ($context, $modifiers) {
+                        return $this->processContextModifiers($context->getValue(), $modifiers);
+                    });
+                }
+
                 $this->_processedContext[$hash] = $operator->assert($context);
             } else {
-                $this->_processedContext[$hash] = $context->getValue();
-            }
-
-            if ($node->isStoppable()) {
-                $this->_forcedStopResult = $this->_processedContext[$hash];
-                return $this->_forcedStopResult;
+                $this->_processedContext[$hash] = $this->processContextModifiers($context->getValue(), $modifiers);
             }
         }
 
+        if ($node->isStoppable()) {
+            $this->_forcedStopResult = $this->_processedContext[$hash];
+        }
+
         return $this->_processedContext[$hash];
+    }
+
+    private function processContextModifiers($value, array $modifiers)
+    {
+        foreach ($modifiers as $modifier) {
+            $modifier = str_replace(['$context'], [$value], $modifier);
+            $value = $this->stringCalc->calculate($modifier);
+        }
+
+        return $value;
     }
 
     private function processCondition(Condition $node)
