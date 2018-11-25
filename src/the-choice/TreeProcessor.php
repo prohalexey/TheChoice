@@ -8,6 +8,7 @@ use TheChoice\NodeType\AndCollection;
 use TheChoice\NodeType\Condition;
 use TheChoice\NodeType\OrCollection;
 use TheChoice\NodeType\Context;
+use TheChoice\NodeType\Value;
 
 class TreeProcessor
 {
@@ -50,6 +51,10 @@ class TreeProcessor
 
         if ($node instanceof Condition) {
             return $this->processCondition($node);
+        }
+
+        if ($node instanceof Value) {
+            return $this->processValue($node);
         }
 
         throw new \InvalidArgumentException(sprintf('Unknown node type "%s"', \gettype($node)));
@@ -160,5 +165,10 @@ class TreeProcessor
         }
 
         return false;
+    }
+
+    private function processValue(Value $node)
+    {
+        return $node->getValue();
     }
 }

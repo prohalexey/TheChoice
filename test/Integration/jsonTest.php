@@ -327,4 +327,14 @@ final class jsonTest extends TestCase
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
+
+    /**
+     * @test
+     */
+    public function nodeValueTest()
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeValue.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertSame(4, $result);
+    }
 }
