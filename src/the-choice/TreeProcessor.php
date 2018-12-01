@@ -4,6 +4,7 @@ namespace TheChoice;
 
 use ChrisKonnertz\StringCalc\StringCalc;
 use TheChoice\Factory\ContextFactory;
+
 use TheChoice\Node\Collection;
 use TheChoice\Node\Condition;
 use TheChoice\Node\Context;

@@ -337,4 +337,14 @@ final class yamlTest extends TestCase
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
+
+    /**
+     * @test
+     */
+    public function nodeValueTest()
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeValue.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertSame(4, $result);
+    }
 }

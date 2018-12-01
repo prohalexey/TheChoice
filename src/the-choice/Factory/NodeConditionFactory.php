@@ -15,6 +15,7 @@ class NodeConditionFactory implements NodeFactoryInterface
         $node = new Condition(
             $builder->build($structure['if']),
             $builder->build($structure['then']),
+
             self::nodeHasElseBranch($structure) ? $builder->build($structure['else']) : null
         );
 
