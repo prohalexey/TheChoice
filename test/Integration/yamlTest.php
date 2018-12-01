@@ -221,6 +221,16 @@ final class yamlTest extends TestCase
     /**
      * @test
      */
+    public function nodeTreeWithStorageTest()
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeTreeWithStorage.yaml');
+        $result = $this->treeProcessor->process($node);
+        self::assertSame(4, $result);
+    }
+
+    /**
+     * @test
+     */
     public function nodeContextWithModifiersAndOperatorTest()
     {
         $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithModifiersAndOperator.yaml');

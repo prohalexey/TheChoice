@@ -1,11 +1,11 @@
 <?php
 
-namespace TheChoice\Operators;
+namespace TheChoice\Operator;
 
-use TheChoice\Contracts\ContextInterface;
-use TheChoice\Contracts\OperatorInterface;
+use TheChoice\Contract\ContextInterface;
+use TheChoice\Contract\OperatorInterface;
 
-class StringContain implements OperatorInterface
+class LowerThanOrEqual implements OperatorInterface
 {
     private $_value;
 
@@ -30,6 +30,6 @@ class StringContain implements OperatorInterface
 
     public function assert(ContextInterface $context): bool
     {
-        return mb_strpos($context->getValue(), $this->getValue()) !== false;
+        return $context->getValue() <= $this->getValue();
     }
 }

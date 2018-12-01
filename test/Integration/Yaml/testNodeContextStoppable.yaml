@@ -2,7 +2,7 @@ node: condition
 if:
   node: collection
   type: and
-  elements:
+  nodes:
   - node: context
     contextName: withdrawalCount
     operator: equal
@@ -16,7 +16,7 @@ if:
 then:
   node: collection
   type: and
-  elements:
+  nodes:
   - node: context
     contextName: actionReturnInt
     break: always

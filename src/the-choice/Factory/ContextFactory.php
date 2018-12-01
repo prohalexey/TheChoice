@@ -6,8 +6,8 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 
 use TheChoice\CallableContext;
-use TheChoice\Contracts\ContextInterface;
-use TheChoice\NodeType\Context;
+use TheChoice\Contract\ContextInterface;
+use TheChoice\Node\Context;
 
 class ContextFactory
 {

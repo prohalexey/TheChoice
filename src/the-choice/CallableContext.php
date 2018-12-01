@@ -2,7 +2,7 @@
 
 namespace TheChoice;
 
-use TheChoice\Contracts\ContextInterface;
+use TheChoice\Contract\ContextInterface;
 
 final class CallableContext implements ContextInterface
 {

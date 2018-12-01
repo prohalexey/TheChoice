@@ -3,7 +3,7 @@
   "if": {
     "node": "collection",
     "type": "and",
-    "elements": [
+    "nodes": [
       {
         "node": "context",
         "contextName": "withdrawalCount",
@@ -24,7 +24,7 @@
   "then": {
     "node": "collection",
     "type": "and",
-    "elements": [
+    "nodes": [
       {
         "node": "context",
         "contextName": "actionReturnInt",

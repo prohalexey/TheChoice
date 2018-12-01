@@ -5,7 +5,19 @@ namespace TheChoice\Tests\Integration;
 use \PHPUnit\Framework\TestCase;
 
 use TheChoice\{
-    Contracts\ContextInterface, Operators\Equal, Operators\NotEqual, Operators\GreaterThan, Operators\GreaterThanOrEqual, Operators\LowerThan, Operators\LowerThanOrEqual, Operators\NumericInRange, Operators\StringContain, Operators\StringNotContain, Operators\ArrayContain, Operators\ArrayNotContain
+    Contract\ContextInterface,
+
+    Operator\Equal,
+    Operator\NotEqual,
+    Operator\GreaterThan,
+    Operator\GreaterThanOrEqual,
+    Operator\LowerThan,
+    Operator\LowerThanOrEqual,
+    Operator\NumericInRange,
+    Operator\StringContain,
+    Operator\StringNotContain,
+    Operator\ArrayContain,
+    Operator\ArrayNotContain
 };
 
 final class OperatorsTest extends TestCase

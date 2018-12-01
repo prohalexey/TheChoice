@@ -4,11 +4,12 @@ namespace TheChoice;
 
 use ChrisKonnertz\StringCalc\StringCalc;
 use TheChoice\Factory\ContextFactory;
-use TheChoice\NodeType\AndCollection;
-use TheChoice\NodeType\Condition;
-use TheChoice\NodeType\OrCollection;
-use TheChoice\NodeType\Context;
-use TheChoice\NodeType\Value;
+
+use TheChoice\Node\Collection;
+use TheChoice\Node\Condition;
+use TheChoice\Node\Context;
+use TheChoice\Node\Tree;
+use TheChoice\Node\Value;
 
 class TreeProcessor
 {
@@ -37,12 +38,12 @@ class TreeProcessor
             return $this->_forcedStopResult;
         }
 
-        if ($node instanceof AndCollection) {
-            return $this->processAndCollection($node);
+        if ($node instanceof Tree) {
+            return $this->processTree($node);
         }
 
-        if ($node instanceof OrCollection) {
-            return $this->processOrCollection($node);
+        if ($node instanceof Collection) {
+            return $this->processCollection($node);
         }
 
         if ($node instanceof Context) {
@@ -60,29 +61,23 @@ class TreeProcessor
         throw new \InvalidArgumentException(sprintf('Unknown node type "%s"', \gettype($node)));
     }
 
-    private function processAndCollection(AndCollection $node)
+    private function processTree(Tree $node)
+    {
+        return $this->process($node->getNodes());
+    }
+
+    private function processCollection(Collection $node)
     {
         $result = true;
 
         foreach ($node->sort()->all() as $item) {
             $result = $this->process($item);
 
-            if ($result === false) {
+            if ($result === false && $node->getType() === Collection::TYPE_AND) {
                 return false;
             }
-        }
 
-        return $result;
-    }
-
-    private function processOrCollection(OrCollection $node)
-    {
-        $result = false;
-
-        foreach ($node->sort()->all() as $item) {
-            $result = $this->process($item);
-
-            if ($result === true) {
+            if ($result === true && $node->getType() === Collection::TYPE_OR) {
                 return true;
             }
         }
@@ -125,14 +120,14 @@ class TreeProcessor
 
             if (null !== $operator) {
                 if (\count($modifiers) > 0) {
-                    $context = new CallableContext(function () use ($context, $modifiers) {
-                        return $this->processContextModifiers($context->getValue(), $modifiers);
+                    $context = new CallableContext(function () use ($context, $node) {
+                        return $this->processContextModifiers($context->getValue(), $node);
                     });
                 }
 
                 $this->_processedContext[$hash] = $operator->assert($context);
             } else {
-                $this->_processedContext[$hash] = $this->processContextModifiers($context->getValue(), $modifiers);
+                $this->_processedContext[$hash] = $this->processContextModifiers($context->getValue(), $node);
             }
         }
 
@@ -143,11 +138,20 @@ class TreeProcessor
         return $this->_processedContext[$hash];
     }
 
-    private function processContextModifiers($value, array $modifiers)
+    private function processContextModifiers($value, Context $node)
     {
-        foreach ($modifiers as $modifier) {
-            $modifier = str_replace(['$context'], [$value], $modifier);
+        $tree = $node->getTree();
+
+        $vars = ['$context' => $value];
+        if (null !== $tree) {
+            $storage = $tree->getStorage();
+            $vars = array_merge($vars, $storage);
+        }
+
+        foreach ($node->getModifiers() as $modifier) {
+            $modifier = str_replace(array_keys($vars), array_values($vars), $modifier);
             $value = $this->stringCalc->calculate($modifier);
+            $vars['$context'] = $value;
         }
 
         return $value;

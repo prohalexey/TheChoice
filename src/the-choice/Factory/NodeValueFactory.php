@@ -2,9 +2,9 @@
 
 namespace TheChoice\Factory;
 
-use TheChoice\Contracts\BuilderInterface;
-use TheChoice\Contracts\NodeFactoryInterface;
-use TheChoice\NodeType\Value;
+use TheChoice\Contract\BuilderInterface;
+use TheChoice\Contract\NodeFactoryInterface;
+use TheChoice\Node\Value;
 
 class NodeValueFactory implements NodeFactoryInterface
 {
@@ -23,19 +23,13 @@ class NodeValueFactory implements NodeFactoryInterface
 
     private static function validate(array &$structure)
     {
-        $keysThatMustBePresent = [
-            'value',
-        ];
-
-        foreach ($keysThatMustBePresent as $key) {
-            if (!array_key_exists($key, $structure)) {
-                throw new \LogicException(sprintf('The "%s" property is absent in node type "value"!', $key));
-            }
+        if (!array_key_exists('value', $structure)) {
+            throw new \LogicException('The "value" property is absent in node type "Value"!');
         }
     }
 
     private static function nodeHasDescription(array &$structure): bool
     {
-        return array_key_exists('description', $structure) && \is_string($structure['description']);
+        return array_key_exists('description', $structure);
     }
 }
