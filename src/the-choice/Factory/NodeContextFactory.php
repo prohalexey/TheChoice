@@ -2,10 +2,10 @@
 
 namespace TheChoice\Factory;
 
-use TheChoice\Contracts\BuilderInterface;
-use TheChoice\Contracts\NodeFactoryInterface;
-use TheChoice\Contracts\OperatorFactoryInterface;
-use TheChoice\NodeType\Context;
+use TheChoice\Contract\BuilderInterface;
+use TheChoice\Contract\NodeFactoryInterface;
+use TheChoice\Contract\OperatorFactoryInterface;
+use TheChoice\Node\Context;
 
 class NodeContextFactory implements NodeFactoryInterface
 {
@@ -57,27 +57,27 @@ class NodeContextFactory implements NodeFactoryInterface
 
     private static function nodeHasDescription(array &$structure): bool
     {
-        return array_key_exists('description', $structure) && \is_string($structure['description']);
+        return array_key_exists('description', $structure);
     }
 
     private static function nodeHasPriority(array &$structure): bool
     {
-        return array_key_exists('priority', $structure) && (\is_string($structure['priority'] || \is_numeric($structure['priority'])));
+        return array_key_exists('priority', $structure);
     }
 
     private static function nodeHasParams(array &$structure): bool
     {
-        return array_key_exists('params', $structure) && \is_array($structure['params']);
+        return array_key_exists('params', $structure);
     }
 
     private static function nodeHasModifiers(array &$structure): bool
     {
-        return array_key_exists('modifiers', $structure) && \is_array($structure['modifiers']);
+        return array_key_exists('modifiers', $structure);
     }
 
     private static function isNodeStoppable(array &$structure): bool
     {
-        return array_key_exists('break', $structure) && \is_string($structure['break']);
+        return array_key_exists('break', $structure) ;
     }
 
     private static function nodeHasOperator(array &$structure): bool

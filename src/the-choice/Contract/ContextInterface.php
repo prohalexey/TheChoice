@@ -1,6 +1,6 @@
 <?php
 
-namespace TheChoice\Contracts;
+namespace TheChoice\Contract;
 
 interface ContextInterface
 {

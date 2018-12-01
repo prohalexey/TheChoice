@@ -1,14 +1,34 @@
 <?php
 
-namespace TheChoice\NodeType;
+namespace TheChoice\Node;
 
-use TheChoice\Contracts\Sortable;
+use TheChoice\Contract\Sortable;
 
-abstract class AbstractCollection implements Sortable
+class Collection implements Sortable
 {
+    const TYPE_AND = 'and';
+    const TYPE_OR = 'or';
+
+    private $_tree;
+
+    private $_type;
     private $_collection = [];
     private $_description = '';
     private $_priority;
+
+    public function __construct($type)
+    {
+        if ($type !== self::TYPE_AND && $type !== self::TYPE_OR) {
+            throw new \LogicException(sprintf('Collection type must be "or" or "and". "%s" given', $type));
+        }
+
+        $this->_type = $type;
+    }
+
+    public function getType()
+    {
+        return $this->_type;
+    }
 
     public function add($element)
     {
@@ -19,6 +39,22 @@ abstract class AbstractCollection implements Sortable
     public function all(): array
     {
         return $this->_collection;
+    }
+
+    public function setTree(Tree $tree)
+    {
+        $this->_tree = $tree;
+    }
+
+    /** @return Tree|null */
+    public function getTree()
+    {
+        return $this->_tree;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->_description;
     }
 
     public function setDescription(string $description)

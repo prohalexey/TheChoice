@@ -1,9 +1,9 @@
 <?php
 
-namespace TheChoice\Operators;
+namespace TheChoice\Operator;
 
-use TheChoice\Contracts\ContextInterface;
-use TheChoice\Contracts\OperatorInterface;
+use TheChoice\Contract\ContextInterface;
+use TheChoice\Contract\OperatorInterface;
 
 class ArrayContain implements OperatorInterface
 {

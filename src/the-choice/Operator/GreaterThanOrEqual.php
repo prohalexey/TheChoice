@@ -1,11 +1,11 @@
 <?php
 
-namespace TheChoice\Operators;
+namespace TheChoice\Operator;
 
-use TheChoice\Contracts\ContextInterface;
-use TheChoice\Contracts\OperatorInterface;
+use TheChoice\Contract\ContextInterface;
+use TheChoice\Contract\OperatorInterface;
 
-class LowerThanOrEqual implements OperatorInterface
+class GreaterThanOrEqual implements OperatorInterface
 {
     private $_value;
 
@@ -30,6 +30,6 @@ class LowerThanOrEqual implements OperatorInterface
 
     public function assert(ContextInterface $context): bool
     {
-        return $context->getValue() <= $this->getValue();
+        return $context->getValue() >= $this->getValue();
     }
 }

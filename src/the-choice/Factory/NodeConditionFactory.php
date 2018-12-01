@@ -2,9 +2,9 @@
 
 namespace TheChoice\Factory;
 
-use TheChoice\Contracts\BuilderInterface;
-use TheChoice\Contracts\NodeFactoryInterface;
-use TheChoice\NodeType\Condition;
+use TheChoice\Contract\BuilderInterface;
+use TheChoice\Contract\NodeFactoryInterface;
+use TheChoice\Node\Condition;
 
 class NodeConditionFactory implements NodeFactoryInterface
 {
@@ -15,7 +15,7 @@ class NodeConditionFactory implements NodeFactoryInterface
         $node = new Condition(
             $builder->build($structure['if']),
             $builder->build($structure['then']),
-            $structure['else'] ? $builder->build($structure['else']) : null
+            self::nodeHasElseBranch($structure) ? $builder->build($structure['else']) : null
         );
 
         if (self::nodeHasDescription($structure)) {
@@ -38,18 +38,23 @@ class NodeConditionFactory implements NodeFactoryInterface
 
         foreach ($keysThatMustBePresent as $key) {
             if (!array_key_exists($key, $structure)) {
-                throw new \LogicException(sprintf('The "%s" property is absent in node type "condition"!', $key));
+                throw new \LogicException(sprintf('The "%s" property is absent in node type "Condition"!', $key));
             }
         }
     }
 
+    private static function nodeHasElseBranch(array &$structure): bool
+    {
+        return array_key_exists('else', $structure);
+    }
+
     private static function nodeHasDescription(array &$structure): bool
     {
-        return array_key_exists('description', $structure) && \is_string($structure['description']);
+        return array_key_exists('description', $structure);
     }
 
     private static function nodeHasPriority(array &$structure): bool
     {
-        return array_key_exists('priority', $structure) && (\is_string($structure['priority'] || \is_numeric($structure['priority'])));
+        return array_key_exists('priority', $structure);
     }
 }

@@ -1,6 +1,6 @@
 node: collection
 type: or
-elements:
+nodes:
   -
     node: context
     contextName: withdrawalCount

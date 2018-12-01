@@ -1,13 +1,15 @@
 <?php
 
-namespace TheChoice\NodeType;
+namespace TheChoice\Node;
 
-use TheChoice\Contracts\OperatorInterface;
-use TheChoice\Contracts\Sortable;
+use TheChoice\Contract\OperatorInterface;
+use TheChoice\Contract\Sortable;
 
 final class Context implements Sortable
 {
     const STOP_ALWAYS = 'always';
+
+    private $_tree;
 
     private $_operator;
     private $_contextName;
@@ -16,6 +18,17 @@ final class Context implements Sortable
     private $_params = [];
     private $_stoppableType;
     private $_modifiers = [];
+
+    public function setTree(Tree $tree)
+    {
+        $this->_tree = $tree;
+    }
+
+    /** @return Tree|null */
+    public function getTree()
+    {
+        return $this->_tree;
+    }
 
     public function getDescription(): string
     {
@@ -72,6 +85,10 @@ final class Context implements Sortable
 
     public function setStoppableType($type)
     {
+        if ($type !== self::STOP_ALWAYS) {
+            throw new \LogicException(sprintf('Stoppable type must be one of (%s). "%s" given', implode(', ', [self::STOP_ALWAYS]), $type));
+        }
+
         $this->_stoppableType = $type;
 
         return $this;
@@ -92,7 +109,7 @@ final class Context implements Sortable
         $this->_params = $params;
     }
 
-    public function getModifiers()
+    public function getModifiers(): array
     {
         return $this->_modifiers;
     }

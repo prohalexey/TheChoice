@@ -5,20 +5,20 @@ namespace TheChoice\Factory;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 
-use TheChoice\Contracts\OperatorFactoryInterface;
-use TheChoice\Contracts\OperatorInterface;
+use TheChoice\Contract\OperatorFactoryInterface;
+use TheChoice\Contract\OperatorInterface;
 
-use TheChoice\Operators\ArrayContain;
-use TheChoice\Operators\ArrayNotContain;
-use TheChoice\Operators\Equal;
-use TheChoice\Operators\GreaterThan;
-use TheChoice\Operators\GreaterThanOrEqual;
-use TheChoice\Operators\LowerThan;
-use TheChoice\Operators\LowerThanOrEqual;
-use TheChoice\Operators\NotEqual;
-use TheChoice\Operators\NumericInRange;
-use TheChoice\Operators\StringContain;
-use TheChoice\Operators\StringNotContain;
+use TheChoice\Operator\ArrayContain;
+use TheChoice\Operator\ArrayNotContain;
+use TheChoice\Operator\Equal;
+use TheChoice\Operator\GreaterThan;
+use TheChoice\Operator\GreaterThanOrEqual;
+use TheChoice\Operator\LowerThan;
+use TheChoice\Operator\LowerThanOrEqual;
+use TheChoice\Operator\NotEqual;
+use TheChoice\Operator\NumericInRange;
+use TheChoice\Operator\StringContain;
+use TheChoice\Operator\StringNotContain;
 
 class OperatorFactory implements OperatorFactoryInterface
 {

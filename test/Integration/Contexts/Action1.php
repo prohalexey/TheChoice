@@ -2,7 +2,7 @@
 
 namespace TheChoice\Tests\Integration\Contexts;
 
-use \TheChoice\Contracts\ContextInterface;
+use \TheChoice\Contract\ContextInterface;
 
 class Action1 implements ContextInterface
 {
