@@ -1,0 +1,2 @@
+node: require
+path: testRequireCircularLoop2.yaml

@@ -15,6 +15,8 @@ class YamlBuilder extends ArrayBuilder
 
     public function parseFile(string $filename)
     {
+        $filename = $this->getRootDir() . $filename;
+
         if (!file_exists($filename)) {
             throw new \InvalidArgumentException(
                 sprintf('File "%s" not found', $filename)

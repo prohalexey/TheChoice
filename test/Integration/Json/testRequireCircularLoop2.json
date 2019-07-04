@@ -1,0 +1,4 @@
+{
+  "node": "require",
+  "path": "testRequireCircularLoop1.json"
+}

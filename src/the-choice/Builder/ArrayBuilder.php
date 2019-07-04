@@ -5,6 +5,7 @@ namespace TheChoice\Builder;
 use TheChoice\Factory\NodeConditionFactory;
 use TheChoice\Factory\NodeCollectionFactory;
 use TheChoice\Factory\NodeContextFactory;
+use TheChoice\Factory\NodeRequireFactory;
 use TheChoice\Factory\NodeTreeFactory;
 use TheChoice\Factory\NodeValueFactory;
 
@@ -13,6 +14,10 @@ use TheChoice\Contract\BuilderInterface;
 
 class ArrayBuilder implements BuilderInterface
 {
+    private $rootDir;
+
+    private static $filesLoaded = [];
+
     private $_nodesCount = 0;
 
     private $_nodeTreeFactory;
@@ -20,6 +25,7 @@ class ArrayBuilder implements BuilderInterface
     private $_nodeCollectionFactory;
     private $_nodeContextFactory;
     private $_nodeValueFactory;
+    private $_nodeRequireFactory;
 
     private $_tree;
 
@@ -30,6 +36,7 @@ class ArrayBuilder implements BuilderInterface
         $this->_nodeCollectionFactory = new NodeCollectionFactory();
         $this->_nodeContextFactory = new NodeContextFactory($operatorFactory);
         $this->_nodeValueFactory = new NodeValueFactory();
+        $this->_nodeRequireFactory = new NodeRequireFactory();
     }
 
     public function build(&$structure)
@@ -58,6 +65,8 @@ class ArrayBuilder implements BuilderInterface
             $node = $this->_nodeContextFactory->build($this, $structure);
         } elseif ($structure['node'] === 'value') {
             $node = $this->_nodeValueFactory->build($this, $structure);
+        } elseif ($structure['node'] === 'require') {
+            $node = $this->_nodeRequireFactory->build($this, $structure);
         } else {
             throw new \InvalidArgumentException(sprintf('Unknown node type "%s"', $structure['node']));
         }
@@ -67,5 +76,25 @@ class ArrayBuilder implements BuilderInterface
         }
 
         return $node;
+    }
+
+    public function getRootDir(): string
+    {
+        return $this->rootDir;
+    }
+
+    public function setRootDir(string $rootDir)
+    {
+        $this->rootDir = $rootDir;
+        return $this;
+    }
+
+    public function addLoadedFile(string $path)
+    {
+        if (in_array($path, self::$filesLoaded, true)) {
+            throw new \RuntimeException(sprintf('Circular link detected while loading file: "%s"', $path));
+        }
+
+        self::$filesLoaded[] = $path;
     }
 }

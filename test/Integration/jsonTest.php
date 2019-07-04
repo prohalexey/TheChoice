@@ -43,7 +43,13 @@ final class jsonTest extends TestCase
     {
         parent::setUp();
 
+        $this->testFilesDir = '';
+        if (basename(getcwd()) === 'TheChoice') {
+            $this->testFilesDir = './test/Integration/';
+        }
+        
         $this->parser = new JsonBuilder(new OperatorFactory());
+        $this->parser->setRootDir($this->testFilesDir . 'Json/');
 
         $this->treeProcessor = (new TreeProcessor())->setContextFactory(
             new ContextFactory([
@@ -60,11 +66,6 @@ final class jsonTest extends TestCase
                 'actionWithParams' => ActionWithParams::class,
             ])
         );
-
-        $this->testFilesDir = '';
-        if (basename(getcwd()) === 'TheChoice') {
-            $this->testFilesDir = './test/Integration/';
-        }
     }
 
     /**
@@ -72,7 +73,7 @@ final class jsonTest extends TestCase
      */
     public function NodeContextWithOperatorArrayContainTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorArrayContain.json');
+        $node = $this->parser->parseFile('testNodeContextWithOperatorArrayContain.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -82,7 +83,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithOperatorArrayNotContainTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorArrayNotContain.json');
+        $node = $this->parser->parseFile('testNodeContextWithOperatorArrayNotContain.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -92,7 +93,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithOperatorEqualTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorEqual.json');
+        $node = $this->parser->parseFile('testNodeContextWithOperatorEqual.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -102,7 +103,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithOperatorEqualAndContextWithParamsTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorEqualAndContextWithParams.json');
+        $node = $this->parser->parseFile('testNodeContextWithOperatorEqualAndContextWithParams.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -112,7 +113,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithOperatorGreaterThanTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorGreaterThan.json');
+        $node = $this->parser->parseFile('testNodeContextWithOperatorGreaterThan.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -122,7 +123,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithOperatorGreaterThanOrEqualTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorGreaterThanOrEqual.json');
+        $node = $this->parser->parseFile('testNodeContextWithOperatorGreaterThanOrEqual.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -132,7 +133,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithOperatorLowerThanTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorLowerThan.json');
+        $node = $this->parser->parseFile('testNodeContextWithOperatorLowerThan.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -143,7 +144,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithOperatorLowerThanOrEqualTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorLowerThanOrEqual.json');
+        $node = $this->parser->parseFile('testNodeContextWithOperatorLowerThanOrEqual.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -153,7 +154,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithOperatorNotEqualTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorNotEqual.json');
+        $node = $this->parser->parseFile('testNodeContextWithOperatorNotEqual.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -163,7 +164,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithOperatorStringContainTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorStringContain.json');
+        $node = $this->parser->parseFile('testNodeContextWithOperatorStringContain.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -173,7 +174,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithOperatorStringNotContainTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorStringNotContain.json');
+        $node = $this->parser->parseFile('testNodeContextWithOperatorStringNotContain.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -183,7 +184,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextResultTrueTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextResultTrue.json');
+        $node = $this->parser->parseFile('testNodeContextResultTrue.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -193,7 +194,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextResultFalseTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextResultFalse.json');
+        $node = $this->parser->parseFile('testNodeContextResultFalse.json');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -203,7 +204,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithParamsTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithParams.json');
+        $node = $this->parser->parseFile('testNodeContextWithParams.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -213,7 +214,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithModifiersTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithModifiers.json');
+        $node = $this->parser->parseFile('testNodeContextWithModifiers.json');
         $result = $this->treeProcessor->process($node);
         self::assertSame(4, $result);
     }
@@ -223,7 +224,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextWithModifiersAndOperatorTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithModifiersAndOperator.json');
+        $node = $this->parser->parseFile('testNodeContextWithModifiersAndOperator.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -233,7 +234,7 @@ final class jsonTest extends TestCase
      */
     public function nodeContextStoppableTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextStoppable.json');
+        $node = $this->parser->parseFile('testNodeContextStoppable.json');
         $result = $this->treeProcessor->process($node);
         self::assertSame(5, $result);
     }
@@ -243,7 +244,7 @@ final class jsonTest extends TestCase
      */
     public function nodeConditionThenCaseTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeConditionThenCase.json');
+        $node = $this->parser->parseFile('testNodeConditionThenCase.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -253,7 +254,7 @@ final class jsonTest extends TestCase
      */
     public function nodeConditionElseCaseTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeConditionElseCase.json');
+        $node = $this->parser->parseFile('testNodeConditionElseCase.json');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -263,7 +264,7 @@ final class jsonTest extends TestCase
      */
     public function nodeAndCollectionAllFalseTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeAndCollectionAllFalse.json');
+        $node = $this->parser->parseFile('testNodeAndCollectionAllFalse.json');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -273,7 +274,7 @@ final class jsonTest extends TestCase
      */
     public function nodeAndCollectionOneFalseTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeAndCollectionOneFalse.json');
+        $node = $this->parser->parseFile('testNodeAndCollectionOneFalse.json');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -283,7 +284,7 @@ final class jsonTest extends TestCase
      */
     public function nodeAndCollectionAllTrueTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeAndCollectionAllTrue.json');
+        $node = $this->parser->parseFile('testNodeAndCollectionAllTrue.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -293,7 +294,7 @@ final class jsonTest extends TestCase
      */
     public function nodeOrCollectionAllFalseTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeOrCollectionAllFalse.json');
+        $node = $this->parser->parseFile('testNodeOrCollectionAllFalse.json');
         $result = $this->treeProcessor->process($node);
         self::assertFalse($result);
     }
@@ -303,7 +304,7 @@ final class jsonTest extends TestCase
      */
     public function nodeOrCollectionOneFalseTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeOrCollectionOneTrue.json');
+        $node = $this->parser->parseFile('testNodeOrCollectionOneTrue.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -313,7 +314,7 @@ final class jsonTest extends TestCase
      */
     public function nodeOrCollectionAllTrueTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeOrCollectionAllTrue.json');
+        $node = $this->parser->parseFile('testNodeOrCollectionAllTrue.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -323,7 +324,7 @@ final class jsonTest extends TestCase
      */
     public function combined1Test()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testCombined1.json');
+        $node = $this->parser->parseFile('testCombined1.json');
         $result = $this->treeProcessor->process($node);
         self::assertTrue($result);
     }
@@ -331,9 +332,28 @@ final class jsonTest extends TestCase
     /**
      * @test
      */
+    public function nodeRequireTest()
+    {
+        $node = $this->parser->parseFile('testRequireLoop1.json');
+        $result = $this->treeProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    /**
+     * @test
+     */
+    public function nodeRequireCircularLoopTest()
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->parser->parseFile('testRequireCircularLoop1.json');
+    }
+
+    /**
+     * @test
+     */
     public function nodeValueTest()
     {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeValue.json');
+        $node = $this->parser->parseFile('testNodeValue.json');
         $result = $this->treeProcessor->process($node);
         self::assertSame(4, $result);
     }

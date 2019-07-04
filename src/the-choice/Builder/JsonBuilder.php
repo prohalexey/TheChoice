@@ -16,6 +16,8 @@ class JsonBuilder extends ArrayBuilder
 
     public function parseFile(string $filename, $maxDepth = 512, $options = 0)
     {
+        $filename = $this->getRootDir() . $filename;
+
         if (!file_exists($filename)) {
             throw new \InvalidArgumentException(
                 sprintf('File "%s" not found', $filename)
