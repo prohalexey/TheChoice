@@ -39,7 +39,7 @@ final class yamlTest extends TestCase
 
     private $testFilesDir;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         
