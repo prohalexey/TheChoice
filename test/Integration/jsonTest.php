@@ -39,7 +39,7 @@ final class jsonTest extends TestCase
     
     private $testFilesDir;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
