@@ -15,18 +15,21 @@ class NodeRequireFactory implements NodeFactoryInterface
 
         $extension = pathinfo($structure['path'], PATHINFO_EXTENSION);
 
+        $operatorFactory = new OperatorFactory();
+
         switch($extension) {
             case 'json':
-                $newBuilder = new JsonBuilder(new OperatorFactory());
+                $newBuilder = new JsonBuilder($operatorFactory);
                 break;
             case 'yaml';
-                $newBuilder = new YamlBuilder(new OperatorFactory());
+                $newBuilder = new YamlBuilder($operatorFactory);
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Unknown filetype of required file: %s, included file: "%s"', $extension, $structure['path']));
         }
 
         $newBuilder->setRootDir($builder->getRootDir());
+
         return $newBuilder->parseFile($structure['path']);
     }
 
