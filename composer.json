@@ -8,15 +8,16 @@
         }
     ],
     "require": {
-        "php": ">=7",
-        "chriskonnertz/string-calc": "^1.0"
+        "php": ">=7.1",
+        "chriskonnertz/string-calc": "^1.0",
+        "symfony/yaml": "^4.3",
+        "ext-json": "*",
+        "ext-mbstring": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.7",
+        "roave/security-advisories": "dev-master",
+        "phpunit/phpunit": "7.0.0",
         "psr/container": "1.0.0"
-    },
-    "suggest": {
-        "symfony/yaml": "To use YAML rules"
     },
     "autoload": {
         "psr-4": {

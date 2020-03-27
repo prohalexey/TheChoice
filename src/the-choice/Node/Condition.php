@@ -1,71 +1,51 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TheChoice\Node;
 
-use TheChoice\Contract\Sortable;
-
-final class Condition implements Sortable
+class Condition extends AbstractChildNode implements Sortable
 {
-    private $_tree;
+    protected $ifNode;
+    protected $thenNode;
+    protected $elseNode;
+    protected $priority;
 
-    private $_if;
-    private $_then;
-    private $_else;
-    private $_description = '';
-    private $_priority;
-
-    public function __construct($if, $then, $else = null)
+    public function __construct(Node $ifNode, Node $thenNode, Node $elseNode = null)
     {
-        $this->_if = $if;
-        $this->_then = $then;
-        $this->_else = $else;
+        $this->ifNode = $ifNode;
+        $this->thenNode = $thenNode;
+        $this->elseNode = $elseNode;
     }
 
-    public function setTree(Tree $tree)
+    public static function getNodeName(): string
     {
-        $this->_tree = $tree;
-    }
-
-    /** @return Tree|null */
-    public function getTree()
-    {
-        return $this->_tree;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->_description;
-    }
-
-    public function setDescription(string $description)
-    {
-        $this->_description = $description;
-        return $this;
+        return 'condition';
     }
 
     public function setPriority(int $priority)
     {
-        $this->_priority = $priority;
+        $this->priority = $priority;
         return $this;
     }
 
-    public function getIf()
+    public function getIfNode()
     {
-        return $this->_if;
+        return $this->ifNode;
     }
 
-    public function getThen()
+    public function getThenNode()
     {
-        return $this->_then;
+        return $this->thenNode;
     }
 
-    public function getElse()
+    public function getElseNode()
     {
-        return $this->_else;
+        return $this->elseNode;
     }
 
     public function getSortableValue()
     {
-        return $this->_priority;
+        return $this->priority;
     }
 }

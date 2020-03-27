@@ -1,8 +1,8 @@
 <?php
 
-namespace TheChoice;
+declare(strict_types=1);
 
-use TheChoice\Contract\ContextInterface;
+namespace TheChoice\Context;
 
 final class CallableContext implements ContextInterface
 {

@@ -1,9 +1,11 @@
 <?php
 
-namespace TheChoice\Factory;
+declare(strict_types=1);
 
-use TheChoice\Contract\BuilderInterface;
-use TheChoice\Contract\NodeFactoryInterface;
+namespace TheChoice\NodeFactory;
+
+use TheChoice\Exception\LogicException;
+use TheChoice\Builder\BuilderInterface;
 use TheChoice\Node\Value;
 
 class NodeValueFactory implements NodeFactoryInterface
@@ -13,6 +15,8 @@ class NodeValueFactory implements NodeFactoryInterface
         self::validate($structure);
 
         $node = new Value($structure['value']);
+
+        $node->setRoot($builder->getRoot());
 
         if (self::nodeHasDescription($structure)) {
             $node->setDescription($structure['description']);
@@ -24,7 +28,7 @@ class NodeValueFactory implements NodeFactoryInterface
     private static function validate(array &$structure)
     {
         if (!array_key_exists('value', $structure)) {
-            throw new \LogicException('The "value" property is absent in node type "Value"!');
+            throw new LogicException('The "value" property is absent in node type "Value"!');
         }
     }
 

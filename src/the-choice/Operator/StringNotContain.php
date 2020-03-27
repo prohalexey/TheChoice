@@ -1,35 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TheChoice\Operator;
 
-use TheChoice\Contract\ContextInterface;
-use TheChoice\Contract\OperatorInterface;
+use TheChoice\Context\ContextInterface;
 
 class StringNotContain implements OperatorInterface
 {
-    private $_value;
+    use GetValueTrait, SetValueTrait;
 
-    public function __construct($value = null)
+    public static function getOperatorName(): string
     {
-        if (null !== $value) {
-            $this->setValue($value);
-        }
-    }
-
-    public function setValue($value)
-    {
-        $this->_value = $value;
-
-        return $this;
-    }
-
-    public function getValue()
-    {
-        return $this->_value;
+        return 'stringNotContain';
     }
 
     public function assert(ContextInterface $context): bool
     {
-        return mb_strpos($context->getValue(), $this->getValue()) === false;
+        return mb_strpos((string)$context->getValue(), (string)$this->getValue()) === false;
     }
 }

@@ -1,77 +1,62 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TheChoice\Node;
 
-use TheChoice\Contract\Sortable;
+use TheChoice\Exception\LogicException;
 
-class Collection implements Sortable
+class Collection extends AbstractChildNode implements Sortable
 {
     const TYPE_AND = 'and';
     const TYPE_OR = 'or';
 
-    private $_tree;
-
-    private $_type;
-    private $_collection = [];
-    private $_description = '';
-    private $_priority;
+    protected $type;
+    protected $collection = [];
+    protected $priority;
 
     public function __construct($type)
     {
         if ($type !== self::TYPE_AND && $type !== self::TYPE_OR) {
-            throw new \LogicException(sprintf('Collection type must be "or" or "and". "%s" given', $type));
+            throw new LogicException(sprintf('Collection type must be "or" or "and". "%s" given', $type));
         }
 
-        $this->_type = $type;
+        $this->type = $type;
+    }
+
+    public static function getNodeName(): string
+    {
+        return 'collection';
     }
 
     public function getType()
     {
-        return $this->_type;
+        return $this->type;
     }
 
-    public function add($element)
+    public function add($element): self
     {
-        $this->_collection[] = $element;
+        $this->collection[] = $element;
         return $this;
     }
 
+    /**
+     * @return Node[]
+     */
     public function all(): array
     {
-        return $this->_collection;
+        return $this->collection;
     }
 
-    public function setTree(Tree $tree)
+    public function setPriority(int $priority): self
     {
-        $this->_tree = $tree;
-    }
-
-    /** @return Tree|null */
-    public function getTree()
-    {
-        return $this->_tree;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->_description;
-    }
-
-    public function setDescription(string $description)
-    {
-        $this->_description = $description;
+        $this->priority = $priority;
         return $this;
     }
 
-    public function setPriority(int $priority)
+    public function sort(): self
     {
-        $this->_priority = $priority;
-        return $this;
-    }
-
-    public function sort()
-    {
-        usort($this->_collection, function($element1, $element2) {
+        usort($this->collection, static function($element1, $element2) {
             if (!$element2 instanceof Sortable) {
                 return 1;
             }
@@ -86,6 +71,6 @@ class Collection implements Sortable
 
     public function getSortableValue()
     {
-        return $this->_priority;
+        return $this->priority;
     }
 }

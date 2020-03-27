@@ -1,31 +1,29 @@
 <?php
 
-namespace TheChoice\Factory;
+declare(strict_types=1);
 
-use TheChoice\Contract\BuilderInterface;
-use TheChoice\Contract\NodeFactoryInterface;
-use TheChoice\Contract\OperatorFactoryInterface;
+namespace TheChoice\NodeFactory;
+
+use TheChoice\Builder\BuilderInterface;
 use TheChoice\Node\Context;
+use TheChoice\Operator\OperatorResolverInterface;
 
 class NodeContextFactory implements NodeFactoryInterface
 {
-    private $_operatorFactory;
-
-    public function __construct(OperatorFactoryInterface $operatorFactory)
-    {
-        $this->_operatorFactory = $operatorFactory;
-    }
-
     public function build(BuilderInterface $builder, array &$structure): Context
     {
         $node = new Context();
 
+        $node->setRoot($builder->getRoot());
+
         if (self::nodeHasOperator($structure)) {
-            $operatorInstance = $this->_operatorFactory->create(
-                $structure['operator'],
-                $structure['value']
-            );
-            $node->setOperator($operatorInstance);
+            $operatorResolver = $builder->getContainer()->get(OperatorResolverInterface::class);
+            $operatorType = $operatorResolver->resolve($structure['operator']);
+
+            $operator = $builder->getContainer()->get($operatorType);
+            $operator->setValue($structure['value']);
+
+            $node->setOperator($operator);
         }
 
         if (self::nodeHasContextName($structure)) {
@@ -49,7 +47,7 @@ class NodeContextFactory implements NodeFactoryInterface
         }
 
         if (self::isNodeStoppable($structure)) {
-            $node->setStoppableType(Context::STOP_ALWAYS);
+            $node->setStoppableType(Context::STOP_IMMEDIATELY);
         }
 
         return $node;

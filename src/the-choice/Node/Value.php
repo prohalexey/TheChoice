@@ -1,43 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TheChoice\Node;
 
-final class Value
+class Value extends AbstractChildNode
 {
-    private $_tree;
-
-    private $_value;
-    private $_description = '';
+    protected $value;
 
     public function __construct($value)
     {
-        $this->_value = $value;
+        $this->value = $value;
     }
 
-    public function setTree(Tree $tree)
+    public static function getNodeName(): string
     {
-        $this->_tree = $tree;
-    }
-
-    /** @return Tree|null */
-    public function getTree()
-    {
-        return $this->_tree;
-    }
-
-    public function setDescription(string $description)
-    {
-        $this->_description = $description;
-        return $this;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->_description;
+        return 'value';
     }
 
     public function getValue()
     {
-        return $this->_value;
+        return $this->value;
     }
 }

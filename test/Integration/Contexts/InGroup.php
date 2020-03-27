@@ -2,7 +2,7 @@
 
 namespace TheChoice\Tests\Integration\Contexts;
 
-use \TheChoice\Contract\ContextInterface;
+use TheChoice\Context\ContextInterface;
 
 class InGroup implements ContextInterface
 {

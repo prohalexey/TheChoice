@@ -1,16 +1,19 @@
 <?php
 
-namespace TheChoice\Factory;
+declare(strict_types=1);
 
-use TheChoice\Contract\BuilderInterface;
-use TheChoice\Contract\NodeFactoryInterface;
+namespace TheChoice\NodeFactory;
+
+use TheChoice\Builder\BuilderInterface;
 use TheChoice\Node\Collection;
 
 class NodeCollectionFactory implements NodeFactoryInterface
 {
-    public function build(BuilderInterface $builder, array &$structure)
+    public function build(BuilderInterface $builder, array &$structure): Collection
     {
         $node = new Collection($structure['type']);
+
+        $node->setRoot($builder->getRoot());
 
         if (self::nodeHasDescription($structure)) {
             $node->setDescription($structure['description']);
@@ -20,7 +23,7 @@ class NodeCollectionFactory implements NodeFactoryInterface
             $node->setPriority((int)$structure['priority']);
         }
 
-        if (\is_array($structure['nodes'])) {
+        if (self::nodeHasChildNodes($structure)) {
             foreach ($structure['nodes'] as $element) {
                 $node->add($builder->build($element));
             }
@@ -37,5 +40,10 @@ class NodeCollectionFactory implements NodeFactoryInterface
     private static function nodeHasPriority(array &$structure): bool
     {
         return array_key_exists('priority', $structure);
+    }
+
+    private static function nodeHasChildNodes(array &$structure): bool
+    {
+        return array_key_exists('nodes', $structure) && is_array($structure['nodes']);
     }
 }
