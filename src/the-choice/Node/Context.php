@@ -1,54 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TheChoice\Node;
 
-use TheChoice\Contract\OperatorInterface;
-use TheChoice\Contract\Sortable;
+use TheChoice\Exception\LogicException;
+use TheChoice\Exception\InvalidArgumentException;
+use TheChoice\Operator\OperatorInterface;
 
-final class Context implements Sortable
+class Context extends AbstractChildNode implements Sortable
 {
-    const STOP_ALWAYS = 'always';
+    public const STOP_IMMEDIATELY = 'immediately';
 
-    private $_tree;
+    protected $operator;
+    protected $contextName;
+    protected $priority;
+    protected $params = [];
+    protected $stoppableType;
+    protected $modifiers = [];
 
-    private $_operator;
-    private $_contextName;
-    private $_description = '';
-    private $_priority;
-    private $_params = [];
-    private $_stoppableType;
-    private $_modifiers = [];
-
-    public function setTree(Tree $tree)
+    public static function getNodeName(): string
     {
-        $this->_tree = $tree;
-    }
-
-    /** @return Tree|null */
-    public function getTree()
-    {
-        return $this->_tree;
-    }
-
-    public function getDescription(): string
-    {
-        return $this->_description;
-    }
-
-    public function setDescription(string $description)
-    {
-        $this->_description = $description;
-        return $this;
+        return 'context';
     }
 
     public function getSortableValue()
     {
-        return $this->_priority;
+        return $this->priority;
     }
 
     public function setPriority(int $priority)
     {
-        $this->_priority = $priority;
+        $this->priority = $priority;
         return $this;
     }
 
@@ -57,7 +40,7 @@ final class Context implements Sortable
      */
     public function getOperator()
     {
-        return $this->_operator;
+        return $this->operator;
     }
 
     /**
@@ -65,67 +48,72 @@ final class Context implements Sortable
      */
     public function getContextName()
     {
-        return $this->_contextName;
+        return $this->contextName;
     }
 
     public function setContextName(string $contextName) {
-        $this->_contextName = $contextName;
+        $this->contextName = $contextName;
         return $this;
     }
 
     public function setOperator(OperatorInterface $operator){
-        $this->_operator = $operator;
+        $this->operator = $operator;
         return $this;
     }
 
     public function getStoppableType()
     {
-        return $this->_stoppableType;
+        return $this->stoppableType;
     }
 
     public function setStoppableType($type)
     {
-        if ($type !== self::STOP_ALWAYS) {
-            throw new \LogicException(sprintf('Stoppable type must be one of (%s). "%s" given', implode(', ', [self::STOP_ALWAYS]), $type));
+        if ($type !== self::STOP_IMMEDIATELY) {
+            throw new LogicException(sprintf('Stoppable type must be one of (%s). "%s" given', implode(', ', static::getStopModes()), $type));
         }
 
-        $this->_stoppableType = $type;
+        $this->stoppableType = $type;
 
         return $this;
     }
 
     public function isStoppable(): bool
     {
-        return null !== $this->_stoppableType;
+        return null !== $this->stoppableType;
     }
 
     public function getParams(): array
     {
-        return $this->_params;
+        return $this->params;
     }
 
     public function setParams(array $params)
     {
-        $this->_params = $params;
+        $this->params = $params;
     }
 
     public function getModifiers(): array
     {
-        return $this->_modifiers;
+        return $this->modifiers;
     }
 
     public function setModifiers(array $modifiers)
     {
         if ($this->checkModifiers($modifiers) === false) {
-            throw new \InvalidArgumentException('Context modifier must be string type');
+            throw new InvalidArgumentException('Context modifier must be string type');
         }
-        $this->_modifiers = $modifiers;
+        $this->modifiers = $modifiers;
+    }
+
+    public static function getStopModes()
+    {
+        return [self::STOP_IMMEDIATELY];
     }
 
     private function checkModifiers(array $modifiers): bool
     {
-        return array_reduce($modifiers, function ($carry, $modifier) {
-            return $carry && \is_string($modifier);
+        return array_reduce($modifiers, static function ($carry, $modifier) {
+            return $carry && is_string($modifier);
         }, true);
     }
 }

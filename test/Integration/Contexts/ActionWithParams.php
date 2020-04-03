@@ -2,7 +2,7 @@
 
 namespace TheChoice\Tests\Integration\Contexts;
 
-use \TheChoice\Contract\ContextInterface;
+use TheChoice\Context\ContextInterface;
 
 class ActionWithParams implements ContextInterface
 {
@@ -14,9 +14,9 @@ class ActionWithParams implements ContextInterface
     public function getValue()
     {
         return
-            \is_numeric($this->a) && $this->a === 1 &&
-            \is_string($this->b) && $this->b === 'test' &&
-            \is_array($this->c) && isset($this->c[0], $this->c[1], $this->c[2]) && $this->c[0] + $this->c[1] + $this->c[2] === 9;
+            is_numeric($this->a) && $this->a === 1 &&
+            is_string($this->b) && $this->b === 'test' &&
+            is_array($this->c) && isset($this->c[0], $this->c[1], $this->c[2]) && $this->c[0] + $this->c[1] + $this->c[2] === 9;
     }
 
     public function setC($c)

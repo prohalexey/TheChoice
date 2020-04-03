@@ -28,7 +28,7 @@
       {
         "node": "context",
         "contextName": "actionReturnInt",
-        "break": "always"
+        "break": "immediately"
       },
       {
         "node": "context",

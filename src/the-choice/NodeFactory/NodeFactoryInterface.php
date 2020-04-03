@@ -1,6 +1,10 @@
 <?php
 
-namespace TheChoice\Contract;
+declare(strict_types=1);
+
+namespace TheChoice\NodeFactory;
+
+use TheChoice\Builder\BuilderInterface;
 
 interface NodeFactoryInterface
 {

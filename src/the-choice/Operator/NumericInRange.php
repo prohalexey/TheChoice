@@ -1,44 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TheChoice\Operator;
 
-use TheChoice\Contract\ContextInterface;
-use TheChoice\Contract\OperatorInterface;
+use TheChoice\Context\ContextInterface;
+use TheChoice\Exception\InvalidArgumentException;
 
 class NumericInRange implements OperatorInterface
 {
-    private $_value;
+    use GetValueTrait;
 
-    public function __construct($value = null)
+    public static function getOperatorName(): string
     {
-        if (null !== $value) {
-            $this->setValue($value);
-        }
+        return 'numericInRange';
     }
 
-    public function setValue($value)
+    public function setValue($value): self
     {
-        if (!\is_array($value)) {
-            throw new \InvalidArgumentException(
-                sprintf('Value passed to NumericInRange operator is not an array, %s given', \gettype($value))
+        if (!is_array($value)) {
+            throw new InvalidArgumentException(
+                sprintf('Value passed to NumericInRange operator is not an array, %s given', gettype($value))
             );
         }
 
-        $argsCount = \count($value);
+        $argsCount = count($value);
         if ($argsCount !== 2) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('NumericInRange operator accept exact 2 args. %d given', $argsCount)
             );
         }
 
-        $this->_value = $value;
+        $this->value = $value;
 
         return $this;
-    }
-
-    public function getValue()
-    {
-        return $this->_value;
     }
 
     public function assert(ContextInterface $context): bool
@@ -48,11 +43,9 @@ class NumericInRange implements OperatorInterface
         list ($leftBoundary, $rightBoundary) = $this->getValue();
 
         if ($leftBoundary > $rightBoundary) {
-            $tmp = $leftBoundary;
-            $leftBoundary = $rightBoundary;
-            $rightBoundary = $tmp;
+            return $contextValue >= $rightBoundary && $contextValue <= $leftBoundary;
+        } else {
+            return $contextValue >= $leftBoundary && $contextValue <= $rightBoundary;
         }
-
-        return $contextValue >= $leftBoundary && $contextValue <= $rightBoundary;
     }
 }

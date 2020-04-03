@@ -1,9 +1,9 @@
-node: tree
+node: root
 description: 'Root node'
 storage:
   $value2: 2
   $value5: 5
-nodes:
+rules:
   node: context
   contextName: actionReturnInt
   modifiers:

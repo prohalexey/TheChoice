@@ -1,10 +1,13 @@
 <?php
 
-namespace TheChoice\Factory;
+declare(strict_types=1);
 
-use TheChoice\Contract\BuilderInterface;
-use TheChoice\Contract\NodeFactoryInterface;
+namespace TheChoice\NodeFactory;
+
+use TheChoice\Builder\BuilderInterface;
 use TheChoice\Node\Condition;
+
+use TheChoice\Exception\LogicException;
 
 class NodeConditionFactory implements NodeFactoryInterface
 {
@@ -15,9 +18,10 @@ class NodeConditionFactory implements NodeFactoryInterface
         $node = new Condition(
             $builder->build($structure['if']),
             $builder->build($structure['then']),
-
             self::nodeHasElseBranch($structure) ? $builder->build($structure['else']) : null
         );
+
+        $node->setRoot($builder->getRoot());
 
         if (self::nodeHasDescription($structure)) {
             $node->setDescription($structure['description']);
@@ -39,7 +43,7 @@ class NodeConditionFactory implements NodeFactoryInterface
 
         foreach ($keysThatMustBePresent as $key) {
             if (!array_key_exists($key, $structure)) {
-                throw new \LogicException(sprintf('The "%s" property is absent in node type "Condition"!', $key));
+                throw new LogicException(sprintf('The "%s" property is absent in node type "Condition"!', $key));
             }
         }
     }
