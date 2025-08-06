@@ -8,9 +8,11 @@ use TheChoice\Exception\InvalidArgumentException;
 
 class Root extends AbstractNode
 {
-    protected $storage = [];
-    protected $rules;
-    protected $result;
+    protected array $storage = [];
+
+    protected Node $rules;
+
+    protected mixed $result = null;
 
     public static function getNodeName(): string
     {
@@ -22,13 +24,14 @@ class Root extends AbstractNode
         return $this->rules;
     }
 
-    public function setRules($node): self
+    public function setRules(Node $node): self
     {
         $this->rules = $node;
+
         return $this;
     }
 
-    public function getResult()
+    public function getResult(): mixed
     {
         return $this->result;
     }
@@ -38,9 +41,10 @@ class Root extends AbstractNode
         return null !== $this->result;
     }
 
-    public function setResult($result): self
+    public function setResult(mixed $result): self
     {
         $this->result = $result;
+
         return $this;
     }
 
@@ -49,22 +53,22 @@ class Root extends AbstractNode
         return $this->storage;
     }
 
-    public function getStorageValue($name)
+    public function getStorageValue(string $name): mixed
     {
         return $this->storage[$name] ?? null;
     }
 
-    public function setGlobal($key, $value)
+    public function setGlobal(string $key, mixed $value): mixed
     {
         if (!preg_match('#[a-z][a-z0-9_]+#i', $key)) {
             throw new InvalidArgumentException(
-                'The key in "storage" property of node type "Root" must be string(format: #[a-z][a-z0-9_]+#i)'
+                'The key in "storage" property of node type "Root" must be string(format: #[a-z][a-z0-9_]+#i)',
             );
         }
 
-        if ($key === 'context') {
+        if ('context' === $key) {
             throw new InvalidArgumentException(
-                'The key "context" for root context is reserved and cannot be used'
+                'The key "context" for root context is reserved and cannot be used',
             );
         }
 

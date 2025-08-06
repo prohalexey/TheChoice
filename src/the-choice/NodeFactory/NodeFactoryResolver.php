@@ -4,37 +4,30 @@ declare(strict_types=1);
 
 namespace TheChoice\NodeFactory;
 
-use TheChoice\Node\{
-    Collection,
-    Condition,
-    Context,
-    Root,
-    Value
-};
-
 use TheChoice\Exception\InvalidArgumentException;
+use TheChoice\Node\Collection;
+use TheChoice\Node\Condition;
+use TheChoice\Node\Context;
+use TheChoice\Node\Root;
+use TheChoice\Node\Value;
 
 final class NodeFactoryResolver implements NodeFactoryResolverInterface
 {
-    public function resolve(string $nodeType)
+    /**
+     * @return class-string
+     */
+    public function resolve(string $nodeType): string
     {
-        $nodeTypeMap = $this->getNodeTypeMap();
-
-        if (!array_key_exists($nodeType, $nodeTypeMap)) {
-            throw new InvalidArgumentException(sprintf('Unknown node type "%s"', $nodeType));
-        }
-
-        return $nodeTypeMap[$nodeType];
-    }
-
-    private function getNodeTypeMap(): array
-    {
-        return [
+        return match ($nodeType) {
             Condition::getNodeName()  => NodeConditionFactory::class,
             Context::getNodeName()    => NodeContextFactory::class,
             Collection::getNodeName() => NodeCollectionFactory::class,
             Root::getNodeName()       => NodeRootFactory::class,
             Value::getNodeName()      => NodeValueFactory::class,
-        ];
+
+            default => throw new InvalidArgumentException(
+                sprintf('Node type "%s" is not supported.', $nodeType),
+            ),
+        };
     }
 }

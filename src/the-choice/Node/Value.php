@@ -6,9 +6,9 @@ namespace TheChoice\Node;
 
 class Value extends AbstractChildNode
 {
-    protected $value;
+    protected mixed $value;
 
-    public function __construct($value)
+    public function __construct(mixed $value)
     {
         $this->value = $value;
     }
@@ -18,7 +18,7 @@ class Value extends AbstractChildNode
         return 'value';
     }
 
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }

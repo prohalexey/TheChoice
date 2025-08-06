@@ -8,7 +8,8 @@ use TheChoice\Context\ContextInterface;
 
 class StringNotContain implements OperatorInterface
 {
-    use GetValueTrait, SetValueTrait;
+    use GetValueTrait;
+    use SetValueTrait;
 
     public static function getOperatorName(): string
     {
@@ -17,6 +18,9 @@ class StringNotContain implements OperatorInterface
 
     public function assert(ContextInterface $context): bool
     {
-        return mb_strpos((string)$context->getValue(), (string)$this->getValue()) === false;
+        $contextValue = is_scalar($context->getValue()) ? (string)$context->getValue() : '';
+        $searchValue = is_scalar($this->getValue()) ? (string)$this->getValue() : '';
+
+        return !str_contains($contextValue, $searchValue);
     }
 }

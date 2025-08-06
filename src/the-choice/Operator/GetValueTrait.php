@@ -6,9 +6,9 @@ namespace TheChoice\Operator;
 
 trait GetValueTrait
 {
-    protected $value;
+    protected mixed $value;
 
-    public function getValue()
+    public function getValue(): mixed
     {
         return $this->value;
     }

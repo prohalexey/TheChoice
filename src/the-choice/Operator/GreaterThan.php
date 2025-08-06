@@ -8,7 +8,8 @@ use TheChoice\Context\ContextInterface;
 
 class GreaterThan implements OperatorInterface
 {
-    use GetValueTrait, SetValueTrait;
+    use GetValueTrait;
+    use SetValueTrait;
 
     public static function getOperatorName(): string
     {

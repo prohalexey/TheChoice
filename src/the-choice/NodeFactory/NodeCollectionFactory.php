@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TheChoice\NodeFactory;
 
+use InvalidArgumentException;
 use TheChoice\Builder\BuilderInterface;
 use TheChoice\Node\Collection;
 
@@ -11,38 +12,54 @@ class NodeCollectionFactory implements NodeFactoryInterface
 {
     public function build(BuilderInterface $builder, array &$structure): Collection
     {
-        $node = new Collection($structure['type']);
+        $type = $structure['type'];
+        if (!is_string($type)) {
+            throw new InvalidArgumentException('Type must be a string');
+        }
 
+        $node = new Collection($type);
         $node->setRoot($builder->getRoot());
 
         if (self::nodeHasDescription($structure)) {
-            $node->setDescription($structure['description']);
+            $description = $structure['description'];
+            if (is_string($description)) {
+                $node->setDescription($description);
+            }
         }
 
         if (self::nodeHasPriority($structure)) {
-            $node->setPriority((int)$structure['priority']);
+            $priority = $structure['priority'];
+            if (is_numeric($priority)) {
+                $node->setPriority((int)$priority);
+            }
         }
 
         if (self::nodeHasChildNodes($structure)) {
-            foreach ($structure['nodes'] as $element) {
-                $node->add($builder->build($element));
+            $nodes = $structure['nodes'];
+            if (is_array($nodes)) {
+                foreach ($nodes as $element) {
+                    if (is_array($element)) {
+                        $builtNode = $builder->build($element);
+                        $node->add($builtNode);
+                    }
+                }
             }
         }
 
         return $node;
     }
 
-    private static function nodeHasDescription(array &$structure): bool
+    private static function nodeHasDescription(array $structure): bool
     {
         return array_key_exists('description', $structure);
     }
 
-    private static function nodeHasPriority(array &$structure): bool
+    private static function nodeHasPriority(array $structure): bool
     {
         return array_key_exists('priority', $structure);
     }
 
-    private static function nodeHasChildNodes(array &$structure): bool
+    private static function nodeHasChildNodes(array $structure): bool
     {
         return array_key_exists('nodes', $structure) && is_array($structure['nodes']);
     }

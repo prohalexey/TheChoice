@@ -6,8 +6,5 @@ namespace TheChoice\Node;
 
 interface Sortable
 {
-    /**
-     * @return int|null
-     */
-    public function getSortableValue();
+    public function getSortableValue(): ?int;
 }

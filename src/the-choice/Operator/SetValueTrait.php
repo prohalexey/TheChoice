@@ -6,11 +6,12 @@ namespace TheChoice\Operator;
 
 trait SetValueTrait
 {
-    protected $value;
+    protected mixed $value;
 
-    public function setValue($value): self
+    public function setValue(mixed $value): static
     {
         $this->value = $value;
+
         return $this;
     }
 }

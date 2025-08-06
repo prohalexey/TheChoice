@@ -6,5 +6,5 @@ namespace TheChoice\NodeFactory;
 
 interface NodeFactoryResolverInterface
 {
-    public function resolve(string $nodeType);
+    public function resolve(string $nodeType): string;
 }

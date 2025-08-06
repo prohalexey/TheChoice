@@ -6,5 +6,5 @@ namespace TheChoice\Operator;
 
 interface OperatorResolverInterface
 {
-    public function resolve(string $operatorType);
+    public function resolve(string $operatorType): string;
 }

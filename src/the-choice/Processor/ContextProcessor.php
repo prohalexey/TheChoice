@@ -5,30 +5,35 @@ declare(strict_types=1);
 namespace TheChoice\Processor;
 
 use ChrisKonnertz\StringCalc\StringCalc;
-
 use Exception;
-use TheChoice\Exception\InvalidContextCalculation;
-use TheChoice\Exception\RuntimeException;
+use InvalidArgumentException;
 use TheChoice\Context\CallableContext;
 use TheChoice\Context\ContextFactoryInterface;
+use TheChoice\Exception\InvalidContextCalculation;
+use TheChoice\Exception\RuntimeException;
 use TheChoice\Node\Context;
+use TheChoice\Node\Node;
 use TheChoice\Operator\OperatorInterface;
 
 class ContextProcessor extends AbstractProcessor
 {
-    /** @var ContextFactoryInterface */
-    protected $contextFactory;
+    protected ?ContextFactoryInterface $contextFactory = null;
 
-    protected $processedContext = [];
+    protected array $processedContext = [];
 
     public function setContextFactory(ContextFactoryInterface $contextFactory): self
     {
         $this->contextFactory = $contextFactory;
+
         return $this;
     }
 
-    public function process(Context $node)
+    public function process(Node $node): mixed
     {
+        if (!$node instanceof Context) {
+            throw new InvalidArgumentException('Node must be an instance of Context');
+        }
+
         if (null === $this->contextFactory) {
             throw new RuntimeException('Context factory not configured');
         }
@@ -38,7 +43,7 @@ class ContextProcessor extends AbstractProcessor
         ];
 
         $params = $node->getParams();
-        if (count($params) > 0) {
+        if ([] !== $params) {
             $hash[] = hash('md5', serialize($params));
         }
 
@@ -47,14 +52,14 @@ class ContextProcessor extends AbstractProcessor
             /** @var OperatorInterface $operator */
             $operatorValue = $operator->getValue();
 
-            $hash[] = get_class($operator);
+            $hash[] = $operator::class;
             $hash[] = is_array($operatorValue) || is_object($operatorValue)
                 ? hash('md5', serialize($operatorValue))
                 : $operatorValue;
         }
 
         $modifiers = $node->getModifiers();
-        if (count($modifiers) > 0) {
+        if ([] !== $modifiers) {
             $hash[] = hash('md5', serialize($modifiers));
         }
 
@@ -64,10 +69,10 @@ class ContextProcessor extends AbstractProcessor
             $context = $this->contextFactory->createContextFromContextNode($node);
 
             if (null !== $operator) {
-                if (count($modifiers) > 0) {
-                    $context = new CallableContext(function () use ($context, $node) {
-                        return $this->processContextModifiers($context->getValue(), $node);
-                    });
+                if ([] !== $modifiers) {
+                    $context = new CallableContext(
+                        fn (): mixed => $this->processContextModifiers($context->getValue(), $node),
+                    );
                 }
 
                 $this->processedContext[$hash] = $operator->assert($context);
@@ -79,19 +84,19 @@ class ContextProcessor extends AbstractProcessor
         if ($node->isStoppable()) {
             $node->getRoot()->setResult($this->processedContext[$hash]);
 
-            /**
+            /*
              * If the "Root" node has a result, we should stop here.
-             * It does not matter what we return, the result is already set to the "Root" node
+             * It does not matter what we return; the result is already set to the "Root" node
              */
-            if ($node->getStoppableType() === Context::STOP_IMMEDIATELY) {
-                return;
+            if (Context::STOP_IMMEDIATELY === $node->getStoppableType()) {
+                return null;
             }
         }
 
         return $this->processedContext[$hash];
     }
 
-    private function processContextModifiers($value, Context $node)
+    private function processContextModifiers(mixed $value, Context $node): mixed
     {
         $vars = ['$context' => $value];
 
@@ -99,7 +104,11 @@ class ContextProcessor extends AbstractProcessor
         $vars = array_merge($vars, $storage);
 
         foreach ($node->getModifiers() as $modifier) {
-            $modifier = str_replace(array_keys($vars), array_values($vars), $modifier);
+            $search = array_keys($vars);
+            $replace = array_values($vars);
+            /** @var array<string> $search */
+            /** @var array<string> $replace */
+            $modifier = str_replace($search, $replace, $modifier);
 
             try {
                 $value = (new StringCalc())->calculate($modifier);

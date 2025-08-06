@@ -6,14 +6,15 @@ namespace TheChoice\Context;
 
 final class CallableContext implements ContextInterface
 {
-    private $context;
+    /** @var callable */
+    private mixed $context;
 
     public function __construct(callable $context)
     {
         $this->context = $context;
     }
 
-    public function getValue()
+    public function getValue(): mixed
     {
         return ($this->context)();
     }

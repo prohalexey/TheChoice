@@ -6,13 +6,14 @@ namespace TheChoice\Node;
 
 abstract class AbstractNode implements Node
 {
-    protected $description;
+    protected string $description;
 
     abstract public static function getNodeName(): string;
 
     public function setDescription(string $description): self
     {
         $this->description = $description;
+
         return $this;
     }
 

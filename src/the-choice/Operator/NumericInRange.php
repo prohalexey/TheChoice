@@ -16,18 +16,18 @@ class NumericInRange implements OperatorInterface
         return 'numericInRange';
     }
 
-    public function setValue($value): self
+    public function setValue(mixed $value): static
     {
         if (!is_array($value)) {
             throw new InvalidArgumentException(
-                sprintf('Value passed to NumericInRange operator is not an array, %s given', gettype($value))
+                sprintf('Value passed to NumericInRange operator is not an array, %s given', gettype($value)),
             );
         }
 
         $argsCount = count($value);
-        if ($argsCount !== 2) {
+        if (2 !== $argsCount) {
             throw new InvalidArgumentException(
-                sprintf('NumericInRange operator accept exact 2 args. %d given', $argsCount)
+                sprintf('NumericInRange operator accept exact 2 args. %d given', $argsCount),
             );
         }
 
@@ -40,12 +40,17 @@ class NumericInRange implements OperatorInterface
     {
         $contextValue = $context->getValue();
 
-        list ($leftBoundary, $rightBoundary) = $this->getValue();
+        $value = $this->getValue();
+        if (!is_array($value) || 2 !== count($value)) {
+            return false;
+        }
+
+        [$leftBoundary, $rightBoundary] = $value;
 
         if ($leftBoundary > $rightBoundary) {
             return $contextValue >= $rightBoundary && $contextValue <= $leftBoundary;
-        } else {
-            return $contextValue >= $leftBoundary && $contextValue <= $rightBoundary;
         }
+
+        return $contextValue >= $leftBoundary && $contextValue <= $rightBoundary;
     }
 }

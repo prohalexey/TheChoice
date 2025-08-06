@@ -6,12 +6,15 @@ namespace TheChoice\Node;
 
 class Condition extends AbstractChildNode implements Sortable
 {
-    protected $ifNode;
-    protected $thenNode;
-    protected $elseNode;
-    protected $priority;
+    protected Node $ifNode;
 
-    public function __construct(Node $ifNode, Node $thenNode, Node $elseNode = null)
+    protected Node $thenNode;
+
+    protected ?Node $elseNode;
+
+    protected int $priority = 0;
+
+    public function __construct(Node $ifNode, Node $thenNode, ?Node $elseNode = null)
     {
         $this->ifNode = $ifNode;
         $this->thenNode = $thenNode;
@@ -23,28 +26,29 @@ class Condition extends AbstractChildNode implements Sortable
         return 'condition';
     }
 
-    public function setPriority(int $priority)
+    public function setPriority(int $priority): static
     {
         $this->priority = $priority;
+
         return $this;
     }
 
-    public function getIfNode()
+    public function getIfNode(): Node
     {
         return $this->ifNode;
     }
 
-    public function getThenNode()
+    public function getThenNode(): Node
     {
         return $this->thenNode;
     }
 
-    public function getElseNode()
+    public function getElseNode(): ?Node
     {
         return $this->elseNode;
     }
 
-    public function getSortableValue()
+    public function getSortableValue(): int
     {
         return $this->priority;
     }

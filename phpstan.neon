@@ -1,0 +1,44 @@
+parameters:
+    tmpDir: ./var/phpstan
+    checkMissingTypehints: true
+    checkMissingVarTagTypehint: true
+    parallel:
+        jobSize: 20
+        maximumNumberOfProcesses: 32
+        minimumNumberOfJobsPerProcess: 2
+    level: 9
+    paths:
+        - ./src
+    ignoreErrors:
+        -
+            identifier: missingType.iterableValue
+    treatPhpDocTypesAsCertain: false
+    strictRules:
+        allRules: true
+        disallowedLooseComparison: true
+        booleansInConditions: false
+        uselessCast: true
+        requireParentConstructorCall: true
+        disallowedBacktick: true
+        disallowedEmpty: false
+        disallowedImplicitArrayCreation: true
+        disallowedShortTernary: false
+        overwriteVariablesWithLoop: true
+        closureUsesThis: true
+        matchingInheritedMethodNames: true
+        numericOperandsInArithmeticOperators: true
+        strictFunctionCalls: false
+        dynamicCallOnStaticMethod: true
+        switchConditionsMatchingType: true
+        noVariableVariables: false
+        strictArrayFilter: false
+        illegalConstructorMethodCall: true
+
+    checkExplicitMixedMissingReturn: true
+    checkDynamicProperties: false
+
+includes:
+    - ./vendor/phpstan/phpstan-phpunit/extension.neon
+    - ./vendor/phpstan/phpstan-strict-rules/rules.neon
+
+

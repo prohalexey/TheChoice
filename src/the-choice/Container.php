@@ -5,16 +5,12 @@ declare(strict_types=1);
 namespace TheChoice;
 
 use Psr\Container\ContainerInterface;
-
 use TheChoice\Builder\ArrayBuilder;
 use TheChoice\Builder\JsonBuilder;
 use TheChoice\Builder\YamlBuilder;
-
-use TheChoice\Context\ContextFactoryInterface;
 use TheChoice\Context\ContextFactory;
-
+use TheChoice\Context\ContextFactoryInterface;
 use TheChoice\Exception\ContainerNotFoundException;
-
 use TheChoice\NodeFactory\NodeCollectionFactory;
 use TheChoice\NodeFactory\NodeConditionFactory;
 use TheChoice\NodeFactory\NodeContextFactory;
@@ -22,7 +18,6 @@ use TheChoice\NodeFactory\NodeFactoryResolver;
 use TheChoice\NodeFactory\NodeFactoryResolverInterface;
 use TheChoice\NodeFactory\NodeRootFactory;
 use TheChoice\NodeFactory\NodeValueFactory;
-
 use TheChoice\Operator\ArrayContain;
 use TheChoice\Operator\ArrayNotContain;
 use TheChoice\Operator\Equal;
@@ -33,10 +28,9 @@ use TheChoice\Operator\LowerThanOrEqual;
 use TheChoice\Operator\NotEqual;
 use TheChoice\Operator\NumericInRange;
 use TheChoice\Operator\OperatorResolver;
+use TheChoice\Operator\OperatorResolverInterface;
 use TheChoice\Operator\StringContain;
 use TheChoice\Operator\StringNotContain;
-use TheChoice\Operator\OperatorResolverInterface;
-
 use TheChoice\Processor\AbstractProcessor;
 use TheChoice\Processor\CollectionProcessor;
 use TheChoice\Processor\ConditionProcessor;
@@ -48,17 +42,13 @@ use TheChoice\Processor\ValueProcessor;
 
 class Container implements ContainerInterface
 {
-    protected $services = [];
-
-    protected $classMap;
-
-    public $builders = [
+    public array $builders = [
         ArrayBuilder::class,
         JsonBuilder::class,
         YamlBuilder::class,
     ];
 
-    public $operators = [
+    public array $operators = [
         ArrayContain::class,
         ArrayNotContain::class,
         Equal::class,
@@ -72,7 +62,7 @@ class Container implements ContainerInterface
         StringNotContain::class,
     ];
 
-    public $nodeFactories = [
+    public array $nodeFactories = [
         NodeConditionFactory::class,
         NodeContextFactory::class,
         NodeCollectionFactory::class,
@@ -80,7 +70,7 @@ class Container implements ContainerInterface
         NodeValueFactory::class,
     ];
 
-    public $processors = [
+    public array $processors = [
         CollectionProcessor::class,
         ContextProcessor::class,
         ConditionProcessor::class,
@@ -88,14 +78,20 @@ class Container implements ContainerInterface
         ValueProcessor::class,
     ];
 
-    public $interfaces = [
+    public array $interfaces = [
         NodeFactoryResolverInterface::class,
         OperatorResolverInterface::class,
         ProcessorResolverInterface::class,
-        ContextFactoryInterface::class
+        ContextFactoryInterface::class,
     ];
 
-    protected $contexts = [];
+    /** @var array<string, object> */
+    protected array $services = [];
+
+    /** @var array<string> */
+    protected array $classMap;
+
+    protected array $contexts;
 
     public function __construct(array $contexts)
     {
@@ -106,38 +102,44 @@ class Container implements ContainerInterface
             $this->operators,
             $this->nodeFactories,
             $this->processors,
-            $this->interfaces
+            $this->interfaces,
         );
     }
 
-    public function get($id)
+    /**
+     * @throws ContainerNotFoundException
+     */
+    public function get(string $id): object
     {
-        if ($id === NodeFactoryResolverInterface::class) {
+        if (NodeFactoryResolverInterface::class === $id) {
             if (!array_key_exists(NodeFactoryResolverInterface::class, $this->services)) {
                 $this->services[NodeFactoryResolverInterface::class] = new NodeFactoryResolver();
-
             }
+
             return $this->services[NodeFactoryResolverInterface::class];
         }
 
-        if ($id === OperatorResolverInterface::class) {
+        if (OperatorResolverInterface::class === $id) {
             if (!array_key_exists(OperatorResolverInterface::class, $this->services)) {
                 $this->services[OperatorResolverInterface::class] = new OperatorResolver();
             }
+
             return $this->services[OperatorResolverInterface::class];
         }
 
-        if ($id === ProcessorResolverInterface::class) {
+        if (ProcessorResolverInterface::class === $id) {
             if (!array_key_exists(ProcessorResolverInterface::class, $this->services)) {
                 $this->services[ProcessorResolverInterface::class] = new ProcessorResolver();
             }
+
             return $this->services[ProcessorResolverInterface::class];
         }
 
         if (in_array($id, $this->nodeFactories, true)) {
             if (!array_key_exists($id, $this->services)) {
-                $this->services[$id] = new $id;
+                $this->services[$id] = new $id();
             }
+
             return $this->services[$id];
         }
 
@@ -146,33 +148,37 @@ class Container implements ContainerInterface
         }
 
         if (in_array($id, $this->operators, true)) {
-            return new $id;
+            return new $id();
         }
 
         if (in_array($id, $this->processors, true)) {
             /** @var AbstractProcessor $processor */
-            $processor = new $id;
+            $processor = new $id();
             $processor->setContainer($this);
 
-            if ($id === ContextProcessor::class) {
+            if (ContextProcessor::class === $id) {
                 /** @var ContextProcessor $processor */
-                $processor->setContextFactory($this->get(ContextFactoryInterface::class));
+                $contextFactory = $this->get(ContextFactoryInterface::class);
+                if ($contextFactory instanceof ContextFactoryInterface) {
+                    $processor->setContextFactory($contextFactory);
+                }
             }
 
             return $processor;
         }
 
-        if ($id === ContextFactoryInterface::class) {
+        if (ContextFactoryInterface::class === $id) {
             $contextFactory = new ContextFactory($this->contexts);
             $contextFactory->setContainer($this);
+
             return $contextFactory;
         }
 
         throw new ContainerNotFoundException(sprintf('There is no configuration for "%s" item in the container', $id));
     }
 
-    public function has($id)
+    public function has(string $id): bool
     {
-        return in_array($id, $this->classMap);
+        return in_array($id, $this->classMap, true);
     }
 }

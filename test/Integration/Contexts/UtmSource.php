@@ -6,7 +6,7 @@ use TheChoice\Context\ContextInterface;
 
 class UtmSource implements ContextInterface
 {
-    public function getValue()
+    public function getValue(): string
     {
         return 'abcd';
     }

@@ -8,16 +8,20 @@ use TheChoice\Exception\LogicException;
 
 class Collection extends AbstractChildNode implements Sortable
 {
-    const TYPE_AND = 'and';
-    const TYPE_OR = 'or';
+    public const TYPE_AND = 'and';
 
-    protected $type;
-    protected $collection = [];
-    protected $priority;
+    public const TYPE_OR = 'or';
 
-    public function __construct($type)
+    protected string $type;
+
+    /** @var array<Node> */
+    protected array $collection = [];
+
+    protected int $priority = 0;
+
+    public function __construct(string $type)
     {
-        if ($type !== self::TYPE_AND && $type !== self::TYPE_OR) {
+        if (!in_array($type, [self::TYPE_AND, self::TYPE_OR], true)) {
             throw new LogicException(sprintf('Collection type must be "or" or "and". "%s" given', $type));
         }
 
@@ -29,19 +33,20 @@ class Collection extends AbstractChildNode implements Sortable
         return 'collection';
     }
 
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    public function add($element): self
+    public function add(Node $element): self
     {
         $this->collection[] = $element;
+
         return $this;
     }
 
     /**
-     * @return Node[]
+     * @return array<Node>
      */
     public function all(): array
     {
@@ -51,25 +56,28 @@ class Collection extends AbstractChildNode implements Sortable
     public function setPriority(int $priority): self
     {
         $this->priority = $priority;
+
         return $this;
     }
 
     public function sort(): self
     {
-        usort($this->collection, static function($element1, $element2) {
+        usort($this->collection, static function ($element1, $element2): int {
             if (!$element2 instanceof Sortable) {
                 return 1;
             }
+
             if (!$element1 instanceof Sortable) {
                 return -1;
             }
+
             return $element1->getSortableValue() <=> $element2->getSortableValue();
         });
 
         return $this;
     }
 
-    public function getSortableValue()
+    public function getSortableValue(): int
     {
         return $this->priority;
     }

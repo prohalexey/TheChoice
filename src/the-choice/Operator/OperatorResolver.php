@@ -8,31 +8,27 @@ use TheChoice\Exception\InvalidArgumentException;
 
 class OperatorResolver implements OperatorResolverInterface
 {
-    public function resolve(string $operatorType)
+    /**
+     * @return class-string
+     */
+    public function resolve(string $operatorType): string
     {
-        $operatorTypeMap = $this->getOperatorMap();
+        return match ($operatorType) {
+            ArrayContain::getOperatorName()       => ArrayContain::class,
+            ArrayNotContain::getOperatorName()    => ArrayNotContain::class,
+            Equal::getOperatorName()              => Equal::class,
+            GreaterThan::getOperatorName()        => GreaterThan::class,
+            GreaterThanOrEqual::getOperatorName() => GreaterThanOrEqual::class,
+            LowerThan::getOperatorName()          => LowerThan::class,
+            LowerThanOrEqual::getOperatorName()   => LowerThanOrEqual::class,
+            NotEqual::getOperatorName()           => NotEqual::class,
+            NumericInRange::getOperatorName()     => NumericInRange::class,
+            StringContain::getOperatorName()      => StringContain::class,
+            StringNotContain::getOperatorName()   => StringNotContain::class,
 
-        if (!array_key_exists($operatorType, $operatorTypeMap)) {
-            throw new InvalidArgumentException(sprintf('Unknown operator type "%s"', $operatorType));
-        }
-
-        return $operatorTypeMap[$operatorType];
-    }
-
-    private function getOperatorMap(): array
-    {
-        return [
-            ArrayContain::getOperatorName()         => ArrayContain::class,
-            ArrayNotContain::getOperatorName()      => ArrayNotContain::class,
-            Equal::getOperatorName()                => Equal::class,
-            GreaterThan::getOperatorName()          => GreaterThan::class,
-            GreaterThanOrEqual::getOperatorName()   => GreaterThanOrEqual::class,
-            LowerThan::getOperatorName()            => LowerThan::class,
-            LowerThanOrEqual::getOperatorName()     => LowerThanOrEqual::class,
-            NotEqual::getOperatorName()             => NotEqual::class,
-            NumericInRange::getOperatorName()       => NumericInRange::class,
-            StringContain::getOperatorName()        => StringContain::class,
-            StringNotContain::getOperatorName()     => StringNotContain::class,
-        ];
+            default => throw new InvalidArgumentException(
+                sprintf('Operator "%s" is not supported.', $operatorType),
+            )
+        };
     }
 }

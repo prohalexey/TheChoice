@@ -4,71 +4,76 @@ declare(strict_types=1);
 
 namespace TheChoice\Node;
 
-use TheChoice\Exception\LogicException;
 use TheChoice\Exception\InvalidArgumentException;
+use TheChoice\Exception\LogicException;
 use TheChoice\Operator\OperatorInterface;
 
 class Context extends AbstractChildNode implements Sortable
 {
     public const STOP_IMMEDIATELY = 'immediately';
 
-    protected $operator;
-    protected $contextName;
-    protected $priority;
-    protected $params = [];
-    protected $stoppableType;
-    protected $modifiers = [];
+    protected ?OperatorInterface $operator = null;
+
+    protected string $contextName;
+
+    protected int $priority = 0;
+
+    protected array $params = [];
+
+    protected ?string $stoppableType = null;
+
+    /** @var array<string> */
+    protected array $modifiers = [];
 
     public static function getNodeName(): string
     {
         return 'context';
     }
 
-    public function getSortableValue()
+    public function getSortableValue(): int
     {
         return $this->priority;
     }
 
-    public function setPriority(int $priority)
+    public function setPriority(int $priority): static
     {
         $this->priority = $priority;
+
         return $this;
     }
 
-    /**
-     * @return OperatorInterface|null
-     */
-    public function getOperator()
+    public function getOperator(): ?OperatorInterface
     {
         return $this->operator;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getContextName()
+    public function getContextName(): ?string
     {
         return $this->contextName;
     }
 
-    public function setContextName(string $contextName) {
+    public function setContextName(string $contextName): static
+    {
         $this->contextName = $contextName;
+
         return $this;
     }
 
-    public function setOperator(OperatorInterface $operator){
+    public function setOperator(OperatorInterface $operator): static
+    {
         $this->operator = $operator;
+
         return $this;
     }
 
-    public function getStoppableType()
+    public function getStoppableType(): ?string
     {
         return $this->stoppableType;
     }
 
-    public function setStoppableType($type)
+    public function setStoppableType(?string $type): static
     {
-        if ($type !== self::STOP_IMMEDIATELY) {
+        if (self::STOP_IMMEDIATELY !== $type) {
             throw new LogicException(sprintf('Stoppable type must be one of (%s). "%s" given', implode(', ', static::getStopModes()), $type));
         }
 
@@ -87,33 +92,36 @@ class Context extends AbstractChildNode implements Sortable
         return $this->params;
     }
 
-    public function setParams(array $params)
+    public function setParams(array $params): void
     {
         $this->params = $params;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getModifiers(): array
     {
         return $this->modifiers;
     }
 
-    public function setModifiers(array $modifiers)
+    public function setModifiers(array $modifiers): void
     {
-        if ($this->checkModifiers($modifiers) === false) {
+        if (false === $this->checkModifiers($modifiers)) {
             throw new InvalidArgumentException('Context modifier must be string type');
         }
+
+        /** @var array<string> $modifiers */
         $this->modifiers = $modifiers;
     }
 
-    public static function getStopModes()
+    public static function getStopModes(): array
     {
         return [self::STOP_IMMEDIATELY];
     }
 
     private function checkModifiers(array $modifiers): bool
     {
-        return array_reduce($modifiers, static function ($carry, $modifier) {
-            return $carry && is_string($modifier);
-        }, true);
+        return array_reduce($modifiers, static fn ($carry, $modifier) => $carry && is_string($modifier), true);
     }
 }

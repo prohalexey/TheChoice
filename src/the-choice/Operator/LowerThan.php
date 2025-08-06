@@ -8,7 +8,8 @@ use TheChoice\Context\ContextInterface;
 
 class LowerThan implements OperatorInterface
 {
-    use GetValueTrait, SetValueTrait;
+    use GetValueTrait;
+    use SetValueTrait;
 
     public static function getOperatorName(): string
     {

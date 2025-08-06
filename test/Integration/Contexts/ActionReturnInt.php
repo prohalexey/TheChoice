@@ -6,7 +6,7 @@ use TheChoice\Context\ContextInterface;
 
 class ActionReturnInt implements ContextInterface
 {
-    public function getValue()
+    public function getValue(): int
     {
         return 5;
     }

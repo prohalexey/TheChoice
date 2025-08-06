@@ -8,7 +8,8 @@ use TheChoice\Context\ContextInterface;
 
 class StringContain implements OperatorInterface
 {
-    use GetValueTrait, SetValueTrait;
+    use GetValueTrait;
+    use SetValueTrait;
 
     public static function getOperatorName(): string
     {
@@ -17,6 +18,13 @@ class StringContain implements OperatorInterface
 
     public function assert(ContextInterface $context): bool
     {
-        return mb_strpos((string)$context->getValue(), (string)$this->getValue()) !== false;
+        $contextValue = $context->getValue();
+        $searchValue = $this->getValue();
+
+        if (!is_string($contextValue) || !is_string($searchValue)) {
+            return false;
+        }
+
+        return str_contains($contextValue, $searchValue);
     }
 }

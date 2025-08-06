@@ -6,12 +6,12 @@ namespace TheChoice\Node;
 
 abstract class AbstractChildNode extends AbstractNode
 {
-    /** @var Root */
-    protected $root;
+    protected Root $root;
 
     public function setRoot(Root $root): Node
     {
         $this->root = $root;
+
         return $this;
     }
 

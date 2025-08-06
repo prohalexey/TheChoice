@@ -6,7 +6,7 @@ use TheChoice\Context\ContextInterface;
 
 class HasVipStatus implements ContextInterface
 {
-    public function getValue()
+    public function getValue(): bool
     {
         return false;
     }

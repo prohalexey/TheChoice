@@ -7,19 +7,20 @@ use TheChoice\Context\ContextInterface;
 class ActionWithParams implements ContextInterface
 {
     public $a;
+
     public $b;
 
     private $c;
 
-    public function getValue()
+    public function getValue(): bool
     {
         return
-            is_numeric($this->a) && $this->a === 1 &&
-            is_string($this->b) && $this->b === 'test' &&
-            is_array($this->c) && isset($this->c[0], $this->c[1], $this->c[2]) && $this->c[0] + $this->c[1] + $this->c[2] === 9;
+            is_numeric($this->a) && 1 === $this->a
+            && is_string($this->b) && 'test' === $this->b
+            && is_array($this->c) && isset($this->c[0], $this->c[1], $this->c[2]) && $this->c[0] + $this->c[1] + $this->c[2] === 9;
     }
 
-    public function setC($c)
+    public function setC($c): void
     {
         $this->c = $c;
     }

@@ -1,31 +1,38 @@
-# Business Rule Engine - TheChoice
+# TheChoice - Business Rule Engine
 
 [![Build Status](https://travis-ci.org/prohalexey/TheChoice.png)](https://travis-ci.org/prohalexey/TheChoice)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/prohalexey/TheChoice/master/LICENSE)
 
-"Business Rule Engine" on PHP
+A powerful and flexible Business Rule Engine for PHP that allows you to separate business logic from your application code.
 
-This library allows you to simplify the writing of rules for business processes, such as:
- - complex discounts calculation
- - giving bonuses to your customers
- - resolving user permissions
- 
-This can be useful for you if you change certain conditions in your code over and over againg.
-It allows you to move these conditions to configuration sources. You can even create a web interface that can edit configurations.
-You can write rules in JSON or YAML format and store them into files or in the database. 
-Configuration can be serialized and cached.
+## Features
 
-# Installation
+This library helps you simplify the implementation of complex business rules such as:
+- Complex discount calculations
+- Customer bonus systems
+- User permission resolution
+- Dynamic pricing strategies
 
-```
+**Why use TheChoice?** If you find yourself constantly modifying business conditions in your code, this library allows you to move those conditions to external configuration sources. You can even create a web interface to edit configurations dynamically.
+
+### Key Benefits
+- ✅ Rules written in JSON or YAML format
+- ✅ Store rules in files or databases
+- ✅ Serializable and cacheable configurations
+- ✅ PSR-11 compatible container support
+- ✅ Extensible with custom operators and contexts
+
+## Installation
+
+```bash
 composer require prohalexey/the-choice
 ```
 
-# Examples
+## Quick Start
 
-JSON configuration
+### JSON Configuration Example
 
-```JSON
+```json
 {
   "node": "condition",
   "if": {
@@ -51,26 +58,26 @@ JSON configuration
   },
   "then": {
     "node": "context",
-    "description": "Giving 10% of deposit's sum as discount for the next order",
+    "description": "Giving 10% of deposit sum as discount for the next order",
     "context": "getDepositSum",
     "modifiers": [
-        "$context * 0.1"
+      "$context * 0.1"
     ],
     "params": {
-        "discountType": "VIP client"
+      "discountType": "VIP client"
     }
   },
   "else": {
     "node": "value",
-    "description": "Giving 5% for the next order",
+    "description": "Giving 5% discount for the next order",
     "value": "5"
   }
 }
 ```
 
-The same thing but in the YAML configuration
+### YAML Configuration Example
 
-```YAML
+```yaml
 node: condition
 if:
   node: collection
@@ -89,23 +96,25 @@ if:
 then:
   node: context
   context: getDepositSum
-  description: "Giving 10% of deposit's sum as discount for the next order"
+  description: "Giving 10% of deposit sum as discount for the next order"
   modifiers: 
     - "$context * 0.1"
   params:
     discountType: "VIP client"
 else:
   node: value
-  description: "Giving 5% for the next order"
+  description: "Giving 5% discount for the next order"
   value: 5
 ```
 
-# Usage in PHP
+### PHP Usage
 
-```PHP
+```php
+<?php
+
 use TheChoice\Container;
 
-// Passing contexts to the PSR-11 compatible container
+// Configure contexts in the PSR-11 compatible container
 $container = new Container([
     'visitCount' => VisitCount::class,
     'hasVipStatus' => HasVipStatus::class,
@@ -120,82 +129,72 @@ $container = new Container([
     'actionWithParams' => ActionWithParams::class,
 ]);
 
-// Creating a parser 
+// Create a parser 
 $parser = $container->get(JsonBuilder::class);
 
-// Load rules from a file or other sources
-$rules = $parser->parseFile('Json/testOneNodeWithRuleGreaterThan.json');
+// Load rules from file or other sources
+$rules = $parser->parseFile('rules/discount-rules.json');
 
-// Loading processor
+// Get the processor
 $resolver = $container->get(ProcessorResolverInterface::class);
 $processor = $resolver->resolve($rules);
 
-// Process the rules
+// Execute the rules
 $result = $processor->process($rules);
 ```
 
-# Core functionality
+## Core Concepts
 
-## Node types
-Each node has a “node” property that describes the type of node.
-And also each node has a “description” property which can be used to store description for UI.
+### Node Types
 
-### Root
-This is a rules' tree root. It has a state and it stores a result of execution.
+Each node has a `node` property that describes its type and an optional `description` property for UI purposes.
 
-######Node properties
-`storage` - Simple container for variables.
+#### Root Node
+The root of the rules tree that maintains state and stores execution results.
 
-`rules` - This property contain the first node that will be processed. Actually even if you omit this node it will be created automatically.
+**Properties:**
+- `storage` - Container for variables
+- `rules` - Contains the first node to be processed
 
-######Example
-```
+**Example:**
+```yaml
 node: root
 description: "Discount settings"
-nodes: 
+rules: 
   node: value
   value: 5
 ```
 
-### Value
-This is a simple node that just return some value. 
+#### Value Node
+Returns a static value.
 
-######Node properties
-`value` - Simple value
+**Properties:**
+- `value` - The value to return (can be array, string, or numeric)
 
-######Example
-```
+**Example:**
+```yaml
 node: value
-description: "Giving 5% for the next order"
+description: "5% discount for next order"
 value: 5
 ```
 
-> The value can be an array, string, numeric.
+#### Context Node
+Executes callable objects and can modify the global state which is stored in the "Root" node.
 
-### Context
+**Properties:**
+- `break` - Special property to stop execution (`"immediately"` stops and returns context result)
+- `context` - Name of the context for calculations
+- `modifiers` - Array of mathematical modifiers
+- `operator` - Operator for calculations or comparisons
+- `params` - Parameters to set in context
+- `priority` - Priority for collection sorting
+- `value` - Default value for the `$context` variable
 
-This is node associated with some callable object and return some values as result of execution that callable objects. This node can change the global state which stored in the "Root" node. 
-
-######Node properties
-`break` - Is a special property that can stop rules processor after execution this node. For now the only allowed value is "immediately" which stop rules execution and return the context result as final result.
-
-`contextName` - The name of context to be used for calculations.
-
-`modifiers` - Array of modifiers.
-
-`operator` - An operator to be used for calculations or comparisons.
-
-`params` - An array of parameters to be set in context.
-
-`priority` - Priority node. If this node will be used in the collection, then the elements in the collection will be sorted according to this value.
-
-`value` - Default value for the **$context** variable;
-
-######Example
-```
+**Example:**
+```yaml
 node: context
 context: getDepositSum
-description: "Giving 10% of deposit's sum as discount for the next order"
+description: "Calculate 10% of deposit sum"
 modifiers: 
   - "$context * 0.1"
 params:
@@ -203,61 +202,27 @@ params:
 priority: 5
 ```
 
-> You can set the parameters to "callable" if this "callable" is object. 
-Parameters will be set via setters or public properties before executing the rules
-
->You can use modifiers for modify return value from context. Use predefined variable `$context` 
-For more information about calculations please read this https://github.com/chriskonnertz/string-calc 
-
-```
+**With Operator Example:**
+```yaml
 node: context
 context: withdrawalCount
 operator: equal
 value: 0
 ```
 
->  The result will be stored in the storage or the result will be returned to the "root" node.
+#### Collection Node
+Contains multiple nodes with AND/OR logic.
 
+**Properties:**
+- `type` - Collection type (`and` or `or`)
+- `elements` - Array of child nodes
+- `priority` - Priority for nested collections
 
-You can use Built-in Operators to test returning value of CONTEXT node against some value.
-
-> Operators must return boolean values
-
-This Built-in operators can be used or you can register new custom operators and add them to the container.
-
-```
-ArrayContain
-ArrayNotContain
-Equal
-GreaterThan
-GreaterThanOrEqual
-LowerThan
-LowerThanOrEqual
-NotEqual
-NumericInRange
-StringContain
-StringNotContain
-```
-
-### Collection
-
-Collection is a node that contains other nodes. 
-
-######Node properties
-
-`type` - Available types of collection are AND and OR.
-
-`nodes` - An array of nodes.
-
-`priority` - Priority node. If this node will be used in the collection, then the elements in the collection will be sorted according to this value.
-
-> PRIORITY property is used if this node is in the another collection (e.g collection of collections)
-
-######Example
-```
+**Example:**
+```yaml
 node: collection
-  type: and
-  elements:
+type: and
+elements:
   - node: context
     context: withdrawalCount
     operator: equal
@@ -270,17 +235,55 @@ node: collection
       - testgroup2
 ```
 
-> This node is expecting boolean values from nodes and return a value depending on the type of collection. 
+#### Condition Node
+Conditional logic with if-then-else structure.
 
-### Condition
+**Properties:**
+- `if` - Condition node (expects boolean result)
+- `then` - Node to execute if condition is true
+- `else` - Node to execute if condition is false
 
-A condition node used to test some conditions.
+### Built-in Operators
 
-`if` - Is expecting boolean value from inner nodes.
+The following operators are available for context nodes:
 
-`then` - Any other nodes include another IF node. Executing if result is TRUE
+- `ArrayContain` - Check if array contains value
+- `ArrayNotContain` - Check if array doesn't contain value
+- `Equal` - Equality comparison
+- `GreaterThan` - Greater than comparison
+- `GreaterThanOrEqual` - Greater than or equal comparison
+- `LowerThan` - Less than comparison
+- `LowerThanOrEqual` - Less than or equal comparison
+- `NotEqual` - Not equal comparison
+- `NumericInRange` - Check if number is within range
+- `StringContain` - Check if string contains substring
+- `StringNotContain` - Check if string doesn't contain substring
 
-`else` - Any other nodes include another IF node. Executing if result is FALSE
+### Modifiers
 
-### Any Questions ?
-See the tests and especially the container for more details.
+Modifiers allow you to transform context values using mathematical expressions. Use the predefined `$context` variable in your expressions.
+
+For more information about calculations, see: https://github.com/chriskonnertz/string-calc
+
+## Advanced Features
+
+### Custom Contexts
+Create custom context classes by implementing the required interface and register them in the container.
+
+### Custom Operators
+Extend the system by creating custom operators and adding them to the container.
+
+### Caching
+Configurations can be serialized and cached for improved performance.
+
+## Examples and Testing
+
+For more detailed examples and usage patterns, see the test files in the `test/` directory, especially the container configuration examples.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

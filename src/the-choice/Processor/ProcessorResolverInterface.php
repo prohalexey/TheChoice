@@ -8,5 +8,8 @@ use TheChoice\Node\Node;
 
 interface ProcessorResolverInterface
 {
-    public function resolve(Node $node);
+    /**
+     * @return class-string
+     */
+    public function resolve(Node $node): string;
 }

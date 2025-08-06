@@ -16,11 +16,11 @@ class ArrayNotContain implements OperatorInterface
         return 'arrayNotContain';
     }
 
-    public function setValue($value): self
+    public function setValue(mixed $value): static
     {
         if (!is_array($value)) {
             throw new InvalidArgumentException(
-                sprintf('Value passed to ArrayContain is not an array, %s given', gettype($value))
+                sprintf('Value passed to ArrayContain is not an array, %s given', gettype($value)),
             );
         }
 
@@ -32,5 +32,10 @@ class ArrayNotContain implements OperatorInterface
     public function assert(ContextInterface $context): bool
     {
         return !in_array($context->getValue(), $this->getValue(), true);
+    }
+
+    public function getValue(): array // @phpstan-ignore-line
+    {
+        return (array)$this->value;
     }
 }

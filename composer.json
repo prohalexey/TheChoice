@@ -1,6 +1,8 @@
 {
     "name": "prohalexey/the-choice",
     "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "authors": [
         {
             "name": "Prokhorov Alexey",
@@ -8,21 +10,33 @@
         }
     ],
     "require": {
-        "php": ">=7.1",
-        "chriskonnertz/string-calc": "^1.0",
-        "symfony/yaml": "^4.3",
+        "php": ">=8.0",
+        "chriskonnertz/string-calc": "^2.0",
+        "symfony/yaml": "^7.3",
         "ext-json": "*",
         "ext-mbstring": "*"
     },
     "require-dev": {
-        "roave/security-advisories": "dev-master",
-        "phpunit/phpunit": "7.0.0",
-        "psr/container": "1.0.0"
+        "friendsofphp/php-cs-fixer": "^v3.68",
+        "phan/phan": "^5.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpunit/phpunit": "^12.0.2",
+        "psr/container": "^2.0.0",
+        "rector/rector": "^2.0",
+        "rector/swiss-knife": "^2.1.7",
+        "roave/security-advisories": "dev-latest",
+        "thecodingmachine/phpstan-safe-rule": "^1.3"
     },
     "autoload": {
         "psr-4": {
             "TheChoice\\": "src/the-choice/",
             "TheChoice\\Tests\\Integration\\": "test/Integration/"
         }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
     }
 }

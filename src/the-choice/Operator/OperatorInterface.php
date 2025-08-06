@@ -10,9 +10,9 @@ interface OperatorInterface
 {
     public static function getOperatorName(): string;
 
-    public function setValue($value);
+    public function setValue(mixed $value): static;
 
-    public function getValue();
+    public function getValue(): mixed;
 
     public function assert(ContextInterface $context): bool;
 }

@@ -6,7 +6,7 @@ use TheChoice\Context\ContextInterface;
 
 class WithdrawalCount implements ContextInterface
 {
-    public function getValue()
+    public function getValue(): int
     {
         return 0;
     }

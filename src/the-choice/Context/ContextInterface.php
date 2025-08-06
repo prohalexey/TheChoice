@@ -6,5 +6,5 @@ namespace TheChoice\Context;
 
 interface ContextInterface
 {
-    public function getValue();
+    public function getValue(): mixed;
 }
