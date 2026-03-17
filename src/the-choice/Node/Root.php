@@ -60,9 +60,9 @@ class Root extends AbstractNode
 
     public function setGlobal(string $key, mixed $value): mixed
     {
-        if (!preg_match('#[a-z][a-z0-9_]+#i', $key)) {
+        if (!preg_match('#^((\$[a-z])|([a-z]))[a-z0-9_]*$#i', $key)) {
             throw new InvalidArgumentException(
-                'The key in "storage" property of node type "Root" must be string(format: #[a-z][a-z0-9_]+#i)',
+                'The key in "storage" property of node type "Root" must be string(format: #^[a-z\$][a-z0-9_]*$#i)',
             );
         }
 

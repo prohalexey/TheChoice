@@ -3,12 +3,12 @@ type: or
 nodes:
   -
     node: context
-    contextName: withdrawalCount
+    context: withdrawalCount
     operator: equal
     value: 5
   -
     node: context
-    contextName: inGroup
+    context: inGroup
     operator: arrayContain
     value:
       - testgroup

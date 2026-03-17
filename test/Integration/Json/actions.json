@@ -2,7 +2,7 @@
   "node": "condition",
   "if": {
     "node": "context",
-    "contextName": "depositCount",
+    "context": "depositCount",
     "operator": "greaterThanOrEqual",
     "value": 2
   },
@@ -14,13 +14,13 @@
       "nodes": [
         {
           "node": "context",
-          "contextName": "withdrawalCount",
+          "context": "withdrawalCount",
           "operator": "equal",
           "value": 0
         },
         {
           "node": "context",
-          "contextName": "hasVipStatus",
+          "context": "hasVipStatus",
           "operator": "equal",
           "value": true
         }
@@ -28,7 +28,7 @@
     },
     "then": {
       "node": "context",
-      "contextName": "actionName1"
+      "context": "actionName1"
     },
     "else": {
       "node": "condition",
@@ -38,7 +38,7 @@
         "nodes": [
           {
             "node": "context",
-            "contextName": "withdrawalCount",
+            "context": "withdrawalCount",
             "operator": "equal",
             "value": 0
           },
@@ -48,13 +48,13 @@
             "nodes": [
               {
                 "node": "context",
-                "contextName": "withdrawalCount",
+                "context": "withdrawalCount",
                 "operator": "equal",
                 "value": 0
               },
               {
                 "node": "context",
-                "contextName": "hasVipStatus",
+                "context": "hasVipStatus",
                 "operator": "equal",
                 "value": true
               }
@@ -64,12 +64,12 @@
       },
       "then": {
         "node": "context",
-        "contextName": "actionName2"
+        "context": "actionName2"
       }
     }
   },
   "else": {
     "node": "context",
-    "contextName": "actionName3"
+    "context": "actionName3"
   }
 }

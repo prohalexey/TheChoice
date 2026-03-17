@@ -6,11 +6,8 @@ namespace TheChoice\Operator;
 
 use TheChoice\Context\ContextInterface;
 
-class LowerThanOrEqual implements OperatorInterface
+class LowerThanOrEqual extends AbstractOperator
 {
-    use GetValueTrait;
-    use SetValueTrait;
-
     public static function getOperatorName(): string
     {
         return 'lowerThanOrEqual';

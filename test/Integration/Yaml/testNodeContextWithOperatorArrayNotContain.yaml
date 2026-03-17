@@ -1,5 +1,5 @@
 node: context
-contextName: inGroup
+context: inGroup
 operator: arrayNotContain
 value:
   - testgroup2

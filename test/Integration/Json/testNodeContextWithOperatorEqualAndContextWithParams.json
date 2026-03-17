@@ -1,6 +1,6 @@
 {
   "node": "context",
-  "contextName": "contextWithParams",
+  "context": "contextWithParams",
   "operator": "equal",
   "value": 2,
   "params": {

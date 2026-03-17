@@ -6,11 +6,8 @@ namespace TheChoice\Operator;
 
 use TheChoice\Context\ContextInterface;
 
-class StringNotContain implements OperatorInterface
+class StringNotContain extends AbstractOperator
 {
-    use GetValueTrait;
-    use SetValueTrait;
-
     public static function getOperatorName(): string
     {
         return 'stringNotContain';

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TheChoice\Operator;
 
-trait SetValueTrait
+abstract class AbstractOperator implements OperatorInterface
 {
     protected mixed $value;
 
@@ -13,5 +13,10 @@ trait SetValueTrait
         $this->value = $value;
 
         return $this;
+    }
+
+    public function getValue(): mixed
+    {
+        return $this->value;
     }
 }

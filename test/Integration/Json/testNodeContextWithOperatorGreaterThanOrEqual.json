@@ -1,6 +1,6 @@
 {
   "node": "context",
-  "contextName": "depositCount",
+  "context": "depositCount",
   "operator": "greaterThanOrEqual",
   "value": 2
 }

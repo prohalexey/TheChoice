@@ -1,0 +1,11 @@
+node: collection
+type: and
+nodes:
+  - node: context
+    context: withdrawalCount
+    operator: equal
+    value: 0
+    break: immediately
+  - node: context
+    context: action2
+

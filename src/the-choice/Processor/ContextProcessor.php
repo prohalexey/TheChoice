@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TheChoice\Processor;
 
 use ChrisKonnertz\StringCalc\StringCalc;
-use Exception;
 use InvalidArgumentException;
 use TheChoice\Context\CallableContext;
 use TheChoice\Context\ContextFactoryInterface;
@@ -14,6 +13,7 @@ use TheChoice\Exception\RuntimeException;
 use TheChoice\Node\Context;
 use TheChoice\Node\Node;
 use TheChoice\Operator\OperatorInterface;
+use Throwable;
 
 class ContextProcessor extends AbstractProcessor
 {
@@ -26,6 +26,11 @@ class ContextProcessor extends AbstractProcessor
         $this->contextFactory = $contextFactory;
 
         return $this;
+    }
+
+    public function flush(): void
+    {
+        $this->processedContext = [];
     }
 
     public function process(Node $node): mixed
@@ -112,8 +117,8 @@ class ContextProcessor extends AbstractProcessor
 
             try {
                 $value = (new StringCalc())->calculate($modifier);
-            } catch (Exception $exception) {
-                throw new InvalidContextCalculation($exception->getMessage());
+            } catch (Throwable $throwable) {
+                throw new InvalidContextCalculation($throwable->getMessage());
             }
 
             $vars['$context'] = $value;

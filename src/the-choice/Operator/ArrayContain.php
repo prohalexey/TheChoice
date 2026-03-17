@@ -7,10 +7,8 @@ namespace TheChoice\Operator;
 use TheChoice\Context\ContextInterface;
 use TheChoice\Exception\InvalidArgumentException;
 
-class ArrayContain implements OperatorInterface
+class ArrayContain extends AbstractOperator
 {
-    use GetValueTrait;
-
     public static function getOperatorName(): string
     {
         return 'arrayContain';

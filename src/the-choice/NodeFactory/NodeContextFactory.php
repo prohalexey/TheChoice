@@ -33,7 +33,7 @@ class NodeContextFactory implements NodeFactoryInterface
         }
 
         if (self::nodeHasContextName($structure)) {
-            $contextName = $structure['contextName'];
+            $contextName = $structure['context'];
             if (is_string($contextName)) {
                 $node->setContextName($contextName);
             }
@@ -103,6 +103,6 @@ class NodeContextFactory implements NodeFactoryInterface
 
     private static function nodeHasContextName(array $structure): bool
     {
-        return array_key_exists('contextName', $structure);
+        return array_key_exists('context', $structure);
     }
 }

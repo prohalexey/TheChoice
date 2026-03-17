@@ -6,13 +6,13 @@
     "nodes": [
       {
         "node": "context",
-        "contextName": "withdrawalCount",
+        "context": "withdrawalCount",
         "operator": "equal",
         "value": 0
       },
       {
         "node": "context",
-        "contextName": "inGroup",
+        "context": "inGroup",
         "operator": "arrayContain",
         "value": [
           "testgroup",
@@ -27,12 +27,12 @@
     "nodes": [
       {
         "node": "context",
-        "contextName": "actionReturnInt",
+        "context": "actionReturnInt",
         "break": "immediately"
       },
       {
         "node": "context",
-        "contextName": "action2"
+        "context": "action2"
       }
     ]
   }

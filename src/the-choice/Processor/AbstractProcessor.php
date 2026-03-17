@@ -7,7 +7,7 @@ namespace TheChoice\Processor;
 use Psr\Container\ContainerInterface;
 use TheChoice\Node\Node;
 
-abstract class AbstractProcessor
+abstract class AbstractProcessor implements ProcessorInterface
 {
     protected ContainerInterface $container;
 
@@ -22,6 +22,12 @@ abstract class AbstractProcessor
     public function getContainer(): ContainerInterface
     {
         return $this->container;
+    }
+
+    public function flush(): void
+    {
+        // Default implementation: nothing to flush.
+        // Override in processors that maintain internal state.
     }
 
     public function getProcessorByNode(Node $node): ?self

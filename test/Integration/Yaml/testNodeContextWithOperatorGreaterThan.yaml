@@ -1,4 +1,4 @@
 node: context
-contextName: depositCount
+context: depositCount
 operator: greaterThan
 value: 1

@@ -20,8 +20,11 @@
         <ini name="display_errors" value="1"/>
     </php>
     <testsuites>
+        <testsuite name="unit">
+            <directory>./test/Unit</directory>
+        </testsuite>
         <testsuite name="integration">
-            <directory>./test</directory>
+            <directory>./test/Integration</directory>
         </testsuite>
     </testsuites>
     <coverage/>

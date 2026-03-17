@@ -42,13 +42,15 @@ use TheChoice\Processor\ValueProcessor;
 
 class Container implements ContainerInterface
 {
-    public array $builders = [
+    /** @var array<class-string> */
+    private array $builders = [
         ArrayBuilder::class,
         JsonBuilder::class,
         YamlBuilder::class,
     ];
 
-    public array $operators = [
+    /** @var array<class-string> */
+    private array $operators = [
         ArrayContain::class,
         ArrayNotContain::class,
         Equal::class,
@@ -62,7 +64,8 @@ class Container implements ContainerInterface
         StringNotContain::class,
     ];
 
-    public array $nodeFactories = [
+    /** @var array<class-string> */
+    private array $nodeFactories = [
         NodeConditionFactory::class,
         NodeContextFactory::class,
         NodeCollectionFactory::class,
@@ -70,7 +73,8 @@ class Container implements ContainerInterface
         NodeValueFactory::class,
     ];
 
-    public array $processors = [
+    /** @var array<class-string> */
+    private array $processors = [
         CollectionProcessor::class,
         ContextProcessor::class,
         ConditionProcessor::class,
@@ -78,7 +82,8 @@ class Container implements ContainerInterface
         ValueProcessor::class,
     ];
 
-    public array $interfaces = [
+    /** @var array<class-string> */
+    private array $interfaces = [
         NodeFactoryResolverInterface::class,
         OperatorResolverInterface::class,
         ProcessorResolverInterface::class,
@@ -88,8 +93,8 @@ class Container implements ContainerInterface
     /** @var array<string, object> */
     protected array $services = [];
 
-    /** @var array<string> */
-    protected array $classMap;
+    /** @var array<string, array{shared: bool, factory: callable(): object}> */
+    private array $definitions = [];
 
     protected array $contexts;
 
@@ -97,13 +102,7 @@ class Container implements ContainerInterface
     {
         $this->contexts = $contexts;
 
-        $this->classMap = array_merge(
-            $this->builders,
-            $this->operators,
-            $this->nodeFactories,
-            $this->processors,
-            $this->interfaces,
-        );
+        $this->registerDefaultDefinitions();
     }
 
     /**
@@ -111,36 +110,12 @@ class Container implements ContainerInterface
      */
     public function get(string $id): object
     {
-        if (NodeFactoryResolverInterface::class === $id) {
-            if (!array_key_exists(NodeFactoryResolverInterface::class, $this->services)) {
-                $this->services[NodeFactoryResolverInterface::class] = new NodeFactoryResolver();
-            }
-
-            return $this->services[NodeFactoryResolverInterface::class];
-        }
-
-        if (OperatorResolverInterface::class === $id) {
-            if (!array_key_exists(OperatorResolverInterface::class, $this->services)) {
-                $this->services[OperatorResolverInterface::class] = new OperatorResolver();
-            }
-
-            return $this->services[OperatorResolverInterface::class];
-        }
-
-        if (ProcessorResolverInterface::class === $id) {
-            if (!array_key_exists(ProcessorResolverInterface::class, $this->services)) {
-                $this->services[ProcessorResolverInterface::class] = new ProcessorResolver();
-            }
-
-            return $this->services[ProcessorResolverInterface::class];
+        if (array_key_exists($id, $this->definitions)) {
+            return $this->resolveDefinition($id);
         }
 
         if (in_array($id, $this->nodeFactories, true)) {
-            if (!array_key_exists($id, $this->services)) {
-                $this->services[$id] = new $id();
-            }
-
-            return $this->services[$id];
+            return $this->getOrCreateShared($id, static fn (): object => new $id());
         }
 
         if (in_array($id, $this->builders, true)) {
@@ -152,26 +127,9 @@ class Container implements ContainerInterface
         }
 
         if (in_array($id, $this->processors, true)) {
-            /** @var AbstractProcessor $processor */
-            $processor = new $id();
-            $processor->setContainer($this);
+            assert(is_a($id, AbstractProcessor::class, true));
 
-            if (ContextProcessor::class === $id) {
-                /** @var ContextProcessor $processor */
-                $contextFactory = $this->get(ContextFactoryInterface::class);
-                if ($contextFactory instanceof ContextFactoryInterface) {
-                    $processor->setContextFactory($contextFactory);
-                }
-            }
-
-            return $processor;
-        }
-
-        if (ContextFactoryInterface::class === $id) {
-            $contextFactory = new ContextFactory($this->contexts);
-            $contextFactory->setContainer($this);
-
-            return $contextFactory;
+            return $this->createProcessor($id);
         }
 
         throw new ContainerNotFoundException(sprintf('There is no configuration for "%s" item in the container', $id));
@@ -179,6 +137,126 @@ class Container implements ContainerInterface
 
     public function has(string $id): bool
     {
-        return in_array($id, $this->classMap, true);
+        return array_key_exists($id, $this->definitions)
+            || in_array($id, $this->builders, true)
+            || in_array($id, $this->operators, true)
+            || in_array($id, $this->nodeFactories, true)
+            || in_array($id, $this->processors, true)
+            || in_array($id, $this->interfaces, true);
+    }
+
+    /**
+     * Registers a shared service definition (singleton-like lifecycle).
+     *
+     * @param callable(): object $factory
+     */
+    public function registerShared(string $id, callable $factory): self
+    {
+        $this->registerDefinition($id, $factory, true);
+
+        return $this;
+    }
+
+    /**
+     * Registers a transient service definition (new instance per get()).
+     *
+     * @param callable(): object $factory
+     */
+    public function registerTransient(string $id, callable $factory): self
+    {
+        $this->registerDefinition($id, $factory, false);
+
+        return $this;
+    }
+
+    private function registerDefaultDefinitions(): void
+    {
+        $this->registerDefinition(
+            NodeFactoryResolverInterface::class,
+            static fn (): object => new NodeFactoryResolver(),
+            true,
+        );
+
+        $this->registerDefinition(
+            OperatorResolverInterface::class,
+            static fn (): object => new OperatorResolver(),
+            true,
+        );
+
+        $this->registerDefinition(
+            ProcessorResolverInterface::class,
+            static fn (): object => new ProcessorResolver(),
+            true,
+        );
+
+        $this->registerDefinition(
+            ContextFactoryInterface::class,
+            function (): object {
+                $contextFactory = new ContextFactory($this->contexts);
+                $contextFactory->setContainer($this);
+
+                return $contextFactory;
+            },
+            false,
+        );
+    }
+
+    /**
+     * @param callable(): object $factory
+     */
+    private function registerDefinition(string $id, callable $factory, bool $shared): void
+    {
+        // If a shared service was already resolved under this id, drop it so
+        // the new definition is applied on subsequent get() calls.
+        unset($this->services[$id]);
+
+        $this->definitions[$id] = [
+            'shared'  => $shared,
+            'factory' => $factory,
+        ];
+    }
+
+    private function resolveDefinition(string $id): object
+    {
+        $definition = $this->definitions[$id];
+        if ($definition['shared']) {
+            return $this->getOrCreateShared($id, $definition['factory']);
+        }
+
+        $factory = $definition['factory'];
+
+        return $factory();
+    }
+
+    /**
+     * @param callable(): object $factory
+     */
+    private function getOrCreateShared(string $id, callable $factory): object
+    {
+        if (!array_key_exists($id, $this->services)) {
+            $this->services[$id] = $factory();
+        }
+
+        return $this->services[$id];
+    }
+
+    /**
+     * @param class-string<AbstractProcessor> $id
+     */
+    private function createProcessor(string $id): AbstractProcessor
+    {
+        /** @var AbstractProcessor $processor */
+        $processor = new $id();
+        $processor->setContainer($this);
+
+        if (ContextProcessor::class === $id) {
+            /** @var ContextProcessor $processor */
+            $contextFactory = $this->get(ContextFactoryInterface::class);
+            if ($contextFactory instanceof ContextFactoryInterface) {
+                $processor->setContextFactory($contextFactory);
+            }
+        }
+
+        return $processor;
     }
 }

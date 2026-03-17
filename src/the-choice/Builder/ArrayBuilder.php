@@ -31,10 +31,11 @@ class ArrayBuilder implements BuilderInterface
             throw new InvalidArgumentException('The "node" property is absent!');
         }
 
+        $isTopLevel = (0 === $this->nodesCount);
         $this->nodesCount++;
 
         // Workaround for short syntax if the root node is omitted
-        if (1 === $this->nodesCount && $structure['node'] !== Root::getNodeName()) {
+        if ($isTopLevel && $structure['node'] !== Root::getNodeName()) {
             $structure = [
                 'node'  => Root::getNodeName(),
                 'rules' => $structure,
@@ -49,7 +50,7 @@ class ArrayBuilder implements BuilderInterface
             throw new InvalidArgumentException('Node type must be a string');
         }
 
-        if (1 !== $this->nodesCount && $structure['node'] === Root::getNodeName()) {
+        if (!$isTopLevel && $structure['node'] === Root::getNodeName()) {
             throw new LogicException('The node "Root" cannot be not root node!');
         }
 
@@ -78,5 +79,10 @@ class ArrayBuilder implements BuilderInterface
     public function getRoot(): Root
     {
         return $this->rootNode;
+    }
+
+    public function resetNodesCount(): void
+    {
+        $this->nodesCount = 0;
     }
 }

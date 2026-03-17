@@ -2,57 +2,10 @@
 
 namespace TheChoice\Tests\Integration;
 
-use PHPUnit\Framework\TestCase;
 use TheChoice\Builder\YamlBuilder;
-use TheChoice\Container;
-use TheChoice\Processor\RootProcessor;
-use TheChoice\Tests\Integration\Contexts\Action1;
-use TheChoice\Tests\Integration\Contexts\Action2;
-use TheChoice\Tests\Integration\Contexts\ActionReturnInt;
-use TheChoice\Tests\Integration\Contexts\ActionWithParams;
-use TheChoice\Tests\Integration\Contexts\ContextWithParams;
-use TheChoice\Tests\Integration\Contexts\DepositCount;
-use TheChoice\Tests\Integration\Contexts\HasVipStatus;
-use TheChoice\Tests\Integration\Contexts\InGroup;
-use TheChoice\Tests\Integration\Contexts\UtmSource;
-use TheChoice\Tests\Integration\Contexts\VisitCount;
-use TheChoice\Tests\Integration\Contexts\WithdrawalCount;
 
-final class yamlTest extends TestCase
+final class yamlTest extends AbstractFormatIntegrationTestCase
 {
-    private YamlBuilder $parser;
-
-    private RootProcessor $rootProcessor;
-
-    private string $testFilesDir;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->testFilesDir = '';
-        if ('TheChoice' === basename(getcwd())) {
-            $this->testFilesDir = './test/Integration/';
-        }
-
-        $container = new Container([
-            'visitCount'        => VisitCount::class,
-            'hasVipStatus'      => HasVipStatus::class,
-            'inGroup'           => InGroup::class,
-            'withdrawalCount'   => WithdrawalCount::class,
-            'depositCount'      => DepositCount::class,
-            'utmSource'         => UtmSource::class,
-            'contextWithParams' => ContextWithParams::class,
-            'action1'           => Action1::class,
-            'action2'           => Action2::class,
-            'actionReturnInt'   => ActionReturnInt::class,
-            'actionWithParams'  => ActionWithParams::class,
-        ]);
-
-        $this->parser = $container->get(YamlBuilder::class);
-        $this->rootProcessor = $container->get(RootProcessor::class);
-    }
-
     public function testNodeContextWithOperatorArrayContainTest(): void
     {
         $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorArrayContain.yaml');
@@ -179,6 +132,13 @@ final class yamlTest extends TestCase
         self::assertSame(5, $result);
     }
 
+    public function testNodeAssertStoppableTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeAssertStoppable.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
     public function testNodeConditionThenCaseTest(): void
     {
         $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeConditionThenCase.yaml');
@@ -221,7 +181,7 @@ final class yamlTest extends TestCase
         self::assertFalse($result);
     }
 
-    public function testNodeOrCollectionOneFalseTest(): void
+    public function testNodeOrCollectionOneTrueTest(): void
     {
         $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeOrCollectionOneTrue.yaml');
         $result = $this->rootProcessor->process($node);
@@ -247,5 +207,10 @@ final class yamlTest extends TestCase
         $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeValue.yaml');
         $result = $this->rootProcessor->process($node);
         self::assertSame(4, $result);
+    }
+
+    protected function getBuilderClass(): string
+    {
+        return YamlBuilder::class;
     }
 }

@@ -122,6 +122,6 @@ class Context extends AbstractChildNode implements Sortable
 
     private function checkModifiers(array $modifiers): bool
     {
-        return array_reduce($modifiers, static fn ($carry, $modifier) => $carry && is_string($modifier), true);
+        return array_reduce($modifiers, static fn ($carry, $modifier): bool => $carry && is_string($modifier), true);
     }
 }

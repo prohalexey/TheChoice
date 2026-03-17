@@ -1,6 +1,6 @@
 {
   "node": "context",
-  "contextName": "utmSource",
+  "context": "utmSource",
   "operator": "stringContain",
   "value": "abc"
 }

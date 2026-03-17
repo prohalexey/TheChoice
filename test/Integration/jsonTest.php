@@ -2,64 +2,10 @@
 
 namespace TheChoice\Tests\Integration;
 
-use PHPUnit\Framework\TestCase;
 use TheChoice\Builder\JsonBuilder;
-use TheChoice\Container;
-use TheChoice\Processor\RootProcessor;
-use TheChoice\Tests\Integration\Contexts\Action1;
-use TheChoice\Tests\Integration\Contexts\Action2;
-use TheChoice\Tests\Integration\Contexts\ActionReturnInt;
-use TheChoice\Tests\Integration\Contexts\ActionWithParams;
-use TheChoice\Tests\Integration\Contexts\ContextWithParams;
-use TheChoice\Tests\Integration\Contexts\DepositCount;
-use TheChoice\Tests\Integration\Contexts\HasVipStatus;
-use TheChoice\Tests\Integration\Contexts\InGroup;
-use TheChoice\Tests\Integration\Contexts\UtmSource;
-use TheChoice\Tests\Integration\Contexts\VisitCount;
-use TheChoice\Tests\Integration\Contexts\WithdrawalCount;
 
-final class jsonTest extends TestCase
+final class jsonTest extends AbstractFormatIntegrationTestCase
 {
-    private JsonBuilder $parser;
-
-    private RootProcessor $rootProcessor;
-
-    private string $testFilesDir;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->testFilesDir = '';
-        if ('TheChoice' === basename(getcwd())) {
-            $this->testFilesDir = './test/Integration/';
-        }
-
-        $container = new Container([
-            'visitCount'        => VisitCount::class,
-            'hasVipStatus'      => HasVipStatus::class,
-            'inGroup'           => InGroup::class,
-            'withdrawalCount'   => WithdrawalCount::class,
-            'depositCount'      => DepositCount::class,
-            'utmSource'         => UtmSource::class,
-            'contextWithParams' => ContextWithParams::class,
-            'action1'           => Action1::class,
-            'action2'           => Action2::class,
-            'actionReturnInt'   => ActionReturnInt::class,
-            'actionWithParams'  => ActionWithParams::class,
-        ]);
-
-        $this->parser = $container->get(JsonBuilder::class);
-        $this->rootProcessor = $container->get(RootProcessor::class);
-    }
-
-    public function testNodeContextWithOperatorArrayContainTestXX(): void
-    {
-        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorArrayContain.json');
-        $result = $this->rootProcessor->process($node);
-        self::assertTrue($result);
-    }
-
     public function testNodeContextWithOperatorArrayContainTest(): void
     {
         $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorArrayContain.json');
@@ -165,6 +111,13 @@ final class jsonTest extends TestCase
         self::assertSame(4, $result);
     }
 
+    public function testNodeRootWithStorageTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeRootWithStorage.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertSame(4, $result);
+    }
+
     public function testNodeContextWithModifiersAndOperatorTest(): void
     {
         $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithModifiersAndOperator.json');
@@ -221,7 +174,7 @@ final class jsonTest extends TestCase
         self::assertFalse($result);
     }
 
-    public function testNodeOrCollectionOneFalseTest(): void
+    public function testNodeOrCollectionOneTrueTest(): void
     {
         $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeOrCollectionOneTrue.json');
         $result = $this->rootProcessor->process($node);
@@ -247,5 +200,10 @@ final class jsonTest extends TestCase
         $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeValue.json');
         $result = $this->rootProcessor->process($node);
         self::assertSame(4, $result);
+    }
+
+    protected function getBuilderClass(): string
+    {
+        return JsonBuilder::class;
     }
 }

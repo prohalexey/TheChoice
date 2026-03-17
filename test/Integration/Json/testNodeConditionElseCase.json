@@ -2,16 +2,16 @@
   "node": "condition",
   "if": {
     "node": "context",
-    "contextName": "depositCount",
+    "context": "depositCount",
     "operator": "greaterThanOrEqual",
     "value": 3
   },
   "then": {
     "node": "context",
-    "contextName": "action1"
+    "context": "action1"
   },
   "else": {
     "node": "context",
-    "contextName": "action2"
+    "context": "action2"
   }
 }

@@ -6,13 +6,13 @@
     "nodes": [
       {
         "node": "context",
-        "contextName": "withdrawalCount",
+        "context": "withdrawalCount",
         "operator": "equal",
         "value": 0
       },
       {
         "node": "context",
-        "contextName": "inGroup",
+        "context": "inGroup",
         "operator": "arrayContain",
         "value": [
           "testgroup",
@@ -23,10 +23,10 @@
   },
   "then": {
     "node": "context",
-    "contextName": "action1"
+    "context": "action1"
   },
   "else": {
     "node": "context",
-    "contextName": "action2"
+    "context": "action2"
   }
 }

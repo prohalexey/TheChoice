@@ -27,7 +27,7 @@ class JsonBuilder extends ArrayBuilder
         return $this->build($decoded);
     }
 
-    public function parseFile(string $filename, int $maxDepth = 512, int $options = 0): mixed
+    public function parseFile(string $filename, int $maxDepth = 512, int $options = 0): Node
     {
         if (!file_exists($filename)) {
             throw new InvalidArgumentException(sprintf('File "%s" not found', $filename));

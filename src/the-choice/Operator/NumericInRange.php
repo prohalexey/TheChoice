@@ -7,10 +7,8 @@ namespace TheChoice\Operator;
 use TheChoice\Context\ContextInterface;
 use TheChoice\Exception\InvalidArgumentException;
 
-class NumericInRange implements OperatorInterface
+class NumericInRange extends AbstractOperator
 {
-    use GetValueTrait;
-
     public static function getOperatorName(): string
     {
         return 'numericInRange';

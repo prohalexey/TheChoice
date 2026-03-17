@@ -5,7 +5,7 @@ storage:
   $value5: 5
 rules:
   node: context
-  contextName: actionReturnInt
+  context: actionReturnInt
   modifiers:
     - ($context * 5 - $value2) * 2
     - ($context - 6) * 0.1

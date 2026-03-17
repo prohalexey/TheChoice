@@ -1,6 +1,6 @@
 {
   "node": "context",
-  "contextName": "actionWithParams",
+  "context": "actionWithParams",
   "params": {
     "a": 1,
     "b": "test",

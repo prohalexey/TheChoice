@@ -1,4 +1,4 @@
 {
   "node": "context",
-  "contextName": "action1"
+  "context": "action1"
 }

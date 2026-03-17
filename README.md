@@ -1,6 +1,5 @@
 # TheChoice - Business Rule Engine
 
-[![Build Status](https://travis-ci.org/prohalexey/TheChoice.png)](https://travis-ci.org/prohalexey/TheChoice)
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/prohalexey/TheChoice/master/LICENSE)
 
 A powerful and flexible Business Rule Engine for PHP that allows you to separate business logic from your application code.
@@ -38,7 +37,7 @@ composer require prohalexey/the-choice
   "if": {
     "node": "collection",
     "type": "and",
-    "elements": [
+    "nodes": [
       {
         "node": "context",
         "context": "withdrawalCount",
@@ -82,7 +81,7 @@ node: condition
 if:
   node: collection
   type: and
-  elements:
+  nodes:
   - node: context
     context: withdrawalCount
     operator: equal
@@ -112,7 +111,9 @@ else:
 ```php
 <?php
 
+use TheChoice\Builder\JsonBuilder;
 use TheChoice\Container;
+use TheChoice\Processor\RootProcessor;
 
 // Configure contexts in the PSR-11 compatible container
 $container = new Container([
@@ -129,19 +130,44 @@ $container = new Container([
     'actionWithParams' => ActionWithParams::class,
 ]);
 
-// Create a parser 
+// Parse rules from a file — returns a Root node (the rule tree)
 $parser = $container->get(JsonBuilder::class);
+$node = $parser->parseFile('rules/discount-rules.json');
 
-// Load rules from file or other sources
-$rules = $parser->parseFile('rules/discount-rules.json');
-
-// Get the processor
-$resolver = $container->get(ProcessorResolverInterface::class);
-$processor = $resolver->resolve($rules);
-
-// Execute the rules
-$result = $processor->process($rules);
+// Get the root processor and execute the rules
+$rootProcessor = $container->get(RootProcessor::class);
+$result = $rootProcessor->process($node);
 ```
+
+## Container Integration
+
+### Built-in Container (Fallback)
+
+`TheChoice\\Container` is a small PSR-11 implementation bundled with the library.
+It is intended as a fallback for plain PHP projects without a DI container.
+
+You can extend it at runtime without modifying library code:
+
+```php
+$container->registerShared('my.shared.service', fn (): object => new MySharedService());
+$container->registerTransient('my.transient.service', fn (): object => new MyTransientService());
+```
+
+You can also override built-in services (for example, a default resolver):
+
+```php
+$customResolver = new App\Rules\CustomOperatorResolver();
+$container->registerShared(\TheChoice\Operator\OperatorResolverInterface::class, static fn () => $customResolver);
+$resolver = $container->get(\TheChoice\Operator\OperatorResolverInterface::class);
+```
+
+### Using Symfony Container
+
+The library is PSR-11 compatible and works with Symfony DI.
+
+For complete Symfony examples (compact setup + explicit setup, `JsonBuilder` and `YamlBuilder` services), see:
+
+- `docs/symfony.md`
 
 ## Core Concepts
 
@@ -150,16 +176,18 @@ $result = $processor->process($rules);
 Each node has a `node` property that describes its type and an optional `description` property for UI purposes.
 
 #### Root Node
-The root of the rules tree that maintains state and stores execution results.
+The root of the rules tree that maintains state and stores execution results. When the root node is omitted in the configuration, the library automatically wraps the top-level node in a root node (short syntax).
 
 **Properties:**
-- `storage` - Container for variables
+- `storage` - Container for named variables accessible in modifiers (e.g. `$myVar`)
 - `rules` - Contains the first node to be processed
 
 **Example:**
 ```yaml
 node: root
 description: "Discount settings"
+storage:
+  $baseRate: 5
 rules: 
   node: value
   value: 5
@@ -182,13 +210,13 @@ value: 5
 Executes callable objects and can modify the global state which is stored in the "Root" node.
 
 **Properties:**
-- `break` - Special property to stop execution (`"immediately"` stops and returns context result)
+- `break` - Special property to stop execution early. When set to `"immediately"`, the context result is saved to the Root node and evaluation stops — subsequent nodes in a collection are skipped. The final result is retrieved from the Root node.
 - `context` - Name of the context for calculations
 - `modifiers` - Array of mathematical modifiers
 - `operator` - Operator for calculations or comparisons
 - `params` - Parameters to set in context
 - `priority` - Priority for collection sorting
-- `value` - Default value for the `$context` variable
+- `value` - Value to compare against when using an operator
 
 **Example:**
 ```yaml
@@ -210,19 +238,26 @@ operator: equal
 value: 0
 ```
 
+**With Break Example:**
+```yaml
+node: context
+context: actionReturnInt
+break: immediately
+```
+
 #### Collection Node
 Contains multiple nodes with AND/OR logic.
 
 **Properties:**
 - `type` - Collection type (`and` or `or`)
-- `elements` - Array of child nodes
+- `nodes` - Array of child nodes
 - `priority` - Priority for nested collections
 
 **Example:**
 ```yaml
 node: collection
 type: and
-elements:
+nodes:
   - node: context
     context: withdrawalCount
     operator: equal
@@ -261,17 +296,33 @@ The following operators are available for context nodes:
 
 ### Modifiers
 
-Modifiers allow you to transform context values using mathematical expressions. Use the predefined `$context` variable in your expressions.
+Modifiers allow you to transform context values using mathematical expressions. Use the predefined `$context` variable in your expressions. Variables defined in the Root `storage` are also available.
 
 For more information about calculations, see: https://github.com/chriskonnertz/string-calc
 
 ## Advanced Features
 
 ### Custom Contexts
-Create custom context classes by implementing the required interface and register them in the container.
+Create custom context classes by implementing `ContextInterface` and register them in the container:
+
+```php
+class MyContext implements ContextInterface
+{
+    public function getValue(): mixed
+    {
+        return 42; // your business logic here
+    }
+}
+
+$container = new Container(['myContext' => MyContext::class]);
+```
 
 ### Custom Operators
-Extend the system by creating custom operators and adding them to the container.
+Create custom operators by implementing `OperatorInterface` and register mappings in `OperatorResolverInterface` via `register()`.
+For Symfony examples (`register()` through DI `calls`), see `docs/symfony.md`.
+
+### Processor Cache Flushing
+Each call to `RootProcessor::process()` automatically calls `flush()` on all registered processors, clearing any memoised results from the previous evaluation. This ensures correctness when the same processor instance is reused across multiple rule evaluations.
 
 ### Caching
 Configurations can be serialized and cached for improved performance.

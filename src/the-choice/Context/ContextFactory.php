@@ -44,6 +44,10 @@ class ContextFactory implements ContextFactoryInterface
 
         $context = $this->contextMap[$contextType];
 
+        if (is_callable($context) && !is_string($context)) {
+            return new CallableContext($context);
+        }
+
         if (is_object($context)) {
             if (!$context instanceof ContextInterface) {
                 throw new InvalidArgumentException(
@@ -56,10 +60,6 @@ class ContextFactory implements ContextFactoryInterface
 
         if (is_string($context)) {
             return $this->getContextFromString($context);
-        }
-
-        if (is_callable($context)) {
-            return new CallableContext($context);
         }
 
         throw new InvalidArgumentException(sprintf('Unknown context type "%s"', $contextType));
