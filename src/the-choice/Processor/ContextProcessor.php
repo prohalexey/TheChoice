@@ -58,9 +58,11 @@ class ContextProcessor extends AbstractProcessor
             $operatorValue = $operator->getValue();
 
             $hash[] = $operator::class;
-            $hash[] = is_array($operatorValue) || is_object($operatorValue)
-                ? hash('md5', serialize($operatorValue))
-                : $operatorValue;
+            if (is_array($operatorValue) || is_object($operatorValue)) {
+                $hash[] = hash('md5', serialize($operatorValue));
+            } elseif (null !== $operatorValue) {
+                $hash[] = $operatorValue;
+            }
         }
 
         $modifiers = $node->getModifiers();

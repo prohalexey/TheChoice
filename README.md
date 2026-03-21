@@ -344,17 +344,33 @@ Conditional logic with if-then-else structure.
 
 The following operators are available for context nodes:
 
-- `ArrayContain` - Check if array contains value
-- `ArrayNotContain` - Check if array doesn't contain value
-- `Equal` - Equality comparison
-- `GreaterThan` - Greater than comparison
-- `GreaterThanOrEqual` - Greater than or equal comparison
-- `LowerThan` - Less than comparison
-- `LowerThanOrEqual` - Less than or equal comparison
-- `NotEqual` - Not equal comparison
-- `NumericInRange` - Check if number is within range
-- `StringContain` - Check if string contains substring
-- `StringNotContain` - Check if string doesn't contain substring
+**Equality & comparison**
+- `equal` — Strict equality (`===`)
+- `notEqual` — Strict inequality (`!==`)
+- `greaterThan` — Greater than comparison
+- `greaterThanOrEqual` — Greater than or equal
+- `lowerThan` — Less than comparison
+- `lowerThanOrEqual` — Less than or equal
+- `numericInRange` — Number within an inclusive range; `value` must be a two-element array `[min, max]`
+
+**String**
+- `stringContain` — String contains substring
+- `stringNotContain` — String does not contain substring
+- `startsWith` — String starts with prefix
+- `endsWith` — String ends with suffix
+- `matchesRegex` — String matches a PCRE regex pattern (e.g. `"/^\d{4}$/"`)
+
+**Array**
+- `arrayContain` — Array contains the given element (strict)
+- `arrayNotContain` — Array does not contain the given element (strict)
+- `containsKey` — Array contains the given key (string or int)
+- `countEqual` — Number of array elements equals `value`
+- `countGreaterThan` — Number of array elements is greater than `value`
+
+**Type checks** *(no `value` field required)*
+- `isEmpty` — Value is `null`, empty string `""`, or empty array `[]`
+- `isNull` — Value is strictly `null`
+- `isInstanceOf` — Object is an instance of the given fully-qualified class name
 
 ### Modifiers
 

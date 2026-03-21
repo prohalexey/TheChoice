@@ -218,12 +218,12 @@ Resolvers are now runtime-extendable via `register(...)` and can be configured d
 
 ```yaml
 services:
-  App\Rules\Operator\StartsWithOperator: ~
+  App\Rules\Operator\StringMatchOperator: ~
 
   TheChoice\Operator\OperatorResolverInterface:
     class: TheChoice\Operator\OperatorResolver
     calls:
-      - register: ['startsWith', App\Rules\Operator\StartsWithOperator]
+      - register: ['stringMatch', App\Rules\Operator\StringMatchOperator]
 ```
 
 ### Custom node factory mapping

@@ -1,0 +1,5 @@
+node: context
+context: utmSource
+operator: matchesRegex
+value: '/^[a-z]{4}$/'
+

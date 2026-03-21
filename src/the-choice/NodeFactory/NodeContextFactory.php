@@ -25,7 +25,9 @@ class NodeContextFactory implements NodeFactoryInterface
                     $operatorType = $operatorResolver->resolve($operatorType);
                     $operator = $builder->getContainer()->get($operatorType);
                     if ($operator instanceof OperatorInterface) {
-                        $operator->setValue($structure['value']);
+                        if (array_key_exists('value', $structure)) {
+                            $operator->setValue($structure['value']);
+                        }
                         $node->setOperator($operator);
                     }
                 }
@@ -98,7 +100,7 @@ class NodeContextFactory implements NodeFactoryInterface
 
     private static function nodeHasOperator(array $structure): bool
     {
-        return array_key_exists('operator', $structure) && array_key_exists('value', $structure);
+        return array_key_exists('operator', $structure);
     }
 
     private static function nodeHasContextName(array $structure): bool

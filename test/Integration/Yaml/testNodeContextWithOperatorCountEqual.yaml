@@ -1,0 +1,5 @@
+node: context
+context: tags
+operator: countEqual
+value: 3
+

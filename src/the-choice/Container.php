@@ -20,15 +20,24 @@ use TheChoice\NodeFactory\NodeRootFactory;
 use TheChoice\NodeFactory\NodeValueFactory;
 use TheChoice\Operator\ArrayContain;
 use TheChoice\Operator\ArrayNotContain;
+use TheChoice\Operator\ContainsKey;
+use TheChoice\Operator\CountEqual;
+use TheChoice\Operator\CountGreaterThan;
+use TheChoice\Operator\EndsWith;
 use TheChoice\Operator\Equal;
 use TheChoice\Operator\GreaterThan;
 use TheChoice\Operator\GreaterThanOrEqual;
+use TheChoice\Operator\IsEmpty;
+use TheChoice\Operator\IsInstanceOf;
+use TheChoice\Operator\IsNull;
 use TheChoice\Operator\LowerThan;
 use TheChoice\Operator\LowerThanOrEqual;
+use TheChoice\Operator\MatchesRegex;
 use TheChoice\Operator\NotEqual;
 use TheChoice\Operator\NumericInRange;
 use TheChoice\Operator\OperatorResolver;
 use TheChoice\Operator\OperatorResolverInterface;
+use TheChoice\Operator\StartsWith;
 use TheChoice\Operator\StringContain;
 use TheChoice\Operator\StringNotContain;
 use TheChoice\Processor\AbstractProcessor;
@@ -58,13 +67,22 @@ class Container implements ContainerInterface
     private array $operators = [
         ArrayContain::class,
         ArrayNotContain::class,
+        ContainsKey::class,
+        CountEqual::class,
+        CountGreaterThan::class,
+        EndsWith::class,
         Equal::class,
         GreaterThan::class,
         GreaterThanOrEqual::class,
+        IsEmpty::class,
+        IsInstanceOf::class,
+        IsNull::class,
         LowerThan::class,
         LowerThanOrEqual::class,
+        MatchesRegex::class,
         NotEqual::class,
         NumericInRange::class,
+        StartsWith::class,
         StringContain::class,
         StringNotContain::class,
     ];

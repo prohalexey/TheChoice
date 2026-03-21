@@ -1,0 +1,7 @@
+{
+  "node": "context",
+  "context": "inGroup",
+  "operator": "endsWith",
+  "value": "group"
+}
+

@@ -2,17 +2,28 @@
 
 namespace TheChoice\Tests\Integration;
 
+use ArrayObject;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use TheChoice\Context\ContextInterface;
 use TheChoice\Operator\ArrayContain;
 use TheChoice\Operator\ArrayNotContain;
+use TheChoice\Operator\ContainsKey;
+use TheChoice\Operator\CountEqual;
+use TheChoice\Operator\CountGreaterThan;
+use TheChoice\Operator\EndsWith;
 use TheChoice\Operator\Equal;
 use TheChoice\Operator\GreaterThan;
 use TheChoice\Operator\GreaterThanOrEqual;
+use TheChoice\Operator\IsEmpty;
+use TheChoice\Operator\IsInstanceOf;
+use TheChoice\Operator\IsNull;
 use TheChoice\Operator\LowerThan;
 use TheChoice\Operator\LowerThanOrEqual;
+use TheChoice\Operator\MatchesRegex;
 use TheChoice\Operator\NotEqual;
 use TheChoice\Operator\NumericInRange;
+use TheChoice\Operator\StartsWith;
 use TheChoice\Operator\StringContain;
 use TheChoice\Operator\StringNotContain;
 
@@ -132,7 +143,121 @@ final class OperatorsTest extends TestCase
         self::assertFalse($operator->assert($this->getContext(6)));
     }
 
-    private function getContext(int|string|array $value): ContextInterface
+    public function testStartsWithTest(): void
+    {
+        $operator = (new StartsWith())->setValue('foo');
+
+        self::assertTrue($operator->assert($this->getContext('foobar')));
+        self::assertTrue($operator->assert($this->getContext('foo')));
+        self::assertFalse($operator->assert($this->getContext('barfoo')));
+        self::assertFalse($operator->assert($this->getContext('')));
+    }
+
+    public function testEndsWithTest(): void
+    {
+        $operator = (new EndsWith())->setValue('bar');
+
+        self::assertTrue($operator->assert($this->getContext('foobar')));
+        self::assertTrue($operator->assert($this->getContext('bar')));
+        self::assertFalse($operator->assert($this->getContext('barfoo')));
+        self::assertFalse($operator->assert($this->getContext('')));
+    }
+
+    public function testMatchesRegexTest(): void
+    {
+        $operator = (new MatchesRegex())->setValue('/^\d{3}$/');
+
+        self::assertTrue($operator->assert($this->getContext('123')));
+        self::assertFalse($operator->assert($this->getContext('12')));
+        self::assertFalse($operator->assert($this->getContext('1234')));
+        self::assertFalse($operator->assert($this->getContext('abc')));
+    }
+
+    public function testIsEmptyTest(): void
+    {
+        $operator = new IsEmpty();
+
+        self::assertTrue($operator->assert($this->getContext('')));
+        self::assertTrue($operator->assert($this->getContext([])));
+        self::assertTrue($operator->assert($this->getNullContext()));
+        self::assertFalse($operator->assert($this->getContext('text')));
+        self::assertFalse($operator->assert($this->getContext(0)));
+        self::assertFalse($operator->assert($this->getContext([1])));
+    }
+
+    public function testIsNullTest(): void
+    {
+        $operator = new IsNull();
+
+        self::assertTrue($operator->assert($this->getNullContext()));
+        self::assertFalse($operator->assert($this->getContext('')));
+        self::assertFalse($operator->assert($this->getContext(0)));
+        self::assertFalse($operator->assert($this->getContext(false)));
+    }
+
+    public function testIsInstanceOfTest(): void
+    {
+        $operator = (new IsInstanceOf())->setValue(stdClass::class);
+
+        self::assertTrue($operator->assert($this->getObjectContext(new stdClass())));
+        self::assertFalse($operator->assert($this->getContext('not-an-object')));
+        self::assertFalse($operator->assert($this->getObjectContext(new ArrayObject())));
+    }
+
+    public function testContainsKeyTest(): void
+    {
+        $operator = (new ContainsKey())->setValue('name');
+
+        self::assertTrue($operator->assert($this->getContext(['name' => 'Alice', 'age' => 30])));
+        self::assertFalse($operator->assert($this->getContext(['age' => 30])));
+        self::assertFalse($operator->assert($this->getContext('not-an-array')));
+    }
+
+    public function testCountEqualTest(): void
+    {
+        $operator = (new CountEqual())->setValue(3);
+
+        self::assertTrue($operator->assert($this->getContext([1, 2, 3])));
+        self::assertFalse($operator->assert($this->getContext([1, 2])));
+        self::assertFalse($operator->assert($this->getContext([])));
+        self::assertFalse($operator->assert($this->getContext('not-an-array')));
+    }
+
+    public function testCountGreaterThanTest(): void
+    {
+        $operator = (new CountGreaterThan())->setValue(2);
+
+        self::assertTrue($operator->assert($this->getContext([1, 2, 3])));
+        self::assertFalse($operator->assert($this->getContext([1, 2])));
+        self::assertFalse($operator->assert($this->getContext([1])));
+        self::assertFalse($operator->assert($this->getContext('not-an-array')));
+    }
+
+    private function getNullContext(): ContextInterface
+    {
+        return new class implements ContextInterface {
+            public function getValue(): mixed
+            {
+                return null;
+            }
+        };
+    }
+
+    private function getObjectContext(object $object): ContextInterface
+    {
+        return new class($object) implements ContextInterface {
+            public function __construct(private readonly object $object)
+            {
+            }
+
+            public function getValue(): object
+            {
+                return $this->object;
+            }
+        };
+    }
+
+    private function getContext(int|string|array|bool $value): ContextInterface
     {
         return new class($value) implements ContextInterface {
             private $value;

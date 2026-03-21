@@ -83,6 +83,55 @@ final class jsonTest extends AbstractFormatIntegrationTestCase
         self::assertTrue($result);
     }
 
+    public function testNodeContextWithOperatorStartsWithTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorStartsWith.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithOperatorEndsWithTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorEndsWith.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithOperatorMatchesRegexTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorMatchesRegex.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithOperatorIsEmptyTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorIsEmpty.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithOperatorContainsKeyTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorContainsKey.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithOperatorCountEqualTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorCountEqual.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithOperatorCountGreaterThanTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextWithOperatorCountGreaterThan.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
     public function testNodeContextResultTrueTest(): void
     {
         $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeContextResultTrue.json');

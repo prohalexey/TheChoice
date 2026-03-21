@@ -1,0 +1,6 @@
+{
+  "node": "context",
+  "context": "emptyString",
+  "operator": "isEmpty"
+}
+

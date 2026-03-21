@@ -1,0 +1,5 @@
+node: context
+context: inGroup
+operator: startsWith
+value: test
+

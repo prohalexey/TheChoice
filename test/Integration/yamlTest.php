@@ -83,6 +83,55 @@ final class yamlTest extends AbstractFormatIntegrationTestCase
         self::assertTrue($result);
     }
 
+    public function testNodeContextWithOperatorStartsWithTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorStartsWith.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithOperatorEndsWithTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorEndsWith.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithOperatorMatchesRegexTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorMatchesRegex.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithOperatorIsEmptyTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorIsEmpty.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithOperatorContainsKeyTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorContainsKey.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithOperatorCountEqualTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorCountEqual.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithOperatorCountGreaterThanTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithOperatorCountGreaterThan.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
     public function testNodeContextResultTrueTest(): void
     {
         $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextResultTrue.yaml');
