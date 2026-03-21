@@ -25,6 +25,8 @@ This library helps you simplify the implementation of complex business rules suc
 - ✅ Rule Validator — static analysis of rules before execution
 - ✅ Evaluation Trace — step-by-step debugging of rule evaluation
 - ✅ Switch Node — multi-branch dispatch on a single context value
+- ✅ Fluent PHP Builder (DSL) — build rule trees programmatically without JSON/YAML
+- ✅ Node Exporter — serialize rule trees back to JSON or YAML
 
 ## Table of Contents
 
@@ -44,6 +46,8 @@ This library helps you simplify the implementation of complex business rules suc
 - [Caching](#caching) — PSR-16
 - [Container Integration](#container-integration) — Built-in & Symfony
 - [Advanced Features](#advanced-features) — custom contexts, operators, processor flushing
+- [Fluent Builder (DSL)](#fluent-builder-dsl) — build rules in PHP without JSON/YAML
+- [Node Exporter](#node-exporter) — serialize rule trees to JSON or YAML
 - [License](#license)
 
 ## Installation
@@ -774,6 +778,173 @@ For more detailed examples and usage patterns, see the test files in the `test/`
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Fluent Builder (DSL)
+
+`RuleBuilder` provides a fluent PHP API for building rule trees programmatically — without writing JSON or YAML. All builders are immutable after construction and materialise their corresponding `Node` on the final `->build()` call.
+
+Always wrap the outermost builder in `RuleBuilder::root()` — its `build()` propagates the `Root` reference to every child node, which is required by modifiers, stoppable contexts, and the Switch processor.
+
+### Full Example
+
+```php
+use TheChoice\Builder\RuleBuilder;
+use TheChoice\Node\Collection;
+
+$root = RuleBuilder::root()
+    ->rules(
+        RuleBuilder::condition()
+            ->if(
+                RuleBuilder::collection(Collection::TYPE_AND)
+                    ->add(RuleBuilder::context('withdrawalCount')->equal(0))
+                    ->add(RuleBuilder::context('inGroup')->arrayContain(['vip', 'premium']))
+            )
+            ->then(
+                RuleBuilder::context('getDepositSum')->modifier('$context * 0.1')
+            )
+            ->else(RuleBuilder::value(5))
+    )
+    ->build();
+
+$result = $rootProcessor->process($root);
+```
+
+### Static Entry Points
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `RuleBuilder::value(mixed $v)` | `ValueBuilder` | Static value node |
+| `RuleBuilder::context(string $name)` | `ContextBuilder` | Context node with optional operator |
+| `RuleBuilder::condition()` | `ConditionBuilder` | if / then / else branching |
+| `RuleBuilder::collection(string $type)` | `CollectionBuilder` | Multi-node collection |
+| `RuleBuilder::switch(string $ctx)` | `SwitchBuilder` | Switch/case dispatch |
+| `RuleBuilder::root()` | `RootBuilder` | Root node — always use as outermost |
+
+### ContextBuilder
+
+All 20 built-in operators are available as typed methods:
+
+```php
+RuleBuilder::context('depositCount')
+    ->equal(2)               // strict equality
+    ->notEqual(0)
+    ->greaterThan(100)
+    ->greaterThanOrEqual(100)
+    ->lowerThan(1000)
+    ->lowerThanOrEqual(999)
+    ->numericInRange([1, 100])        // inclusive range
+    ->arrayContain('vip')
+    ->arrayNotContain('banned')
+    ->containsKey('discount')
+    ->countEqual(3)
+    ->countGreaterThan(0)
+    ->stringContain('prefix')
+    ->stringNotContain('spam')
+    ->startsWith('VIP-')
+    ->endsWith('.ru')
+    ->matchesRegex('/^\d{4}$/')
+    ->isEmpty()              // no value needed
+    ->isNull()               // no value needed
+    ->isInstanceOf(MyClass::class);
+```
+
+Additional configuration:
+
+```php
+RuleBuilder::context('amount')
+    ->modifier('$context * 0.1')           // append one modifier
+    ->modifiers(['$context * 2', '...'])   // replace all modifiers
+    ->params(['discountType' => 'vip'])    // context parameters
+    ->priority(10)                         // sort priority in collections
+    ->description('10% of deposit')
+    ->stoppable()                          // store result on Root and stop
+    ->build();
+```
+
+### CollectionBuilder
+
+```php
+RuleBuilder::collection(Collection::TYPE_AT_LEAST)
+    ->count(2)
+    ->add(RuleBuilder::context('withdrawalCount')->equal(0))
+    ->add(RuleBuilder::context('visitCount')->greaterThan(5))
+    ->add(RuleBuilder::context('hasVipStatus')->equal(true))
+    ->build();
+```
+
+Available types: `and`, `or`, `not`, `atLeast` (requires `->count(n)`), `exactly` (requires `->count(n)`).
+
+### SwitchBuilder
+
+```php
+// Equality dispatch (default operator: equal)
+RuleBuilder::switch('userRole')
+    ->case('admin', RuleBuilder::value(100))
+    ->case('manager', RuleBuilder::value(50))
+    ->default(RuleBuilder::value(0));
+
+// Range dispatch with named operator
+RuleBuilder::switch('depositSum')
+    ->caseOp('greaterThan', 10000, RuleBuilder::value('platinum'))
+    ->caseOp('greaterThan', 5000,  RuleBuilder::value('gold'))
+    ->caseOp('greaterThan', 1000,  RuleBuilder::value('silver'))
+    ->default(RuleBuilder::value('bronze'));
+
+// Pre-configured operator instance
+RuleBuilder::switch('amount')
+    ->caseWith(new GreaterThan()->setValue(5000), RuleBuilder::value('gold'));
+```
+
+### RootBuilder
+
+```php
+RuleBuilder::root()
+    ->rules(NodeBuilderInterface $node)   // required
+    ->storage(['$rate' => 0.1, '$max' => 1000])
+    ->description('Discount rules v3')
+    ->build(); // → Root (with all child roots propagated)
+```
+
+## Node Exporter
+
+`JsonNodeExporter` and `YamlNodeExporter` convert a Node tree back to a JSON or YAML string (or file). The output is **round-trip safe** — re-parsing the exported content produces a tree with identical runtime behaviour.
+
+Both exporters share the same `NodeSerializer` which builds the intermediate PHP array.
+
+```php
+use TheChoice\Exporter\JsonNodeExporter;
+use TheChoice\Exporter\NodeSerializer;
+use TheChoice\Exporter\YamlNodeExporter;
+
+$serializer   = new NodeSerializer();
+$jsonExporter = new JsonNodeExporter($serializer);
+$yamlExporter = new YamlNodeExporter($serializer);
+
+// From a parsed file, a RuleBuilder tree, or any other Node source:
+$node = $jsonBuilder->parseFile('rules/discount.json');
+
+// ── JSON ──────────────────────────────────────────────────────────────
+$pretty  = $jsonExporter->export($node);               // pretty-printed (default)
+$compact = $jsonExporter->export($node, pretty: false); // compact / minified
+
+$jsonExporter->exportToFile($node, 'rules/discount.json');         // pretty
+$jsonExporter->exportToFile($node, 'rules/discount.min.json', pretty: false);
+
+// ── YAML ──────────────────────────────────────────────────────────────
+$yaml = $yamlExporter->export($node);                  // default: inline=4, indent=2
+$yaml = $yamlExporter->export($node, inline: 6);       // expand deeper before going inline
+
+$yamlExporter->exportToFile($node, 'rules/discount.yaml');
+```
+
+The `NodeSerializer` intermediate `toArray()` is public — use it directly when you need the raw PHP array:
+
+```php
+$array = $serializer->toArray($node);
+// → ['node' => 'root', 'rules' => ['node' => 'condition', ...]]
+```
+
+**Round-trip guarantee:** all built-in node types (`Root`, `Value`, `Context`, `Condition`, `Collection`, `SwitchNode`) are fully supported. Optional fields (`description`, `priority`, `params`, `modifiers`, `storage`, `break`, `else`, `default`) are only emitted when they differ from the default value, keeping the output minimal.
 
 ## License
 
