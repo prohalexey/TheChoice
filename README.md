@@ -17,9 +17,33 @@ This library helps you simplify the implementation of complex business rules suc
 ### Key Benefits
 - ✅ Rules written in JSON or YAML format
 - ✅ Store rules in files or databases
-- ✅ Serializable and cacheable configurations
+- ✅ Serializable and cacheable configurations (PSR-16)
 - ✅ PSR-11 compatible container support
 - ✅ Extensible with custom operators and contexts
+- ✅ Rule Engine — evaluate multiple rules in a single run
+- ✅ Rule Registry — named rules with tags, version, and metadata
+- ✅ Rule Validator — static analysis of rules before execution
+- ✅ Evaluation Trace — step-by-step debugging of rule evaluation
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Configuration Formats](#configuration-formats)
+  - [JSON](#json-configuration-example)
+  - [YAML](#yaml-configuration-example)
+- [Core Concepts](#core-concepts)
+  - [Node Types](#node-types) — Root, Value, Context, Condition, Collection
+  - [Built-in Operators](#built-in-operators)
+  - [Modifiers](#modifiers)
+- [Rule Engine](#rule-engine) — multi-rule evaluation
+- [Rule Registry](#rule-registry) — named rules with metadata
+- [Rule Validator](#rule-validator) — static analysis / linter
+- [Evaluation Trace](#evaluation-trace) — debugging
+- [Caching](#caching) — PSR-16
+- [Container Integration](#container-integration) — Built-in & Symfony
+- [Advanced Features](#advanced-features) — custom contexts, operators, processor flushing
+- [License](#license)
 
 ## Installation
 
@@ -29,29 +53,35 @@ composer require prohalexey/the-choice
 
 **Requirements:** PHP 8.4+
 
-## Caching
-
-`CachedJsonBuilder` and `CachedYamlBuilder` wrap the base builders with a transparent PSR-16 cache layer. The node tree is serialized after the first parse and deserialized on subsequent calls; the cache key is derived from the MD5 of the rule content, so the cache is automatically invalidated when the content changes.
+## Quick Start
 
 ```php
-use Psr\SimpleCache\CacheInterface;
-use TheChoice\Builder\CachedJsonBuilder;
+<?php
 
-/** @var CacheInterface $cache */ // any PSR-16 adapter (Symfony Cache, Laravel Cache, etc.)
+use TheChoice\Builder\JsonBuilder;
+use TheChoice\Container;
+use TheChoice\Processor\RootProcessor;
 
-$builder = new CachedJsonBuilder(
-    container: $container,
-    cache: $cache,
-    ttl: 3600,        // optional, seconds or \DateInterval
-    keyPrefix: 'rules.',  // optional
-);
+// 1. Configure contexts — map names to classes that implement ContextInterface
+$container = new Container([
+    'visitCount'      => VisitCount::class,
+    'hasVipStatus'    => HasVipStatus::class,
+    'inGroup'         => InGroup::class,
+    'withdrawalCount' => WithdrawalCount::class,
+    'depositCount'    => DepositCount::class,
+    'getDepositSum'   => GetDepositSum::class,
+]);
 
-// First call: parse → serialize → store
-// Subsequent calls: deserialize from cache, no parsing
-$node = $builder->parseFile('rules/discount.json');
+// 2. Parse rules from a JSON file — returns a Root node (the rule tree)
+$parser = $container->get(JsonBuilder::class);
+$node = $parser->parseFile('rules/discount-rules.json');
+
+// 3. Execute the rules
+$rootProcessor = $container->get(RootProcessor::class);
+$result = $rootProcessor->process($node);
 ```
 
-## Quick Start
+## Configuration Formats
 
 ### JSON Configuration Example
 
@@ -130,126 +160,6 @@ else:
   value: 5
 ```
 
-### PHP Usage
-
-```php
-<?php
-
-use TheChoice\Builder\JsonBuilder;
-use TheChoice\Container;
-use TheChoice\Processor\RootProcessor;
-
-// Configure contexts in the PSR-11 compatible container
-$container = new Container([
-    'visitCount' => VisitCount::class,
-    'hasVipStatus' => HasVipStatus::class,
-    'inGroup' => InGroup::class,
-    'withdrawalCount' => WithdrawalCount::class,
-    'depositCount' => DepositCount::class,
-    'utmSource' => UtmSource::class,
-    'contextWithParams' => ContextWithParams::class,
-    'action1' => Action1::class,
-    'action2' => Action2::class,
-    'actionReturnInt' => ActionReturnInt::class,
-    'actionWithParams' => ActionWithParams::class,
-]);
-
-// Parse rules from a file — returns a Root node (the rule tree)
-$parser = $container->get(JsonBuilder::class);
-$node = $parser->parseFile('rules/discount-rules.json');
-
-// Get the root processor and execute the rules
-$rootProcessor = $container->get(RootProcessor::class);
-$result = $rootProcessor->process($node);
-```
-
-### Rule Engine (multi-rule mode)
-
-`RuleEngine` evaluates multiple rules in a single `run()` call and returns an `EngineReport` with the result of each rule. Rules are executed in priority order (highest first).
-
-```php
-use TheChoice\Engine\RuleEngine;
-
-$engine = new RuleEngine($container);
-
-$engine->addRule('vip_discount', $jsonBuilder->parseFile('rules/vip.json'), priority: 10);
-$engine->addRule('loyal_discount', $jsonBuilder->parseFile('rules/loyal.json'), priority: 5);
-$engine->addRule('fraud_block', $jsonBuilder->parseFile('rules/fraud.json'));
-
-$report = $engine->run();
-
-// Iterate over fired rules
-foreach ($report->getFired() as $name => $ruleResult) {
-    echo "{$name}: {$ruleResult->result}\n";
-}
-
-// Check specific rule
-if ($report->hasFired('vip_discount')) {
-    $discount = $report->getResult('vip_discount')->result;
-}
-```
-
-A rule is considered **fired** when its result is neither `null` nor `false`.
-
-### Rule Registry
-
-`RuleRegistry` is a named storage for rules with tags, version, and description metadata.
-
-```php
-use TheChoice\Registry\RuleRegistry;
-
-$registry = new RuleRegistry();
-
-$registry->register(
-    name:        'vip_discount',
-    node:        $jsonBuilder->parseFile('rules/vip.json'),
-    tags:        ['discount', 'vip'],
-    version:     '2.1',
-    description: 'VIP discount: 10% of last deposit',
-    priority:    10,
-);
-
-// Lookup by name
-$entry = $registry->get('vip_discount');
-
-// Filter by tag
-$discountRules = $registry->findByTag('discount');
-
-// Load into the engine
-$engine->loadFromRegistry($registry);
-$report = $engine->run();
-```
-
-## Container Integration
-
-### Built-in Container (Fallback)
-
-`TheChoice\\Container` is a small PSR-11 implementation bundled with the library.
-It is intended as a fallback for plain PHP projects without a DI container.
-
-You can extend it at runtime without modifying library code:
-
-```php
-$container->registerShared('my.shared.service', fn (): object => new MySharedService());
-$container->registerTransient('my.transient.service', fn (): object => new MyTransientService());
-```
-
-You can also override built-in services (for example, a default resolver):
-
-```php
-$customResolver = new App\Rules\CustomOperatorResolver();
-$container->registerShared(\TheChoice\Operator\OperatorResolverInterface::class, static fn () => $customResolver);
-$resolver = $container->get(\TheChoice\Operator\OperatorResolverInterface::class);
-```
-
-### Using Symfony Container
-
-The library is PSR-11 compatible and works with Symfony DI.
-
-For complete Symfony examples (compact setup + explicit setup, `JsonBuilder` and `YamlBuilder` services), see:
-
-- `docs/symfony.md`
-
 ## Core Concepts
 
 ### Node Types
@@ -324,6 +234,30 @@ value: 0
 node: context
 context: actionReturnInt
 break: immediately
+```
+
+#### Condition Node
+Conditional logic with if-then-else structure.
+
+**Properties:**
+- `if` - Condition node (expects boolean result)
+- `then` - Node to execute if condition is true
+- `else` - Node to execute if condition is false (optional)
+
+**Example:**
+```yaml
+node: condition
+if:
+  node: context
+  context: hasVipStatus
+  operator: equal
+  value: true
+then:
+  node: value
+  value: 10
+else:
+  node: value
+  value: 5
 ```
 
 #### Collection Node
@@ -413,14 +347,6 @@ nodes:
     value: true
 ```
 
-#### Condition Node
-Conditional logic with if-then-else structure.
-
-**Properties:**
-- `if` - Condition node (expects boolean result)
-- `then` - Node to execute if condition is true
-- `else` - Node to execute if condition is false
-
 ### Built-in Operators
 
 The following operators are available for context nodes:
@@ -459,12 +385,239 @@ Modifiers allow you to transform context values using mathematical expressions. 
 
 For more information about calculations, see: https://github.com/chriskonnertz/string-calc
 
+## Rule Engine
+
+`RuleEngine` evaluates multiple rules in a single `run()` call and returns an `EngineReport` with the result of each rule. Rules are executed in priority order (highest first).
+
+```php
+use TheChoice\Engine\RuleEngine;
+
+$engine = new RuleEngine($container);
+
+$engine->addRule('vip_discount', $jsonBuilder->parseFile('rules/vip.json'), priority: 10);
+$engine->addRule('loyal_discount', $jsonBuilder->parseFile('rules/loyal.json'), priority: 5);
+$engine->addRule('fraud_block', $jsonBuilder->parseFile('rules/fraud.json'));
+
+$report = $engine->run();
+
+// Iterate over fired rules
+foreach ($report->getFired() as $name => $ruleResult) {
+    echo "{$name}: {$ruleResult->result}\n";
+}
+
+// Check a specific rule
+if ($report->hasFired('vip_discount')) {
+    $discount = $report->getResult('vip_discount')->result;
+}
+
+// Get skipped rules (result was null or false)
+$skipped = $report->getSkipped();
+```
+
+A rule is considered **fired** when its result is neither `null` nor `false`.
+
+## Rule Registry
+
+`RuleRegistry` is a named storage for rules with tags, version, and description metadata.
+
+```php
+use TheChoice\Registry\RuleRegistry;
+
+$registry = new RuleRegistry();
+
+$registry->register(
+    name:        'vip_discount',
+    node:        $jsonBuilder->parseFile('rules/vip.json'),
+    tags:        ['discount', 'vip'],
+    version:     '2.1',
+    description: 'VIP discount: 10% of last deposit',
+    priority:    10,
+);
+
+// Lookup by name
+$entry = $registry->get('vip_discount');
+
+// Filter by tag
+$discountRules = $registry->findByTag('discount');
+
+// Load into the engine for batch evaluation
+$engine->loadFromRegistry($registry);
+$report = $engine->run();
+```
+
+## Rule Validator
+
+`RuleValidator` performs static analysis of a rule tree **before execution** — it checks that all referenced contexts and operators are registered. Unknown names produce helpful "did you mean?" suggestions based on Levenshtein distance. This is useful in CI/CD pipelines to catch configuration errors before deployment.
+
+```php
+use TheChoice\Validator\RuleValidator;
+
+$validator = new RuleValidator(
+    contexts:  ['withdrawalCount', 'inGroup', 'getDepositSum'],
+    operators: ['equal', 'arrayContain', 'greaterThan'],
+);
+
+// Validate and inspect errors
+$result = $validator->validate($node);
+
+if (!$result->isValid()) {
+    foreach ($result->getErrors() as $error) {
+        echo $error->toString();
+        // [root > rules > collection[0]] Context "getDisconut" is not registered (did you mean "getDepositSum"?)
+    }
+}
+
+// Or throw on the first invalid rule (useful in CI/CD)
+$validator->validateOrThrow($node); // throws ValidationException
+```
+
+Each `ValidationError` contains:
+- `message` — human-readable error description
+- `path` — location in the tree (e.g. `root > rules > condition.if > collection[1]`)
+- `suggestion` — closest valid name if the Levenshtein distance is ≤ 3, or `null`
+
+Pass empty arrays to skip validation of contexts or operators:
+
+```php
+// Only validate operators, allow any context name
+$validator = new RuleValidator(contexts: [], operators: ['equal', 'greaterThan']);
+```
+
+The `ValidationException` provides programmatic access to errors:
+
+```php
+use TheChoice\Exception\ValidationException;
+
+try {
+    $validator->validateOrThrow($node);
+} catch (ValidationException $e) {
+    $result = $e->getValidationResult();
+    $errors = $result->getErrors(); // array<ValidationError>
+    echo $result->toString();       // all errors as a multi-line string
+}
+```
+
+## Evaluation Trace
+
+`RootProcessor::processWithTrace()` runs the rule tree with tracing enabled. It returns an `EvaluationTrace` that contains both the final result and a detailed tree of every node visited during evaluation — which node was entered, what it returned, and the nesting structure.
+
+```php
+$trace = $rootProcessor->processWithTrace($node);
+
+// The result is the same as $rootProcessor->process($node)
+echo $trace->getValue(); // e.g. 10.5
+
+// Human-readable explanation
+echo $trace->explain();
+// Root[root] → 10.5
+//   Condition[condition] → 10.5
+//     Collection[and] → TRUE
+//       Context[withdrawalCount equal] → TRUE
+//       Context[inGroup arrayContain] → TRUE
+//     Context[getDepositSum] → 10.5
+```
+
+### Programmatic Trace Access
+
+The trace is a tree of `TraceEntry` objects that you can walk programmatically:
+
+```php
+$rootEntry = $trace->getTrace();
+
+echo $rootEntry->getNodeType(); // "Root"
+echo $rootEntry->getNodeName(); // "root"
+echo $rootEntry->getResult();   // 10.5
+
+foreach ($rootEntry->getChildren() as $child) {
+    echo $child->getNodeType();  // "Condition", "Collection", "Context", "Value"
+    echo $child->getNodeName();  // e.g. "withdrawalCount equal"
+    echo $child->getResult();    // the value returned by this node
+
+    // Children can be nested (e.g. Collection → Context children)
+    foreach ($child->getChildren() as $grandChild) {
+        // ...
+    }
+}
+```
+
+### Result Formatting
+
+`TraceEntry::toString()` formats results in a human-readable way:
+
+| Result type | Output |
+|-------------|--------|
+| `true` | `TRUE` |
+| `false` | `FALSE` |
+| `null` | `null` |
+| `int` / `float` | `42`, `10.5` |
+| `string` | `"hello"` |
+| `array` | `[1,2,3]` |
+
+### Zero Overhead
+
+Tracing has **zero overhead** when not used — the trace collector is only active during `processWithTrace()` and is automatically cleaned up afterwards. A normal `process()` call is completely unaffected.
+
+## Caching
+
+`CachedJsonBuilder` and `CachedYamlBuilder` wrap the base builders with a transparent PSR-16 cache layer. The node tree is serialized after the first parse and deserialized on subsequent calls; the cache key is derived from the MD5 of the rule content, so the cache is automatically invalidated when the content changes.
+
+```php
+use Psr\SimpleCache\CacheInterface;
+use TheChoice\Builder\CachedJsonBuilder;
+
+/** @var CacheInterface $cache */ // any PSR-16 adapter (Symfony Cache, Laravel Cache, etc.)
+
+$builder = new CachedJsonBuilder(
+    container: $container,
+    cache: $cache,
+    ttl: 3600,            // optional, seconds or \DateInterval
+    keyPrefix: 'rules.',  // optional
+);
+
+// First call: parse → serialize → store
+// Subsequent calls: deserialize from cache, no parsing
+$node = $builder->parseFile('rules/discount.json');
+```
+
+`CachedYamlBuilder` works identically — just substitute `CachedYamlBuilder` for `CachedJsonBuilder`.
+
+## Container Integration
+
+### Built-in Container
+
+`TheChoice\Container` is a small PSR-11 implementation bundled with the library. It is intended as a fallback for plain PHP projects without a DI container.
+
+You can extend it at runtime without modifying library code:
+
+```php
+$container->registerShared('my.shared.service', fn (): object => new MySharedService());
+$container->registerTransient('my.transient.service', fn (): object => new MyTransientService());
+```
+
+You can also override built-in services (for example, a default resolver):
+
+```php
+$customResolver = new App\Rules\CustomOperatorResolver();
+$container->registerShared(\TheChoice\Operator\OperatorResolverInterface::class, static fn () => $customResolver);
+$resolver = $container->get(\TheChoice\Operator\OperatorResolverInterface::class);
+```
+
+### Using Symfony Container
+
+The library is PSR-11 compatible and works with Symfony DI.
+
+For complete Symfony examples (compact setup + explicit setup, `JsonBuilder` and `YamlBuilder` services), see:
+
+- [`docs/symfony.md`](docs/symfony.md)
+
 ## Advanced Features
 
 ### Custom Contexts
 Create custom context classes by implementing `ContextInterface` and register them in the container:
 
 ```php
+use TheChoice\Context\ContextInterface;
+
 class MyContext implements ContextInterface
 {
     public function getValue(): mixed
@@ -477,14 +630,37 @@ $container = new Container(['myContext' => MyContext::class]);
 ```
 
 ### Custom Operators
-Create custom operators by implementing `OperatorInterface` and register mappings in `OperatorResolverInterface` via `register()`.
-For Symfony examples (`register()` through DI `calls`), see `docs/symfony.md`.
+Create custom operators by extending `AbstractOperator` and registering the mapping via `OperatorResolverInterface::register()`:
+
+```php
+use TheChoice\Context\ContextInterface;
+use TheChoice\Operator\AbstractOperator;
+
+class BetweenExclusive extends AbstractOperator
+{
+    public static function getOperatorName(): string
+    {
+        return 'betweenExclusive';
+    }
+
+    public function assert(ContextInterface $context): bool
+    {
+        $value = $context->getValue();
+        [$min, $max] = $this->getValue();
+
+        return $value > $min && $value < $max;
+    }
+}
+
+// Register in the resolver
+$resolver = $container->get(\TheChoice\Operator\OperatorResolverInterface::class);
+$resolver->register('betweenExclusive', BetweenExclusive::class);
+```
+
+For Symfony examples (`register()` through DI `calls`), see [`docs/symfony.md`](docs/symfony.md).
 
 ### Processor Cache Flushing
 Each call to `RootProcessor::process()` automatically calls `flush()` on all registered processors, clearing any memoised results from the previous evaluation. This ensures correctness when the same processor instance is reused across multiple rule evaluations.
-
-### Caching
-Configurations can be serialized and cached for improved performance.
 
 ## Examples and Testing
 

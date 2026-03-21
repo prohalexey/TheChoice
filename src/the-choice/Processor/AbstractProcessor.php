@@ -6,10 +6,13 @@ namespace TheChoice\Processor;
 
 use Psr\Container\ContainerInterface;
 use TheChoice\Node\Node;
+use TheChoice\Trace\TraceCollector;
 
 abstract class AbstractProcessor implements ProcessorInterface
 {
     protected ContainerInterface $container;
+
+    protected ?TraceCollector $traceCollector = null;
 
     /** @var array<string, class-string> */
     protected array $processorResolvingCache = [];
@@ -22,6 +25,16 @@ abstract class AbstractProcessor implements ProcessorInterface
     public function getContainer(): ContainerInterface
     {
         return $this->container;
+    }
+
+    public function setTraceCollector(?TraceCollector $traceCollector): void
+    {
+        $this->traceCollector = $traceCollector;
+    }
+
+    public function getTraceCollector(): ?TraceCollector
+    {
+        return $this->traceCollector;
     }
 
     public function flush(): void
@@ -40,7 +53,13 @@ abstract class AbstractProcessor implements ProcessorInterface
         }
 
         // @phpstan-ignore-next-line
-        return $this->getContainer()->get($this->processorResolvingCache[$nodeType]);
+        $processor = $this->getContainer()->get($this->processorResolvingCache[$nodeType]);
+
+        if ($processor instanceof self && null !== $this->traceCollector) {
+            $processor->setTraceCollector($this->traceCollector);
+        }
+
+        return $processor;
     }
 
     abstract public function process(Node $node): mixed;

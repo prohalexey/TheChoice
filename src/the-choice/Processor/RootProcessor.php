@@ -11,6 +11,9 @@ use TheChoice\Node\Context;
 use TheChoice\Node\Node;
 use TheChoice\Node\Root;
 use TheChoice\Node\Value;
+use TheChoice\Trace\EvaluationTrace;
+use TheChoice\Trace\TraceCollector;
+use TheChoice\Trace\TraceEntry;
 
 class RootProcessor extends AbstractProcessor
 {
@@ -35,6 +38,48 @@ class RootProcessor extends AbstractProcessor
         }
 
         return $result;
+    }
+
+    /**
+     * Processes the node tree with tracing enabled, returning an EvaluationTrace
+     * that contains both the result and the full trace tree.
+     */
+    public function processWithTrace(Node $node): EvaluationTrace
+    {
+        if (!$node instanceof Root) {
+            throw new InvalidArgumentException('Node must be an instance of Root');
+        }
+
+        $collector = new TraceCollector();
+        $this->setTraceCollector($collector);
+
+        try {
+            $this->flushAllProcessors($node);
+
+            $collector->begin('Root', 'root');
+
+            $rules = $node->getRules();
+            $processor = $this->getProcessorByNode($rules);
+
+            $result = null;
+            if (null !== $processor) {
+                $result = $processor->process($rules);
+                if ($node->hasResult()) {
+                    $result = $node->getResult();
+                }
+            }
+
+            $collector->end($result);
+
+            $rootEntry = $collector->getRoot();
+            if (null === $rootEntry) {
+                $rootEntry = new TraceEntry('Root', 'root', $result);
+            }
+
+            return new EvaluationTrace($result, $rootEntry);
+        } finally {
+            $this->setTraceCollector(null);
+        }
     }
 
     /**

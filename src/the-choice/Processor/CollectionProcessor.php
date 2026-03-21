@@ -17,7 +17,9 @@ class CollectionProcessor extends AbstractProcessor
             throw new InvalidArgumentException('Node must be an instance of Collection');
         }
 
-        return match ($node->getType()) {
+        $this->traceCollector?->begin('Collection', $node->getType());
+
+        $result = match ($node->getType()) {
             Collection::TYPE_AND      => $this->processShortCircuit($node, false),
             Collection::TYPE_OR       => $this->processShortCircuit($node, true),
             Collection::TYPE_NOT      => $this->processNot($node),
@@ -27,6 +29,10 @@ class CollectionProcessor extends AbstractProcessor
                 sprintf('Unsupported collection type "%s"', $node->getType()),
             ),
         };
+
+        $this->traceCollector?->end($result);
+
+        return $result;
     }
 
     /**

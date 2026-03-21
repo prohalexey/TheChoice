@@ -45,6 +45,15 @@ class ContextProcessor extends AbstractProcessor
             throw new RuntimeException('Context factory not configured');
         }
 
+        $contextName = $node->getContextName() ?? 'unknown';
+        $operator = $node->getOperator();
+        $traceName = $contextName;
+        if (null !== $operator) {
+            $traceName .= ' ' . $operator::getOperatorName();
+        }
+
+        $this->traceCollector?->begin('Context', $traceName);
+
         $hash = [
             $node->getContextName(),
         ];
@@ -54,7 +63,6 @@ class ContextProcessor extends AbstractProcessor
             $hash[] = hash('md5', serialize($params));
         }
 
-        $operator = $node->getOperator();
         if (null !== $operator) {
             /** @var OperatorInterface $operator */
             $operatorValue = $operator->getValue();
@@ -98,9 +106,13 @@ class ContextProcessor extends AbstractProcessor
              * It does not matter what we return; the result is already set to the "Root" node
              */
             if (Context::STOP_IMMEDIATELY === $node->getStoppableType()) {
+                $this->traceCollector?->end($this->processedContext[$hash]);
+
                 return null;
             }
         }
+
+        $this->traceCollector?->end($this->processedContext[$hash]);
 
         return $this->processedContext[$hash];
     }

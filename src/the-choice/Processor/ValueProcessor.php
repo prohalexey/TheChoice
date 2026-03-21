@@ -16,6 +16,11 @@ class ValueProcessor extends AbstractProcessor
             throw new InvalidArgumentException('Node must be an instance of Value');
         }
 
-        return $node->getValue();
+        $result = $node->getValue();
+
+        $this->traceCollector?->begin('Value', 'value');
+        $this->traceCollector?->end($result);
+
+        return $result;
     }
 }

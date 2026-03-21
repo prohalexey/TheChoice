@@ -16,20 +16,30 @@ class ConditionProcessor extends AbstractProcessor
             throw new InvalidArgumentException('Node must be an instance of Condition');
         }
 
+        $this->traceCollector?->begin('Condition', 'condition');
+
         $processorIf = $this->getProcessorByNode($node->getIfNode());
-        if (null !== $processorIf && $processorIf->process($node->getIfNode())) {
+        $ifResult = null !== $processorIf ? $processorIf->process($node->getIfNode()) : null;
+
+        if ($ifResult) {
             $processorThen = $this->getProcessorByNode($node->getThenNode());
-            if (null !== $processorThen) {
-                return $processorThen->process($node->getThenNode());
-            }
+            $result = null !== $processorThen ? $processorThen->process($node->getThenNode()) : false;
+
+            $this->traceCollector?->end($result);
+
+            return $result;
         }
 
         if (null !== $node->getElseNode()) {
             $processorElse = $this->getProcessorByNode($node->getElseNode());
-            if (null !== $processorElse) {
-                return $processorElse->process($node->getElseNode());
-            }
+            $result = null !== $processorElse ? $processorElse->process($node->getElseNode()) : false;
+
+            $this->traceCollector?->end($result);
+
+            return $result;
         }
+
+        $this->traceCollector?->end(false);
 
         return false;
     }
