@@ -1,0 +1,10 @@
+{
+  "node": "switch",
+  "context": "depositCount",
+  "cases": [
+    { "value": 2, "then": { "node": "value", "value": "two" } },
+    { "value": 1, "then": { "node": "value", "value": "one" } }
+  ],
+  "default": { "node": "value", "value": "other" }
+}
+

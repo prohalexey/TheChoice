@@ -10,6 +10,7 @@ use TheChoice\Node\Condition;
 use TheChoice\Node\Context;
 use TheChoice\Node\Node;
 use TheChoice\Node\Root;
+use TheChoice\Node\SwitchNode;
 use TheChoice\Node\Value;
 
 class ProcessorResolver implements ProcessorResolverInterface
@@ -87,6 +88,7 @@ class ProcessorResolver implements ProcessorResolverInterface
             Collection::class => CollectionProcessor::class,
             Value::class      => ValueProcessor::class,
             Context::class    => ContextProcessor::class,
+            SwitchNode::class => SwitchProcessor::class,
         ];
     }
 }

@@ -1,0 +1,15 @@
+{
+  "node": "switch",
+  "context": "userRole",
+  "cases": [
+    {
+      "value": "admin",
+      "then": {
+        "node": "context",
+        "context": "depositCount"
+      }
+    }
+  ],
+  "default": { "node": "value", "value": 0 }
+}
+

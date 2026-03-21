@@ -17,6 +17,7 @@ use TheChoice\NodeFactory\NodeContextFactory;
 use TheChoice\NodeFactory\NodeFactoryResolver;
 use TheChoice\NodeFactory\NodeFactoryResolverInterface;
 use TheChoice\NodeFactory\NodeRootFactory;
+use TheChoice\NodeFactory\NodeSwitchFactory;
 use TheChoice\NodeFactory\NodeValueFactory;
 use TheChoice\Operator\ArrayContain;
 use TheChoice\Operator\ArrayNotContain;
@@ -47,6 +48,7 @@ use TheChoice\Processor\ContextProcessor;
 use TheChoice\Processor\ProcessorResolver;
 use TheChoice\Processor\ProcessorResolverInterface;
 use TheChoice\Processor\RootProcessor;
+use TheChoice\Processor\SwitchProcessor;
 use TheChoice\Processor\ValueProcessor;
 
 class Container implements ContainerInterface
@@ -93,6 +95,7 @@ class Container implements ContainerInterface
         NodeContextFactory::class,
         NodeCollectionFactory::class,
         NodeRootFactory::class,
+        NodeSwitchFactory::class,
         NodeValueFactory::class,
     ];
 
@@ -102,6 +105,7 @@ class Container implements ContainerInterface
         ContextProcessor::class,
         ConditionProcessor::class,
         RootProcessor::class,
+        SwitchProcessor::class,
         ValueProcessor::class,
     ];
 
@@ -267,8 +271,8 @@ class Container implements ContainerInterface
         $processor = new $id();
         $processor->setContainer($this);
 
-        if (ContextProcessor::class === $id) {
-            /** @var ContextProcessor $processor */
+        if (ContextProcessor::class === $id || SwitchProcessor::class === $id) {
+            /** @var ContextProcessor|SwitchProcessor $processor */
             $contextFactory = $this->get(ContextFactoryInterface::class);
             if ($contextFactory instanceof ContextFactoryInterface) {
                 $processor->setContextFactory($contextFactory);

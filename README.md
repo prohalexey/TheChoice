@@ -24,6 +24,7 @@ This library helps you simplify the implementation of complex business rules suc
 - ✅ Rule Registry — named rules with tags, version, and metadata
 - ✅ Rule Validator — static analysis of rules before execution
 - ✅ Evaluation Trace — step-by-step debugging of rule evaluation
+- ✅ Switch Node — multi-branch dispatch on a single context value
 
 ## Table of Contents
 
@@ -33,7 +34,7 @@ This library helps you simplify the implementation of complex business rules suc
   - [JSON](#json-configuration-example)
   - [YAML](#yaml-configuration-example)
 - [Core Concepts](#core-concepts)
-  - [Node Types](#node-types) — Root, Value, Context, Condition, Collection
+  - [Node Types](#node-types) — Root, Value, Context, Condition, Collection, **Switch**
   - [Built-in Operators](#built-in-operators)
   - [Modifiers](#modifiers)
 - [Rule Engine](#rule-engine) — multi-rule evaluation
@@ -345,6 +346,110 @@ nodes:
     context: hasVipStatus
     operator: equal
     value: true
+```
+
+#### Switch Node
+
+Evaluates a single context value once and routes execution to the first matching case branch. Similar to a `switch`/`case` statement in PHP, but the match criterion for each case can be any registered operator (not just equality).
+
+**Properties:**
+- `context` — name of the context to evaluate (resolved once)
+- `cases` — array of case entries, each containing:
+  - `value` — the value to compare against
+  - `operator` — *(optional)* operator name; defaults to `equal`
+  - `then` — any node to execute when this case matches
+- `default` — *(optional)* any node to execute when no case matches; returns `null` when omitted
+
+Cases are evaluated in order and the **first match wins** — subsequent cases are skipped.
+
+**Basic example (role-based dispatch):**
+```yaml
+node: switch
+context: userRole
+cases:
+  -
+    value: admin
+    then:
+      node: value
+      value: 100
+  -
+    value: manager
+    then:
+      node: value
+      value: 50
+  -
+    value: user
+    then:
+      node: value
+      value: 10
+default:
+  node: value
+  value: 0
+```
+
+**Range dispatch with operators** (first match wins):
+```yaml
+node: switch
+context: depositSum
+cases:
+  -
+    operator: greaterThan
+    value: 10000
+    then:
+      node: value
+      value: platinum
+  -
+    operator: greaterThan
+    value: 5000
+    then:
+      node: value
+      value: gold
+  -
+    operator: greaterThan
+    value: 1000
+    then:
+      node: value
+      value: silver
+default:
+  node: value
+  value: bronze
+```
+
+**JSON equivalent:**
+```json
+{
+  "node": "switch",
+  "context": "userRole",
+  "cases": [
+    { "value": "admin",   "then": { "node": "value", "value": 100 } },
+    { "value": "manager", "then": { "node": "value", "value": 50 } },
+    { "value": "user",    "then": { "node": "value", "value": 10 } }
+  ],
+  "default": { "node": "value", "value": 0 }
+}
+```
+
+The `then` and `default` branches can be **any node type** — including `context` (with modifiers), `condition`, `collection`, or even a nested `switch`:
+
+```yaml
+node: switch
+context: userTier
+cases:
+  -
+    value: vip
+    then:
+      node: context
+      context: getDepositSum
+      modifiers: ["$context * 0.15"]
+  -
+    value: regular
+    then:
+      node: context
+      context: getDepositSum
+      modifiers: ["$context * 0.05"]
+default:
+  node: value
+  value: 0
 ```
 
 ### Built-in Operators

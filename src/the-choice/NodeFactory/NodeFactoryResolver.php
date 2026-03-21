@@ -9,6 +9,7 @@ use TheChoice\Node\Collection;
 use TheChoice\Node\Condition;
 use TheChoice\Node\Context;
 use TheChoice\Node\Root;
+use TheChoice\Node\SwitchNode;
 use TheChoice\Node\Value;
 
 final class NodeFactoryResolver implements NodeFactoryResolverInterface
@@ -71,6 +72,7 @@ final class NodeFactoryResolver implements NodeFactoryResolverInterface
             Collection::getNodeName() => NodeCollectionFactory::class,
             Root::getNodeName()       => NodeRootFactory::class,
             Value::getNodeName()      => NodeValueFactory::class,
+            SwitchNode::getNodeName() => NodeSwitchFactory::class,
         ];
     }
 }

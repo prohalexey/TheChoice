@@ -10,6 +10,7 @@ use TheChoice\Node\Condition;
 use TheChoice\Node\Context;
 use TheChoice\Node\Node;
 use TheChoice\Node\Root;
+use TheChoice\Node\SwitchNode;
 use TheChoice\Node\Value;
 use TheChoice\Trace\EvaluationTrace;
 use TheChoice\Trace\TraceCollector;
@@ -140,6 +141,19 @@ class RootProcessor extends AbstractProcessor
         }
 
         if ($node instanceof Context || $node instanceof Value) {
+            return;
+        }
+
+        if ($node instanceof SwitchNode) {
+            foreach ($node->getCases() as $case) {
+                yield from $this->iterateNodes($case->getThenNode());
+            }
+
+            $defaultNode = $node->getDefaultNode();
+            if (null !== $defaultNode) {
+                yield from $this->iterateNodes($defaultNode);
+            }
+
             return;
         }
     }

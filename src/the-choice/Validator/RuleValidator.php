@@ -10,6 +10,7 @@ use TheChoice\Node\Condition;
 use TheChoice\Node\Context;
 use TheChoice\Node\Node;
 use TheChoice\Node\Root;
+use TheChoice\Node\SwitchNode;
 use TheChoice\Node\Value;
 
 /**
@@ -99,7 +100,54 @@ final readonly class RuleValidator
             return;
         }
 
+        if ($node instanceof SwitchNode) {
+            $this->validateSwitchNode($node, $path, $errors);
+
+            return;
+        }
+
         // Value nodes and other leaf nodes require no validation
+    }
+
+    /**
+     * @param array<ValidationError> $errors
+     */
+    private function validateSwitchNode(SwitchNode $node, string $path, array &$errors): void
+    {
+        $contextName = $node->getContextName();
+        if ([] !== $this->contexts && !in_array($contextName, $this->contexts, true)) {
+            $suggestion = $this->findClosestMatch($contextName, $this->contexts);
+
+            $errors[] = new ValidationError(
+                message: sprintf('Context "%s" is not registered', $contextName),
+                path: $path,
+                suggestion: $suggestion,
+            );
+        }
+
+        foreach ($node->getCases() as $index => $case) {
+            $casePath = sprintf('%s > switch.cases[%d]', $path, $index);
+
+            if ([] !== $this->operators) {
+                $operatorName = $case->getOperator()::getOperatorName();
+                if (!in_array($operatorName, $this->operators, true)) {
+                    $suggestion = $this->findClosestMatch($operatorName, $this->operators);
+
+                    $errors[] = new ValidationError(
+                        message: sprintf('Operator "%s" is not registered', $operatorName),
+                        path: $casePath,
+                        suggestion: $suggestion,
+                    );
+                }
+            }
+
+            $this->walkNode($case->getThenNode(), $casePath . ' > then', $errors);
+        }
+
+        $defaultNode = $node->getDefaultNode();
+        if (null !== $defaultNode) {
+            $this->walkNode($defaultNode, $path . ' > switch.default', $errors);
+        }
     }
 
     /**

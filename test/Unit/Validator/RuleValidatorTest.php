@@ -13,6 +13,8 @@ use TheChoice\Node\Condition;
 use TheChoice\Node\Context;
 use TheChoice\Node\Node;
 use TheChoice\Node\Root;
+use TheChoice\Node\SwitchCase;
+use TheChoice\Node\SwitchNode;
 use TheChoice\Node\Value;
 use TheChoice\Operator\AbstractOperator;
 use TheChoice\Operator\ArrayContain;
@@ -414,6 +416,145 @@ final class RuleValidatorTest extends TestCase
         self::assertTrue($result->isValid());
     }
 
+    // ─── SwitchNode validation ────────────────────────────────────────────
+
+    public function testValidSwitchNodePassesValidation(): void
+    {
+        $switchNode = new SwitchNode(
+            'withdrawalCount',
+            [new SwitchCase(new Equal(), new Value(1))],
+            new Value(0),
+        );
+
+        $root = $this->buildRoot($switchNode);
+
+        $result = $this->validator->validate($root);
+
+        self::assertTrue($result->isValid());
+    }
+
+    public function testSwitchNodeWithUnknownContextIsReported(): void
+    {
+        $switchNode = new SwitchNode(
+            'unknownContext',
+            [new SwitchCase(new Equal(), new Value(1))],
+        );
+
+        $root = $this->buildRoot($switchNode);
+
+        $result = $this->validator->validate($root);
+
+        self::assertFalse($result->isValid());
+        self::assertCount(1, $result->getErrors());
+        self::assertStringContainsString('Context "unknownContext" is not registered', $result->getErrors()[0]->message);
+    }
+
+    public function testSwitchNodeCaseWithUnknownOperatorIsReported(): void
+    {
+        $unknownOperator = new class extends AbstractOperator {
+            public static function getOperatorName(): string
+            {
+                return 'unknownSwitchOp';
+            }
+
+            public function assert(ContextInterface $context): bool
+            {
+                return false;
+            }
+        };
+
+        $switchNode = new SwitchNode(
+            'withdrawalCount',
+            [new SwitchCase($unknownOperator, new Value(1))],
+        );
+
+        $root = $this->buildRoot($switchNode);
+
+        $result = $this->validator->validate($root);
+
+        self::assertFalse($result->isValid());
+        self::assertCount(1, $result->getErrors());
+        self::assertStringContainsString('Operator "unknownSwitchOp" is not registered', $result->getErrors()[0]->message);
+    }
+
+    public function testSwitchNodeThenNodeIsValidatedRecursively(): void
+    {
+        $badContext = $this->buildContext('badThenContext', new Equal());
+        $switchNode = new SwitchNode(
+            'withdrawalCount',
+            [new SwitchCase(new Equal(), $badContext)],
+        );
+
+        $root = $this->buildRoot($switchNode);
+
+        $result = $this->validator->validate($root);
+
+        self::assertFalse($result->isValid());
+        self::assertCount(1, $result->getErrors());
+        self::assertStringContainsString('badThenContext', $result->getErrors()[0]->message);
+    }
+
+    public function testSwitchNodeDefaultNodeIsValidatedRecursively(): void
+    {
+        $badDefault = $this->buildContext('badDefaultContext', new Equal());
+        $switchNode = new SwitchNode(
+            'withdrawalCount',
+            [],
+            $badDefault,
+        );
+
+        $root = $this->buildRoot($switchNode);
+
+        $result = $this->validator->validate($root);
+
+        self::assertFalse($result->isValid());
+        self::assertCount(1, $result->getErrors());
+        self::assertStringContainsString('badDefaultContext', $result->getErrors()[0]->message);
+    }
+
+    public function testSwitchNodeErrorPathIncludesCaseIndex(): void
+    {
+        $unknownOperator = new class extends AbstractOperator {
+            public static function getOperatorName(): string
+            {
+                return 'unknownOp';
+            }
+
+            public function assert(ContextInterface $context): bool
+            {
+                return false;
+            }
+        };
+
+        $switchNode = new SwitchNode(
+            'withdrawalCount',
+            [
+                new SwitchCase(new Equal(), new Value(1)),
+                new SwitchCase($unknownOperator, new Value(2)),
+            ],
+        );
+
+        $root = $this->buildRoot($switchNode);
+
+        $result = $this->validator->validate($root);
+
+        self::assertFalse($result->isValid());
+        self::assertStringContainsString('switch.cases[1]', $result->getErrors()[0]->path);
+    }
+
+    public function testSwitchNodeDefaultPathIsCorrect(): void
+    {
+        $badDefault = $this->buildContext('badDefaultCtx', new Equal());
+        $switchNode = new SwitchNode('withdrawalCount', [], $badDefault);
+
+        $root = $this->buildRoot($switchNode);
+
+        $result = $this->validator->validate($root);
+
+        self::assertFalse($result->isValid());
+        self::assertStringContainsString('switch.default', $result->getErrors()[0]->path);
+    }
+
     private function buildContext(string $name, ?OperatorInterface $operator = null): Context
     {
         $context = new Context();
@@ -455,6 +596,17 @@ final class RuleValidatorTest extends TestCase
         if ($node instanceof Collection) {
             foreach ($node->all() as $child) {
                 $this->setRootRecursively($child, $root);
+            }
+        }
+
+        if ($node instanceof SwitchNode) {
+            foreach ($node->getCases() as $case) {
+                $this->setRootRecursively($case->getThenNode(), $root);
+            }
+
+            $defaultNode = $node->getDefaultNode();
+            if (null !== $defaultNode) {
+                $this->setRootRecursively($defaultNode, $root);
             }
         }
     }

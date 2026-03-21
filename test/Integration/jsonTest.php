@@ -300,6 +300,49 @@ final class jsonTest extends AbstractFormatIntegrationTestCase
         self::assertSame(4, $result);
     }
 
+    public function testNodeSwitchEqualMatchTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeSwitchEqualMatch.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertSame(100, $result);
+    }
+
+    public function testNodeSwitchOperatorMatchTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeSwitchOperatorMatch.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertSame('gold', $result);
+    }
+
+    public function testNodeSwitchDefaultFallbackTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeSwitchDefaultFallback.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertSame(0, $result);
+    }
+
+    public function testNodeSwitchNoDefaultTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeSwitchNoDefault.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertNull($result);
+    }
+
+    public function testNodeSwitchEmptyCasesTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeSwitchEmptyCases.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertSame(999, $result);
+    }
+
+    public function testNodeSwitchComplexThenTest(): void
+    {
+        // userRole='admin' matches, then returns depositCount context value (2)
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeSwitchComplexThen.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertSame(2, $result);
+    }
+
     protected function getBuilderClass(): string
     {
         return JsonBuilder::class;

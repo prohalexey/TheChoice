@@ -1,0 +1,10 @@
+{
+  "node": "switch",
+  "context": "userRole",
+  "cases": [
+    { "value": "manager", "then": { "node": "value", "value": 50 } },
+    { "value": "user",    "then": { "node": "value", "value": 10 } }
+  ],
+  "default": { "node": "value", "value": 0 }
+}
+

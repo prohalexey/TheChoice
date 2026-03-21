@@ -1,0 +1,25 @@
+node: switch
+context: depositSum
+cases:
+  -
+    operator: greaterThan
+    value: 10000
+    then:
+      node: value
+      value: platinum
+  -
+    operator: greaterThan
+    value: 5000
+    then:
+      node: value
+      value: gold
+  -
+    operator: greaterThan
+    value: 1000
+    then:
+      node: value
+      value: silver
+default:
+  node: value
+  value: bronze
+

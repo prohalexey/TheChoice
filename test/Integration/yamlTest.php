@@ -307,6 +307,49 @@ final class yamlTest extends AbstractFormatIntegrationTestCase
         self::assertSame(4, $result);
     }
 
+    public function testNodeSwitchEqualMatchTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeSwitchEqualMatch.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertSame(100, $result);
+    }
+
+    public function testNodeSwitchOperatorMatchTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeSwitchOperatorMatch.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertSame('gold', $result);
+    }
+
+    public function testNodeSwitchDefaultFallbackTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeSwitchDefaultFallback.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertSame(0, $result);
+    }
+
+    public function testNodeSwitchNoDefaultTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeSwitchNoDefault.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertNull($result);
+    }
+
+    public function testNodeSwitchEmptyCasesTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeSwitchEmptyCases.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertSame(999, $result);
+    }
+
+    public function testNodeSwitchComplexThenTest(): void
+    {
+        // userRole='admin' matches, then returns depositCount context value (2)
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeSwitchComplexThen.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertSame(2, $result);
+    }
+
     protected function getBuilderClass(): string
     {
         return YamlBuilder::class;

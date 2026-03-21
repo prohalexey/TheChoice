@@ -256,4 +256,57 @@ final class NegativeScenariosTest extends TestCase
         $node2 = $this->jsonBuilder->parse('{"node": "value", "value": 2}');
         self::assertSame(2, $this->rootProcessor->process($node2));
     }
+
+    // ─── SwitchNode parsing errors ────────────────────────────────────────
+
+    public function testSwitchNodeMissingContextFieldThrowsException(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('"context" property is absent');
+
+        $json = json_encode([
+            'node'  => 'switch',
+            'cases' => [['value' => 0, 'then' => ['node' => 'value', 'value' => 1]]],
+        ]);
+        $this->jsonBuilder->parse($json);
+    }
+
+    public function testSwitchNodeMissingCasesFieldThrowsException(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('"cases" property is absent');
+
+        $json = json_encode([
+            'node'    => 'switch',
+            'context' => 'withdrawalCount',
+        ]);
+        $this->jsonBuilder->parse($json);
+    }
+
+    public function testSwitchNodeCaseMissingThenFieldThrowsException(): void
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('"then" property is absent in switch case at index 0');
+
+        $json = json_encode([
+            'node'    => 'switch',
+            'context' => 'withdrawalCount',
+            'cases'   => [['value' => 0]],
+        ]);
+        $this->jsonBuilder->parse($json);
+    }
+
+    public function testSwitchNodeUnknownContextAtRuntimeThrowsException(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('not found');
+
+        $json = json_encode([
+            'node'    => 'switch',
+            'context' => 'nonExistentContext',
+            'cases'   => [['value' => 0, 'then' => ['node' => 'value', 'value' => 1]]],
+        ]);
+        $node = $this->jsonBuilder->parse($json);
+        $this->rootProcessor->process($node);
+    }
 }

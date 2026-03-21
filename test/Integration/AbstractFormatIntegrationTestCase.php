@@ -15,10 +15,12 @@ use TheChoice\Tests\Integration\Contexts\ActionReturnInt;
 use TheChoice\Tests\Integration\Contexts\ActionWithParams;
 use TheChoice\Tests\Integration\Contexts\ContextWithParams;
 use TheChoice\Tests\Integration\Contexts\DepositCount;
+use TheChoice\Tests\Integration\Contexts\DepositSum;
 use TheChoice\Tests\Integration\Contexts\EmptyStringContext;
 use TheChoice\Tests\Integration\Contexts\HasVipStatus;
 use TheChoice\Tests\Integration\Contexts\InGroup;
 use TheChoice\Tests\Integration\Contexts\TagsContext;
+use TheChoice\Tests\Integration\Contexts\UserRole;
 use TheChoice\Tests\Integration\Contexts\UtmSource;
 use TheChoice\Tests\Integration\Contexts\VisitCount;
 use TheChoice\Tests\Integration\Contexts\WithdrawalCount;
@@ -46,6 +48,8 @@ abstract class AbstractFormatIntegrationTestCase extends TestCase
             'inGroup'           => InGroup::class,
             'withdrawalCount'   => WithdrawalCount::class,
             'depositCount'      => DepositCount::class,
+            'depositSum'        => DepositSum::class,
+            'userRole'          => UserRole::class,
             'utmSource'         => UtmSource::class,
             'contextWithParams' => ContextWithParams::class,
             'action1'           => Action1::class,

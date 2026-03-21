@@ -1,0 +1,7 @@
+{
+  "node": "switch",
+  "context": "userRole",
+  "cases": [],
+  "default": { "node": "value", "value": 999 }
+}
+

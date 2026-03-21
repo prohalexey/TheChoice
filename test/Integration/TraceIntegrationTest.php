@@ -145,6 +145,7 @@ final class TraceIntegrationTest extends TestCase
             'testNodeRootWithStorage.json',
             'testNodeContextWithParams.json',
             'testNodeValue.json',
+            'testNodeSwitchTrace.json',
         ];
 
         foreach ($testFiles as $file) {
@@ -263,5 +264,17 @@ final class TraceIntegrationTest extends TestCase
         $result = $this->rootProcessor->process($node);
 
         self::assertSame(4, $result);
+    }
+
+    public function testProcessWithTraceSwitchNode(): void
+    {
+        $node = $this->jsonBuilder->parseFile($this->testFilesDir . 'Json/testNodeSwitchTrace.json');
+
+        $trace = $this->rootProcessor->processWithTrace($node);
+
+        self::assertSame('two', $trace->getValue());
+
+        $explanation = $trace->explain();
+        self::assertStringContainsString('Switch', $explanation);
     }
 }
