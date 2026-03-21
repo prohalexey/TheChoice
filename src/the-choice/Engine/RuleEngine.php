@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace TheChoice\Engine;
 
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use TheChoice\Event\EngineRunAfterEvent;
+use TheChoice\Event\EngineRunBeforeEvent;
+use TheChoice\Event\RuleErrorEvent;
+use TheChoice\Event\RuleFiredEvent;
 use TheChoice\Node\Node;
 use TheChoice\Processor\RootProcessor;
 use TheChoice\Registry\RuleEntry;
 use TheChoice\Registry\RuleRegistry;
+use Throwable;
 
 /**
  * Evaluates multiple rules in a single run and returns an aggregated report.
@@ -22,6 +28,7 @@ class RuleEngine
 
     public function __construct(
         private readonly ContainerInterface $container,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
     }
 
@@ -64,18 +71,59 @@ class RuleEngine
         /** @var RootProcessor $processor */
         $processor = $this->container->get(RootProcessor::class);
 
+        if (null !== $this->eventDispatcher) {
+            $processor->setEventDispatcher($this->eventDispatcher);
+        }
+
         $sorted = $this->getSortedEntries();
+
+        $this->eventDispatcher?->dispatch(new EngineRunBeforeEvent($sorted));
+
+        $startTime = hrtime(true);
         $results = [];
 
         foreach ($sorted as $entry) {
-            $result = $processor->process($entry->node);
-            $results[$entry->name] = new RuleResult(
+            $ruleStart = hrtime(true);
+
+            try {
+                $result = $processor->process($entry->node);
+            } catch (Throwable $exception) {
+                $this->eventDispatcher?->dispatch(new RuleErrorEvent(
+                    ruleName: $entry->name,
+                    entry: $entry,
+                    exception: $exception,
+                ));
+
+                throw $exception;
+            }
+
+            $ruleResult = new RuleResult(
                 name: $entry->name,
                 result: $result,
             );
+            $results[$entry->name] = $ruleResult;
+
+            $ruleElapsedMs = (hrtime(true) - $ruleStart) / 1_000_000;
+
+            if ($ruleResult->fired) {
+                $this->eventDispatcher?->dispatch(new RuleFiredEvent(
+                    ruleName: $entry->name,
+                    entry: $entry,
+                    result: $ruleResult,
+                    elapsedMs: $ruleElapsedMs,
+                ));
+            }
         }
 
-        return new EngineReport($results);
+        $report = new EngineReport($results);
+
+        $totalElapsedMs = (hrtime(true) - $startTime) / 1_000_000;
+        $this->eventDispatcher?->dispatch(new EngineRunAfterEvent(
+            report: $report,
+            elapsedMs: $totalElapsedMs,
+        ));
+
+        return $report;
     }
 
     /**

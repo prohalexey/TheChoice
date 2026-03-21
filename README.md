@@ -24,6 +24,7 @@ This library helps you simplify the implementation of complex business rules suc
 - ✅ Rule Registry — named rules with tags, version, and metadata
 - ✅ Rule Validator — static analysis of rules before execution
 - ✅ Evaluation Trace — step-by-step debugging of rule evaluation
+- ✅ Event System — PSR-14 lifecycle and node-level events for observability
 - ✅ Switch Node — multi-branch dispatch on a single context value
 - ✅ Fluent PHP Builder (DSL) — build rule trees programmatically without JSON/YAML
 - ✅ Node Exporter — serialize rule trees back to JSON or YAML
@@ -45,6 +46,7 @@ This library helps you simplify the implementation of complex business rules suc
 - [Rule Registry](#rule-registry) — named rules with metadata
 - [Rule Validator](#rule-validator) — static analysis / linter
 - [Evaluation Trace](#evaluation-trace) — debugging
+- [Event System](#event-system) — PSR-14 lifecycle & node events
 - [Caching](#caching) — PSR-16
 - [Container Integration](#container-integration) — Built-in & Symfony
 - [Advanced Features](#advanced-features) — custom contexts, operators, processor flushing
@@ -724,6 +726,79 @@ foreach ($rootEntry->getChildren() as $child) {
 ### Zero Overhead
 
 Tracing has **zero overhead** when not used — the trace collector is only active during `processWithTrace()` and is automatically cleaned up afterwards. A normal `process()` call is completely unaffected.
+
+## Event System
+
+`RuleEngine` accepts an optional PSR-14 `EventDispatcherInterface` and dispatches events at key points during evaluation. Events are purely observational — they do not alter rule results.
+
+```php
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use TheChoice\Engine\RuleEngine;
+use TheChoice\Event\ContextEvaluatedEvent;
+use TheChoice\Event\EngineRunAfterEvent;
+use TheChoice\Event\RuleFiredEvent;
+use TheChoice\Event\RuleErrorEvent;
+
+$dispatcher = new EventDispatcher();
+
+// Metrics — total run time and fired count
+$dispatcher->addListener(EngineRunAfterEvent::class, function (EngineRunAfterEvent $e): void {
+    echo sprintf("Engine finished in %.2f ms, %d rules fired\n", $e->elapsedMs, count($e->report->getFired()));
+});
+
+// Audit — log every fired rule
+$dispatcher->addListener(RuleFiredEvent::class, function (RuleFiredEvent $e): void {
+    echo sprintf("Rule '%s' fired with result: %s (%.2f ms)\n", $e->ruleName, var_export($e->result->result, true), $e->elapsedMs);
+});
+
+// Debug — see why a context evaluated the way it did
+$dispatcher->addListener(ContextEvaluatedEvent::class, function (ContextEvaluatedEvent $e): void {
+    echo sprintf("  %s = %s (%s %s) → %s\n",
+        $e->contextName,
+        var_export($e->contextValue, true),
+        $e->operatorName ?? 'no operator',
+        var_export($e->operatorValue, true),
+        var_export($e->result, true),
+    );
+});
+
+// Error handling
+$dispatcher->addListener(RuleErrorEvent::class, function (RuleErrorEvent $e): void {
+    echo sprintf("Rule '%s' failed: %s\n", $e->ruleName, $e->exception->getMessage());
+});
+
+$engine = new RuleEngine($container, $dispatcher);
+$engine->addRule('vip_discount', $jsonBuilder->parseFile('rules/vip.json'), priority: 10);
+$report = $engine->run();
+```
+
+### Available Events
+
+| Event class | When dispatched |
+|---|---|
+| `EngineRunBeforeEvent` | Before `RuleEngine::run()` processes any rules. Contains the sorted rule list. |
+| `EngineRunAfterEvent` | After all rules are processed. Contains `EngineReport` and `elapsedMs`. |
+| `RuleFiredEvent` | When a rule fires (result ≠ `null` and ≠ `false`). Contains `RuleResult` and `elapsedMs`. |
+| `RuleErrorEvent` | When a rule throws an exception. Contains the `Throwable`. Exception is re-thrown after dispatch. |
+| `ContextEvaluatedEvent` | After a context node is evaluated. Contains raw `contextValue`, `operatorName`, `operatorValue`, and `result`. |
+| `SwitchResolvedEvent` | After a switch node resolves. Contains `contextValue`, `matchedCaseIndex` (`null` = default), and `result`. |
+
+### Using with RootProcessor directly
+
+You can also attach the dispatcher to `RootProcessor` for standalone rule evaluation (without `RuleEngine`):
+
+```php
+$rootProcessor = $container->get(RootProcessor::class);
+$rootProcessor->setEventDispatcher($dispatcher);
+
+$result = $rootProcessor->process($node); // context & switch events will fire
+```
+
+Events work alongside `processWithTrace()` — both systems are independent.
+
+### Zero Overhead
+
+Events have **zero overhead** when no dispatcher is set — all dispatch calls are guarded by null checks.
 
 ## Caching
 

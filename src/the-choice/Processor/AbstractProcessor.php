@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TheChoice\Processor;
 
 use Psr\Container\ContainerInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use TheChoice\Node\Node;
 use TheChoice\Trace\TraceCollector;
 
@@ -13,6 +14,8 @@ abstract class AbstractProcessor implements ProcessorInterface
     protected ContainerInterface $container;
 
     protected ?TraceCollector $traceCollector = null;
+
+    protected ?EventDispatcherInterface $eventDispatcher = null;
 
     /** @var array<string, class-string> */
     protected array $processorResolvingCache = [];
@@ -37,6 +40,16 @@ abstract class AbstractProcessor implements ProcessorInterface
         return $this->traceCollector;
     }
 
+    public function setEventDispatcher(?EventDispatcherInterface $eventDispatcher): void
+    {
+        $this->eventDispatcher = $eventDispatcher;
+    }
+
+    public function getEventDispatcher(): ?EventDispatcherInterface
+    {
+        return $this->eventDispatcher;
+    }
+
     public function flush(): void
     {
         // Default implementation: nothing to flush.
@@ -52,13 +65,19 @@ abstract class AbstractProcessor implements ProcessorInterface
             $this->processorResolvingCache[$nodeType] = $processorResolver->resolve($node);
         }
 
-        // @phpstan-ignore-next-line
         $processor = $this->getContainer()->get($this->processorResolvingCache[$nodeType]);
 
-        if ($processor instanceof self && null !== $this->traceCollector) {
-            $processor->setTraceCollector($this->traceCollector);
+        if ($processor instanceof self) {
+            if (null !== $this->traceCollector) {
+                $processor->setTraceCollector($this->traceCollector);
+            }
+
+            if (null !== $this->eventDispatcher) {
+                $processor->setEventDispatcher($this->eventDispatcher);
+            }
         }
 
+        // @phpstan-ignore return.type
         return $processor;
     }
 

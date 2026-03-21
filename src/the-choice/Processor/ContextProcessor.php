@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Override;
 use TheChoice\Context\CallableContext;
 use TheChoice\Context\ContextFactoryInterface;
+use TheChoice\Event\ContextEvaluatedEvent;
 use TheChoice\Exception\InvalidContextCalculation;
 use TheChoice\Exception\RuntimeException;
 use TheChoice\Node\Context;
@@ -22,6 +23,9 @@ class ContextProcessor extends AbstractProcessor
 
     protected array $processedContext = [];
 
+    /** @var array<string, mixed> raw context values cached for event dispatching */
+    protected array $contextValues = [];
+
     public function setContextFactory(ContextFactoryInterface $contextFactory): self
     {
         $this->contextFactory = $contextFactory;
@@ -33,6 +37,7 @@ class ContextProcessor extends AbstractProcessor
     public function flush(): void
     {
         $this->processedContext = [];
+        $this->contextValues = [];
     }
 
     public function process(Node $node): mixed
@@ -84,18 +89,29 @@ class ContextProcessor extends AbstractProcessor
 
         if (!isset($this->processedContext[$hash])) {
             $context = $this->contextFactory->createContextFromContextNode($node);
+            $this->contextValues[$hash] = $context->getValue();
 
             if (null !== $operator) {
                 if ([] !== $modifiers) {
                     $context = new CallableContext(
-                        fn (): mixed => $this->processContextModifiers($context->getValue(), $node),
+                        fn (): mixed => $this->processContextModifiers($this->contextValues[$hash], $node),
                     );
                 }
 
                 $this->processedContext[$hash] = $operator->assert($context);
             } else {
-                $this->processedContext[$hash] = $this->processContextModifiers($context->getValue(), $node);
+                $this->processedContext[$hash] = $this->processContextModifiers($this->contextValues[$hash], $node);
             }
+        }
+
+        if (null !== $this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(new ContextEvaluatedEvent(
+                contextName: $contextName,
+                contextValue: $this->contextValues[$hash] ?? null,
+                operatorName: null !== $operator ? $operator::getOperatorName() : null,
+                operatorValue: null !== $operator ? $operator->getValue() : null,
+                result: $this->processedContext[$hash],
+            ));
         }
 
         if ($node->isStoppable()) {
