@@ -25,7 +25,7 @@ final class RootProcessorPsrContainerTest extends TestCase
         $rootProcessor = new RootProcessor();
         $valueProcessor = new ValueProcessor();
 
-        $container = new class($resolver, $rootProcessor, $valueProcessor) implements ContainerInterface {
+        $container = new readonly class($resolver, $rootProcessor, $valueProcessor) implements ContainerInterface {
             public function __construct(
                 private ProcessorResolverInterface $resolver,
                 private RootProcessor $rootProcessor,

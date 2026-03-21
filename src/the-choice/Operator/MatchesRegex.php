@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TheChoice\Operator;
 
+use Override;
 use TheChoice\Context\ContextInterface;
 use TheChoice\Exception\InvalidArgumentException;
 
@@ -14,6 +15,7 @@ class MatchesRegex extends AbstractOperator
         return 'matchesRegex';
     }
 
+    #[Override]
     public function setValue(mixed $value): static
     {
         if (!is_string($value)) {

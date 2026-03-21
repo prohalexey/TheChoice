@@ -28,6 +28,7 @@ class NodeContextFactory implements NodeFactoryInterface
                         if (array_key_exists('value', $structure)) {
                             $operator->setValue($structure['value']);
                         }
+
                         $node->setOperator($operator);
                     }
                 }

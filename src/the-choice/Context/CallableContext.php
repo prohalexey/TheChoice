@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TheChoice\Context;
 
-final class CallableContext implements ContextInterface
+final readonly class CallableContext implements ContextInterface
 {
     /** @var callable */
     private mixed $context;

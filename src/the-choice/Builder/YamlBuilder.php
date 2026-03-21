@@ -20,7 +20,7 @@ class YamlBuilder extends ArrayBuilder
         return $this->build($decoded);
     }
 
-    public function parseFile(string $filename): mixed
+    public function parseFile(string $filename): Node
     {
         if (!file_exists($filename)) {
             throw new InvalidArgumentException(sprintf('File "%s" not found', $filename));

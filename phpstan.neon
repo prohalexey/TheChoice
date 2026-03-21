@@ -1,5 +1,6 @@
 parameters:
     tmpDir: ./var/phpstan
+    phpVersion: 80400
     checkMissingTypehints: true
     checkMissingVarTagTypehint: true
     parallel:

@@ -31,61 +31,61 @@ final class OperatorsTest extends TestCase
 {
     public function testEqualTest(): void
     {
-        self::assertTrue((new Equal())->setValue(1)->assert($this->getContext(1)));
-        self::assertFalse((new Equal())->setValue('1')->assert($this->getContext(1)));
-        self::assertFalse((new Equal())->setValue(2)->assert($this->getContext(1)));
+        self::assertTrue(new Equal()->setValue(1)->assert($this->getContext(1)));
+        self::assertFalse(new Equal()->setValue('1')->assert($this->getContext(1)));
+        self::assertFalse(new Equal()->setValue(2)->assert($this->getContext(1)));
 
-        self::assertTrue((new Equal())->setValue('1')->assert($this->getContext('1')));
-        self::assertFalse((new Equal())->setValue(1)->assert($this->getContext('1')));
-        self::assertFalse((new Equal())->setValue('2')->assert($this->getContext(1)));
+        self::assertTrue(new Equal()->setValue('1')->assert($this->getContext('1')));
+        self::assertFalse(new Equal()->setValue(1)->assert($this->getContext('1')));
+        self::assertFalse(new Equal()->setValue('2')->assert($this->getContext(1)));
 
-        self::assertTrue((new Equal())->setValue([1])->assert($this->getContext([1])));
-        self::assertFalse((new Equal())->setValue([1])->assert($this->getContext([2])));
+        self::assertTrue(new Equal()->setValue([1])->assert($this->getContext([1])));
+        self::assertFalse(new Equal()->setValue([1])->assert($this->getContext([2])));
     }
 
     public function testNotEqualTest(): void
     {
-        self::assertFalse((new NotEqual())->setValue(1)->assert($this->getContext(1)));
-        self::assertTrue((new NotEqual())->setValue('1')->assert($this->getContext(1)));
-        self::assertTrue((new NotEqual())->setValue(2)->assert($this->getContext(1)));
+        self::assertFalse(new NotEqual()->setValue(1)->assert($this->getContext(1)));
+        self::assertTrue(new NotEqual()->setValue('1')->assert($this->getContext(1)));
+        self::assertTrue(new NotEqual()->setValue(2)->assert($this->getContext(1)));
 
-        self::assertFalse((new NotEqual())->setValue('1')->assert($this->getContext('1')));
-        self::assertTrue((new NotEqual())->setValue(1)->assert($this->getContext('1')));
-        self::assertTrue((new NotEqual())->setValue('2')->assert($this->getContext(1)));
+        self::assertFalse(new NotEqual()->setValue('1')->assert($this->getContext('1')));
+        self::assertTrue(new NotEqual()->setValue(1)->assert($this->getContext('1')));
+        self::assertTrue(new NotEqual()->setValue('2')->assert($this->getContext(1)));
 
-        self::assertFalse((new NotEqual())->setValue([1])->assert($this->getContext([1])));
-        self::assertTrue((new NotEqual())->setValue([1])->assert($this->getContext([2])));
+        self::assertFalse(new NotEqual()->setValue([1])->assert($this->getContext([1])));
+        self::assertTrue(new NotEqual()->setValue([1])->assert($this->getContext([2])));
     }
 
     public function testGreaterThanTest(): void
     {
-        self::assertTrue((new GreaterThan())->setValue(1)->assert($this->getContext(2)));
-        self::assertFalse((new GreaterThan())->setValue(2)->assert($this->getContext(1)));
+        self::assertTrue(new GreaterThan()->setValue(1)->assert($this->getContext(2)));
+        self::assertFalse(new GreaterThan()->setValue(2)->assert($this->getContext(1)));
     }
 
     public function testGreaterThanOrEqualTest(): void
     {
-        self::assertTrue((new GreaterThanOrEqual())->setValue(1)->assert($this->getContext(2)));
-        self::assertTrue((new GreaterThanOrEqual())->setValue(1)->assert($this->getContext(1)));
-        self::assertFalse((new GreaterThanOrEqual())->setValue(2)->assert($this->getContext(1)));
+        self::assertTrue(new GreaterThanOrEqual()->setValue(1)->assert($this->getContext(2)));
+        self::assertTrue(new GreaterThanOrEqual()->setValue(1)->assert($this->getContext(1)));
+        self::assertFalse(new GreaterThanOrEqual()->setValue(2)->assert($this->getContext(1)));
     }
 
     public function testLowerThanTest(): void
     {
-        self::assertFalse((new LowerThan())->setValue(1)->assert($this->getContext(2)));
-        self::assertTrue((new LowerThan())->setValue(2)->assert($this->getContext(1)));
+        self::assertFalse(new LowerThan()->setValue(1)->assert($this->getContext(2)));
+        self::assertTrue(new LowerThan()->setValue(2)->assert($this->getContext(1)));
     }
 
     public function testLowerThanOrEqualTest(): void
     {
-        self::assertFalse((new LowerThanOrEqual())->setValue(1)->assert($this->getContext(2)));
-        self::assertTrue((new LowerThanOrEqual())->setValue(1)->assert($this->getContext(1)));
-        self::assertTrue((new LowerThanOrEqual())->setValue(2)->assert($this->getContext(1)));
+        self::assertFalse(new LowerThanOrEqual()->setValue(1)->assert($this->getContext(2)));
+        self::assertTrue(new LowerThanOrEqual()->setValue(1)->assert($this->getContext(1)));
+        self::assertTrue(new LowerThanOrEqual()->setValue(2)->assert($this->getContext(1)));
     }
 
     public function testStringContainTest(): void
     {
-        $operator = (new StringContain())->setValue('test');
+        $operator = new StringContain()->setValue('test');
 
         self::assertTrue($operator->assert($this->getContext('test')));
         self::assertTrue($operator->assert($this->getContext('atest')));
@@ -95,7 +95,7 @@ final class OperatorsTest extends TestCase
 
     public function testStringNotContainTest(): void
     {
-        $operator = (new StringNotContain())->setValue('test');
+        $operator = new StringNotContain()->setValue('test');
 
         self::assertFalse($operator->assert($this->getContext('test')));
         self::assertFalse($operator->assert($this->getContext('atest')));
@@ -105,7 +105,7 @@ final class OperatorsTest extends TestCase
 
     public function testArrayContainTest(): void
     {
-        $operator = (new ArrayContain())->setValue([1, 2, 3, 'a']);
+        $operator = new ArrayContain()->setValue([1, 2, 3, 'a']);
 
         self::assertTrue($operator->assert($this->getContext(1)));
         self::assertTrue($operator->assert($this->getContext(2)));
@@ -117,7 +117,7 @@ final class OperatorsTest extends TestCase
 
     public function testArrayNotContainTest(): void
     {
-        $operator = (new ArrayNotContain())->setValue([1, 2, 3, 'a']);
+        $operator = new ArrayNotContain()->setValue([1, 2, 3, 'a']);
 
         self::assertFalse($operator->assert($this->getContext(1)));
         self::assertFalse($operator->assert($this->getContext(2)));
@@ -129,7 +129,7 @@ final class OperatorsTest extends TestCase
 
     public function testArrayNumericInRangeTest(): void
     {
-        $operator = (new NumericInRange())->setValue([1, 5]);
+        $operator = new NumericInRange()->setValue([1, 5]);
 
         self::assertTrue($operator->assert($this->getContext(1)));
         self::assertTrue($operator->assert($this->getContext(3)));
@@ -145,7 +145,7 @@ final class OperatorsTest extends TestCase
 
     public function testStartsWithTest(): void
     {
-        $operator = (new StartsWith())->setValue('foo');
+        $operator = new StartsWith()->setValue('foo');
 
         self::assertTrue($operator->assert($this->getContext('foobar')));
         self::assertTrue($operator->assert($this->getContext('foo')));
@@ -155,7 +155,7 @@ final class OperatorsTest extends TestCase
 
     public function testEndsWithTest(): void
     {
-        $operator = (new EndsWith())->setValue('bar');
+        $operator = new EndsWith()->setValue('bar');
 
         self::assertTrue($operator->assert($this->getContext('foobar')));
         self::assertTrue($operator->assert($this->getContext('bar')));
@@ -165,7 +165,7 @@ final class OperatorsTest extends TestCase
 
     public function testMatchesRegexTest(): void
     {
-        $operator = (new MatchesRegex())->setValue('/^\d{3}$/');
+        $operator = new MatchesRegex()->setValue('/^\d{3}$/');
 
         self::assertTrue($operator->assert($this->getContext('123')));
         self::assertFalse($operator->assert($this->getContext('12')));
@@ -197,7 +197,7 @@ final class OperatorsTest extends TestCase
 
     public function testIsInstanceOfTest(): void
     {
-        $operator = (new IsInstanceOf())->setValue(stdClass::class);
+        $operator = new IsInstanceOf()->setValue(stdClass::class);
 
         self::assertTrue($operator->assert($this->getObjectContext(new stdClass())));
         self::assertFalse($operator->assert($this->getContext('not-an-object')));
@@ -206,7 +206,7 @@ final class OperatorsTest extends TestCase
 
     public function testContainsKeyTest(): void
     {
-        $operator = (new ContainsKey())->setValue('name');
+        $operator = new ContainsKey()->setValue('name');
 
         self::assertTrue($operator->assert($this->getContext(['name' => 'Alice', 'age' => 30])));
         self::assertFalse($operator->assert($this->getContext(['age' => 30])));
@@ -215,7 +215,7 @@ final class OperatorsTest extends TestCase
 
     public function testCountEqualTest(): void
     {
-        $operator = (new CountEqual())->setValue(3);
+        $operator = new CountEqual()->setValue(3);
 
         self::assertTrue($operator->assert($this->getContext([1, 2, 3])));
         self::assertFalse($operator->assert($this->getContext([1, 2])));
@@ -225,7 +225,7 @@ final class OperatorsTest extends TestCase
 
     public function testCountGreaterThanTest(): void
     {
-        $operator = (new CountGreaterThan())->setValue(2);
+        $operator = new CountGreaterThan()->setValue(2);
 
         self::assertTrue($operator->assert($this->getContext([1, 2, 3])));
         self::assertFalse($operator->assert($this->getContext([1, 2])));
@@ -245,8 +245,8 @@ final class OperatorsTest extends TestCase
 
     private function getObjectContext(object $object): ContextInterface
     {
-        return new class($object) implements ContextInterface {
-            public function __construct(private readonly object $object)
+        return new readonly class($object) implements ContextInterface {
+            public function __construct(private object $object)
             {
             }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TheChoice\Operator;
 
+use Override;
 use TheChoice\Context\ContextInterface;
 use TheChoice\Exception\InvalidArgumentException;
 
@@ -14,6 +15,7 @@ class ArrayContain extends AbstractOperator
         return 'arrayContain';
     }
 
+    #[Override]
     public function setValue(mixed $value): static
     {
         if (!is_array($value)) {
@@ -32,7 +34,8 @@ class ArrayContain extends AbstractOperator
         return in_array($context->getValue(), $this->getValue(), true);
     }
 
-    public function getValue(): array // @phpstan-ignore-line
+    #[Override]
+    public function getValue(): array
     {
         return (array)$this->value;
     }

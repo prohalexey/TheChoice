@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TheChoice\Operator;
 
+use Override;
 use TheChoice\Context\ContextInterface;
 use TheChoice\Exception\InvalidArgumentException;
 
@@ -14,6 +15,7 @@ class ContainsKey extends AbstractOperator
         return 'containsKey';
     }
 
+    #[Override]
     public function setValue(mixed $value): static
     {
         if (!is_string($value) && !is_int($value)) {
@@ -35,6 +37,10 @@ class ContainsKey extends AbstractOperator
         $contextValue = $context->getValue();
 
         if (!is_array($contextValue)) {
+            return false;
+        }
+
+        if (!is_string($this->value) && !is_int($this->value)) {
             return false;
         }
 

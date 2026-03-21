@@ -27,6 +27,30 @@ This library helps you simplify the implementation of complex business rules suc
 composer require prohalexey/the-choice
 ```
 
+**Requirements:** PHP 8.4+
+
+## Caching
+
+`CachedJsonBuilder` and `CachedYamlBuilder` wrap the base builders with a transparent PSR-16 cache layer. The node tree is serialized after the first parse and deserialized on subsequent calls; the cache key is derived from the MD5 of the rule content, so the cache is automatically invalidated when the content changes.
+
+```php
+use Psr\SimpleCache\CacheInterface;
+use TheChoice\Builder\CachedJsonBuilder;
+
+/** @var CacheInterface $cache */ // any PSR-16 adapter (Symfony Cache, Laravel Cache, etc.)
+
+$builder = new CachedJsonBuilder(
+    container: $container,
+    cache: $cache,
+    ttl: 3600,        // optional, seconds or \DateInterval
+    keyPrefix: 'rules.',  // optional
+);
+
+// First call: parse → serialize → store
+// Subsequent calls: deserialize from cache, no parsing
+$node = $builder->parseFile('rules/discount.json');
+```
+
 ## Quick Start
 
 ### JSON Configuration Example

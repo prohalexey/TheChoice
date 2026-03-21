@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TheChoice\Operator;
 
 use Countable;
+use Override;
 use TheChoice\Context\ContextInterface;
 use TheChoice\Exception\InvalidArgumentException;
 
@@ -15,6 +16,7 @@ class CountGreaterThan extends AbstractOperator
         return 'countGreaterThan';
     }
 
+    #[Override]
     public function setValue(mixed $value): static
     {
         if (!is_numeric($value)) {

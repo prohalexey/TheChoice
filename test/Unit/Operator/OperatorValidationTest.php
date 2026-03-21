@@ -36,14 +36,14 @@ final class OperatorValidationTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('not an array');
 
-        (new ArrayContain())->setValue('not-an-array');
+        new ArrayContain()->setValue('not-an-array');
     }
 
     public function testArrayContainThrowsWhenValueIsInt(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new ArrayContain())->setValue(42);
+        new ArrayContain()->setValue(42);
     }
 
     // ─── ArrayNotContain ─────────────────────────────────────────────────────
@@ -52,7 +52,7 @@ final class OperatorValidationTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new ArrayNotContain())->setValue('string');
+        new ArrayNotContain()->setValue('string');
     }
 
     // ─── NumericInRange ──────────────────────────────────────────────────────
@@ -62,7 +62,7 @@ final class OperatorValidationTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('not an array');
 
-        (new NumericInRange())->setValue(5);
+        new NumericInRange()->setValue(5);
     }
 
     public function testNumericInRangeThrowsWhenArrayHasWrongCount(): void
@@ -70,14 +70,14 @@ final class OperatorValidationTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('exact 2 args');
 
-        (new NumericInRange())->setValue([1, 2, 3]);
+        new NumericInRange()->setValue([1, 2, 3]);
     }
 
     public function testNumericInRangeThrowsWhenArrayHasOneElement(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new NumericInRange())->setValue([1]);
+        new NumericInRange()->setValue([1]);
     }
 
     // ─── StringContain ───────────────────────────────────────────────────────
@@ -98,7 +98,7 @@ final class OperatorValidationTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new StartsWith())->setValue(42);
+        new StartsWith()->setValue(42);
     }
 
     // ─── EndsWith ────────────────────────────────────────────────────────────
@@ -107,7 +107,7 @@ final class OperatorValidationTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new EndsWith())->setValue(42);
+        new EndsWith()->setValue(42);
     }
 
     // ─── MatchesRegex ────────────────────────────────────────────────────────
@@ -116,7 +116,7 @@ final class OperatorValidationTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new MatchesRegex())->setValue(42);
+        new MatchesRegex()->setValue(42);
     }
 
     public function testMatchesRegexThrowsWhenPatternIsInvalid(): void
@@ -124,7 +124,7 @@ final class OperatorValidationTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('valid regex pattern');
 
-        (new MatchesRegex())->setValue('not-a-regex');
+        new MatchesRegex()->setValue('not-a-regex');
     }
 
     // ─── IsInstanceOf ────────────────────────────────────────────────────────
@@ -133,14 +133,14 @@ final class OperatorValidationTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new IsInstanceOf())->setValue('');
+        new IsInstanceOf()->setValue('');
     }
 
     public function testIsInstanceOfThrowsWhenValueIsNotString(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new IsInstanceOf())->setValue(42);
+        new IsInstanceOf()->setValue(42);
     }
 
     // ─── ContainsKey ─────────────────────────────────────────────────────────
@@ -149,7 +149,7 @@ final class OperatorValidationTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new ContainsKey())->setValue(3.14);
+        new ContainsKey()->setValue(3.14);
     }
 
     // ─── CountEqual ──────────────────────────────────────────────────────────
@@ -158,7 +158,7 @@ final class OperatorValidationTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new CountEqual())->setValue('abc');
+        new CountEqual()->setValue('abc');
     }
 
     // ─── CountGreaterThan ────────────────────────────────────────────────────
@@ -167,7 +167,7 @@ final class OperatorValidationTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        (new CountGreaterThan())->setValue('abc');
+        new CountGreaterThan()->setValue('abc');
     }
 
     // ─── Operator name consistency ───────────────────────────────────────────

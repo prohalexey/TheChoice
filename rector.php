@@ -26,15 +26,11 @@ use Rector\PHPUnit\CodeQuality\Rector\Class_\PreferPHPUnitThisCallRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\RemoveDataProviderParamKeysRector;
 use Rector\PHPUnit\CodeQuality\Rector\Class_\YieldDataProviderRector;
 use Rector\PHPUnit\Set\PHPUnitSetList;
-use Rector\Renaming\Rector\ClassConstFetch\RenameClassConstFetchRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 use Rector\Strict\Rector\Empty_\DisallowedEmptyRuleFixerRector;
 use Rector\Symfony\CodeQuality\Rector\Class_\InlineClassRoutePrefixRector;
 use Rector\Symfony\CodeQuality\Rector\ClassMethod\ActionSuffixRemoverRector;
-use Rector\Symfony\Symfony73\Rector\Class_\ConstraintOptionsToNamedArgumentsRector;
-use Rector\Symfony\Symfony73\Rector\Class_\GetFiltersToAsTwigFilterAttributeRector;
-use Rector\Symfony\Symfony73\Rector\Class_\GetFunctionsToAsTwigFunctionAttributeRector;
 use Rector\Symfony\Symfony73\Rector\Class_\InvokableCommandInputAttributeRector;
 use Rector\TypeDeclaration\Rector\FunctionLike\AddClosureParamTypeForArrayMapRector;
 use Rector\ValueObject\PhpVersion;
@@ -61,7 +57,7 @@ return RectorConfig::configure()
     )
     ->withCache(__DIR__ . '/var/rector')
     ->withParallel(240)
-    ->withPhpVersion(PhpVersion::PHP_80)
+    ->withPhpVersion(PhpVersion::PHP_84)
     ->withSkip([
         ActionSuffixRemoverRector::class,
         CatchExceptionNameMatchingTypeRector::class,
@@ -69,15 +65,12 @@ return RectorConfig::configure()
         ClassPropertyAssignToConstructorPromotionRector::class,
         CombineIfRector::class,
         CompactToVariablesRector::class,
-        ConstraintOptionsToNamedArgumentsRector::class,
         DisallowedEmptyRuleFixerRector::class,
         EncapsedStringsToSprintfRector::class,
         ExplicitBoolCompareRector::class,
         FlipTypeControlToUseExclusiveTypeRector::class,
         ForeachToArrayAnyRector::class,
         ForeachToArrayFindRector::class,
-        GetFiltersToAsTwigFilterAttributeRector::class,
-        GetFunctionsToAsTwigFunctionAttributeRector::class,
         InlineClassRoutePrefixRector::class,
         InlineConstructorDefaultToPropertyRector::class,
         InvokableCommandInputAttributeRector::class,
@@ -86,14 +79,13 @@ return RectorConfig::configure()
         NullToStrictStringFuncCallArgRector::class,
         PreferPHPUnitThisCallRector::class,
         RemoveDataProviderParamKeysRector::class,
-        RenameClassConstFetchRector::class,
         RestoreDefaultNullToNullableTypePropertyRector::class,
         SimplifyIfElseToTernaryRector::class,
         ThrowWithPreviousExceptionRector::class,
         YieldDataProviderRector::class,
     ])
     ->withSets([
-        LevelSetList::UP_TO_PHP_80,
+        LevelSetList::UP_TO_PHP_84,
         PHPUnitSetList::PHPUNIT_CODE_QUALITY,
         SetList::CODE_QUALITY,
         SetList::CODING_STYLE,

@@ -6,6 +6,7 @@ namespace TheChoice\Processor;
 
 use ChrisKonnertz\StringCalc\StringCalc;
 use InvalidArgumentException;
+use Override;
 use TheChoice\Context\CallableContext;
 use TheChoice\Context\ContextFactoryInterface;
 use TheChoice\Exception\InvalidContextCalculation;
@@ -28,6 +29,7 @@ class ContextProcessor extends AbstractProcessor
         return $this;
     }
 
+    #[Override]
     public function flush(): void
     {
         $this->processedContext = [];
@@ -118,7 +120,7 @@ class ContextProcessor extends AbstractProcessor
             $modifier = str_replace($search, $replace, $modifier);
 
             try {
-                $value = (new StringCalc())->calculate($modifier);
+                $value = new StringCalc()->calculate($modifier);
             } catch (Throwable $throwable) {
                 throw new InvalidContextCalculation($throwable->getMessage());
             }
