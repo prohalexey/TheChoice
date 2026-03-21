@@ -91,9 +91,16 @@ class Collection extends AbstractChildNode implements Sortable
         return $this->count;
     }
 
-    public function sort(): self
+    /**
+     * Returns a sorted copy of the collection without mutating the original order.
+     *
+     * @return array<Node>
+     */
+    public function sorted(): array
     {
-        usort($this->collection, static function ($element1, $element2): int {
+        $copy = $this->collection;
+
+        usort($copy, static function ($element1, $element2): int {
             if (!$element2 instanceof Sortable) {
                 return 1;
             }
@@ -105,7 +112,7 @@ class Collection extends AbstractChildNode implements Sortable
             return $element1->getSortableValue() <=> $element2->getSortableValue();
         });
 
-        return $this;
+        return $copy;
     }
 
     public function getSortableValue(): int

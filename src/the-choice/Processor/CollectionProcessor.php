@@ -38,7 +38,7 @@ class CollectionProcessor extends AbstractProcessor
         $result = true;
         $rootNode = $node->getRoot();
 
-        foreach ($node->sort()->all() as $item) {
+        foreach ($node->sorted() as $item) {
             $processor = $this->getProcessorByNode($item);
             if (null === $processor) {
                 continue;
@@ -65,7 +65,7 @@ class CollectionProcessor extends AbstractProcessor
     {
         $rootNode = $node->getRoot();
 
-        foreach ($node->sort()->all() as $item) {
+        foreach ($node->sorted() as $item) {
             $processor = $this->getProcessorByNode($item);
             if (null === $processor) {
                 continue;
@@ -97,7 +97,7 @@ class CollectionProcessor extends AbstractProcessor
 
         $rootNode = $node->getRoot();
         $trueCount = 0;
-        $items = $node->sort()->all();
+        $items = $node->sorted();
         $total = count($items);
 
         foreach ($items as $index => $item) {
@@ -142,7 +142,7 @@ class CollectionProcessor extends AbstractProcessor
         $rootNode = $node->getRoot();
         $trueCount = 0;
 
-        foreach ($node->sort()->all() as $item) {
+        foreach ($node->sorted() as $item) {
             $processor = $this->getProcessorByNode($item);
             if (null === $processor) {
                 continue;
