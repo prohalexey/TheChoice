@@ -1,0 +1,13 @@
+{
+  "node": "root",
+  "storage": {
+    "$minVisits": 1
+  },
+  "rules": {
+    "node": "context",
+    "context": "visitCount",
+    "operator": "greaterThan",
+    "value": "$minVisits"
+  }
+}
+

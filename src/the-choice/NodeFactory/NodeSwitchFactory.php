@@ -78,7 +78,9 @@ class NodeSwitchFactory implements NodeFactoryInterface
             }
 
             if (array_key_exists('value', $caseData)) {
-                $operator->setValue($caseData['value']);
+                $operator->setValue(
+                    StorageValueResolver::resolve($caseData['value'], $builder),
+                );
             }
 
             $thenStructure = $caseData['then'];

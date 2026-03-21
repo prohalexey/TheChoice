@@ -27,6 +27,7 @@ This library helps you simplify the implementation of complex business rules suc
 - ✅ Switch Node — multi-branch dispatch on a single context value
 - ✅ Fluent PHP Builder (DSL) — build rule trees programmatically without JSON/YAML
 - ✅ Node Exporter — serialize rule trees back to JSON or YAML
+- ✅ Storage variable references — use `$storageKey` as operator values
 
 ## Table of Contents
 
@@ -39,6 +40,7 @@ This library helps you simplify the implementation of complex business rules suc
   - [Node Types](#node-types) — Root, Value, Context, Condition, Collection, **Switch**
   - [Built-in Operators](#built-in-operators)
   - [Modifiers](#modifiers)
+  - [Storage Variable References](#storage-variable-references)
 - [Rule Engine](#rule-engine) — multi-rule evaluation
 - [Rule Registry](#rule-registry) — named rules with metadata
 - [Rule Validator](#rule-validator) — static analysis / linter
@@ -175,7 +177,7 @@ Each node has a `node` property that describes its type and an optional `descrip
 The root of the rules tree that maintains state and stores execution results. When the root node is omitted in the configuration, the library automatically wraps the top-level node in a root node (short syntax).
 
 **Properties:**
-- `storage` - Container for named variables accessible in modifiers (e.g. `$myVar`)
+- `storage` - Named variables accessible in modifier expressions **and** as operator `value` references (e.g. `$myVar`). Values are resolved at parse time.
 - `rules` - Contains the first node to be processed
 
 **Example:**
@@ -212,7 +214,7 @@ Executes callable objects and can modify the global state which is stored in the
 - `operator` - Operator for calculations or comparisons
 - `params` - Parameters to set in context
 - `priority` - Priority for collection sorting
-- `value` - Value to compare against when using an operator
+- `value` - Value to compare against when using an operator. Can be a literal (`0`, `"admin"`, `[1,100]`) or a `$storageKey` reference (resolved from Root `storage` at parse time).
 
 **Example:**
 ```yaml
@@ -493,6 +495,63 @@ The following operators are available for context nodes:
 Modifiers allow you to transform context values using mathematical expressions. Use the predefined `$context` variable in your expressions. Variables defined in the Root `storage` are also available.
 
 For more information about calculations, see: https://github.com/chriskonnertz/string-calc
+
+### Storage Variable References
+
+Any string starting with `$` in an operator's `value` field (or a Switch case `value`) is resolved against Root `storage` **at parse time**. This lets you centralise thresholds and constants in one place and reference them across rules:
+
+```yaml
+node: root
+storage:
+  $minDeposit: 1000
+  $vipThreshold: 50000
+  $adminRole: admin
+rules:
+  node: collection
+  type: and
+  nodes:
+    - node: context
+      context: depositAmount
+      operator: greaterThan
+      value: "$minDeposit"        # → resolved to integer 1000 at parse time
+
+    - node: context
+      context: totalDeposit
+      operator: greaterThan
+      value: "$vipThreshold"      # → resolved to integer 50000 at parse time
+```
+
+Works equally in Switch cases:
+
+```yaml
+node: root
+storage:
+  $adminRole: admin
+rules:
+  node: switch
+  context: userRole
+  cases:
+    - value: "$adminRole"         # → resolved to 'admin'
+      then:
+        node: value
+        value: 100
+  default:
+    node: value
+    value: 0
+```
+
+**Resolution rules:**
+
+| `value` in rule | Storage contains | Result |
+|---|---|---|
+| `"$threshold"` | `$threshold: 1000` | operator receives `1000` (int) |
+| `"$role"` | `$role: "admin"` | operator receives `"admin"` (string) |
+| `"$range"` | `$range: [100, 500]` | operator receives `[100, 500]` (array) |
+| `"$unknown"` | *(absent)* | operator receives `"$unknown"` (unchanged, no error) |
+| `"admin"` | *(any)* | operator receives `"admin"` (literal, no resolution) |
+| `42` | *(any)* | operator receives `42` (non-string, no resolution) |
+
+Storage variables continue to work in `modifiers` exactly as before — the two features are independent and composable.
 
 ## Rule Engine
 

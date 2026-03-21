@@ -350,6 +350,32 @@ final class yamlTest extends AbstractFormatIntegrationTestCase
         self::assertSame(2, $result);
     }
 
+    // ─── Storage variables in operator values (#13) ───────────────────────
+
+    public function testNodeContextWithStorageValueTest(): void
+    {
+        // depositCount=2, $expectedCount=2 → equal → true
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithStorageValue.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeContextWithStorageValueOperatorTest(): void
+    {
+        // visitCount=2, $minVisits=1 → greaterThan → true
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeContextWithStorageValueOperator.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeSwitchWithStorageValueTest(): void
+    {
+        // userRole='admin', $adminRole='admin' → case matches → 100
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeSwitchWithStorageValue.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertSame(100, $result);
+    }
+
     protected function getBuilderClass(): string
     {
         return YamlBuilder::class;

@@ -309,4 +309,28 @@ final class NegativeScenariosTest extends TestCase
         $node = $this->jsonBuilder->parse($json);
         $this->rootProcessor->process($node);
     }
+
+    // ─── Storage value resolution (#13) ──────────────────────────────────
+
+    public function testUnresolvableStorageReferenceKeepsStringAndDoesNotThrow(): void
+    {
+        // '$nonExistent' is not in storage → value stays as string → equal(0, '$nonExistent') = false
+        // No exception should be thrown — unresolvable references are backward-compatible
+        $json = json_encode([
+            'node'    => 'root',
+            'storage' => [],
+            'rules'   => [
+                'node'     => 'context',
+                'context'  => 'withdrawalCount',
+                'operator' => 'equal',
+                'value'    => '$nonExistent',
+            ],
+        ]);
+
+        $node = $this->jsonBuilder->parse($json);
+        $result = $this->rootProcessor->process($node);
+
+        // withdrawalCount=0 !== '$nonExistent' → false
+        self::assertFalse($result);
+    }
 }

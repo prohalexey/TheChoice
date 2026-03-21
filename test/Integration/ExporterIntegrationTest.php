@@ -188,6 +188,10 @@ final class ExporterIntegrationTest extends TestCase
             ['testNodeSwitchNoDefault.json'],
             ['testNodeSwitchEmptyCases.json'],
             ['testNodeSwitchComplexThen.json'],
+            // Storage variable references
+            ['testNodeContextWithStorageValue.json'],
+            ['testNodeContextWithStorageValueOperator.json'],
+            ['testNodeSwitchWithStorageValue.json'],
         ];
     }
 

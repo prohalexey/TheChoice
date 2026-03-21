@@ -26,7 +26,9 @@ class NodeContextFactory implements NodeFactoryInterface
                     $operator = $builder->getContainer()->get($operatorType);
                     if ($operator instanceof OperatorInterface) {
                         if (array_key_exists('value', $structure)) {
-                            $operator->setValue($structure['value']);
+                            $operator->setValue(
+                                StorageValueResolver::resolve($structure['value'], $builder),
+                            );
                         }
 
                         $node->setOperator($operator);

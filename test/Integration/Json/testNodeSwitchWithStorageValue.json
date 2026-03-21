@@ -1,0 +1,17 @@
+{
+  "node": "root",
+  "storage": {
+    "$adminRole": "admin"
+  },
+  "rules": {
+    "node": "switch",
+    "context": "userRole",
+    "cases": [
+      { "value": "$adminRole", "then": { "node": "value", "value": 100 } },
+      { "value": "manager",    "then": { "node": "value", "value": 50 } }
+    ],
+    "default": { "node": "value", "value": 0 }
+  }
+}
+
+

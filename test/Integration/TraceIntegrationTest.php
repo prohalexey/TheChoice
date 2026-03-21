@@ -146,6 +146,8 @@ final class TraceIntegrationTest extends TestCase
             'testNodeContextWithParams.json',
             'testNodeValue.json',
             'testNodeSwitchTrace.json',
+            'testNodeContextWithStorageValue.json',
+            'testNodeContextWithStorageValueOperator.json',
         ];
 
         foreach ($testFiles as $file) {

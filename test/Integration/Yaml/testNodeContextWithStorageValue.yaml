@@ -1,0 +1,9 @@
+node: root
+storage:
+  $expectedCount: 2
+rules:
+  node: context
+  context: depositCount
+  operator: equal
+  value: "$expectedCount"
+
