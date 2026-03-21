@@ -246,14 +246,25 @@ break: immediately
 ```
 
 #### Collection Node
-Contains multiple nodes with AND/OR logic.
+Contains multiple child nodes evaluated with a chosen logical strategy.
 
 **Properties:**
-- `type` - Collection type (`and` or `or`)
+- `type` - Collection type: `and`, `or`, `not`, `atLeast`, or `exactly`
 - `nodes` - Array of child nodes
-- `priority` - Priority for nested collections
+- `count` - Required for `atLeast` and `exactly` types; specifies the threshold
+- `priority` - Priority used when this collection is nested inside another collection
 
-**Example:**
+**Type reference:**
+
+| Type | Behaviour |
+|------|-----------|
+| `and` | Returns `true` if **all** children return `true`. Short-circuits on the first `false`. |
+| `or` | Returns `true` if **at least one** child returns `true`. Short-circuits on the first `true`. |
+| `not` | Returns `true` only if **none** of the children return `true` (NOR). Short-circuits on the first `true`. |
+| `atLeast` | Returns `true` if **at least `count`** children return `true`. Requires `count`. |
+| `exactly` | Returns `true` if **exactly `count`** children return `true`. Requires `count`. |
+
+**`and` Example:**
 ```yaml
 node: collection
 type: and
@@ -268,6 +279,57 @@ nodes:
     value:
       - testgroup
       - testgroup2
+```
+
+**`not` Example** — passes when the user is *not* blacklisted:
+```yaml
+node: collection
+type: not
+nodes:
+  - node: context
+    context: isBlacklisted
+    operator: equal
+    value: true
+```
+
+**`atLeast` Example** — passes when at least 2 out of 3 conditions are met:
+```yaml
+node: collection
+type: atLeast
+count: 2
+nodes:
+  - node: context
+    context: withdrawalCount
+    operator: equal
+    value: 0
+  - node: context
+    context: visitCount
+    operator: greaterThan
+    value: 1
+  - node: context
+    context: hasVipStatus
+    operator: equal
+    value: true
+```
+
+**`exactly` Example** — passes when exactly 2 conditions are met:
+```yaml
+node: collection
+type: exactly
+count: 2
+nodes:
+  - node: context
+    context: withdrawalCount
+    operator: equal
+    value: 0
+  - node: context
+    context: visitCount
+    operator: greaterThan
+    value: 1
+  - node: context
+    context: hasVipStatus
+    operator: equal
+    value: true
 ```
 
 #### Condition Node

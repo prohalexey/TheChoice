@@ -188,6 +188,55 @@ final class jsonTest extends AbstractFormatIntegrationTestCase
         self::assertTrue($result);
     }
 
+    public function testNodeNotCollectionTrueTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeNotCollectionTrue.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeNotCollectionFalseTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeNotCollectionFalse.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    public function testNodeNotCollectionMultipleTrueTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeNotCollectionMultipleTrue.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeAtLeastCollectionTrueTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeAtLeastCollectionTrue.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeAtLeastCollectionFalseTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeAtLeastCollectionFalse.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    public function testNodeExactlyCollectionTrueTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeExactlyCollectionTrue.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeExactlyCollectionFalseTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Json/testNodeExactlyCollectionFalse.json');
+        $result = $this->rootProcessor->process($node);
+        self::assertFalse($result);
+    }
+
     public function testCombined1Test(): void
     {
         $node = $this->parser->parseFile($this->testFilesDir . 'Json/testCombined1.json');

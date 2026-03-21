@@ -34,6 +34,13 @@ class NodeCollectionFactory implements NodeFactoryInterface
             }
         }
 
+        if (self::nodeHasCount($structure)) {
+            $count = $structure['count'];
+            if (is_numeric($count)) {
+                $node->setCount((int)$count);
+            }
+        }
+
         if (self::nodeHasChildNodes($structure)) {
             $nodes = $structure['nodes'];
             if (is_array($nodes)) {
@@ -57,6 +64,11 @@ class NodeCollectionFactory implements NodeFactoryInterface
     private static function nodeHasPriority(array $structure): bool
     {
         return array_key_exists('priority', $structure);
+    }
+
+    private static function nodeHasCount(array $structure): bool
+    {
+        return array_key_exists('count', $structure);
     }
 
     private static function nodeHasChildNodes(array $structure): bool

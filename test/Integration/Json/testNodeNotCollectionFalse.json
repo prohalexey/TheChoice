@@ -1,0 +1,13 @@
+{
+  "node": "collection",
+  "type": "not",
+  "nodes": [
+    {
+      "node": "context",
+      "context": "withdrawalCount",
+      "operator": "equal",
+      "value": 0
+    }
+  ]
+}
+

@@ -12,6 +12,12 @@ class Collection extends AbstractChildNode implements Sortable
 
     public const TYPE_OR = 'or';
 
+    public const TYPE_NOT = 'not';
+
+    public const TYPE_AT_LEAST = 'atLeast';
+
+    public const TYPE_EXACTLY = 'exactly';
+
     protected string $type;
 
     /** @var array<Node> */
@@ -19,10 +25,23 @@ class Collection extends AbstractChildNode implements Sortable
 
     protected int $priority = 0;
 
+    protected ?int $count = null;
+
     public function __construct(string $type)
     {
-        if (!in_array($type, [self::TYPE_AND, self::TYPE_OR], true)) {
-            throw new LogicException(sprintf('Collection type must be "or" or "and". "%s" given', $type));
+        $allowed = [
+            self::TYPE_AND,
+            self::TYPE_OR,
+            self::TYPE_NOT,
+            self::TYPE_AT_LEAST,
+            self::TYPE_EXACTLY,
+        ];
+        if (!in_array($type, $allowed, true)) {
+            throw new LogicException(sprintf(
+                'Collection type must be one of "%s". "%s" given',
+                implode('", "', $allowed),
+                $type,
+            ));
         }
 
         $this->type = $type;
@@ -58,6 +77,18 @@ class Collection extends AbstractChildNode implements Sortable
         $this->priority = $priority;
 
         return $this;
+    }
+
+    public function setCount(int $count): self
+    {
+        $this->count = $count;
+
+        return $this;
+    }
+
+    public function getCount(): ?int
+    {
+        return $this->count;
     }
 
     public function sort(): self

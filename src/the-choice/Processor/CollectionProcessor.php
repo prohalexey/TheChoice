@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TheChoice\Processor;
 
 use InvalidArgumentException;
+use TheChoice\Exception\LogicException;
 use TheChoice\Node\Collection;
 use TheChoice\Node\Node;
 
@@ -16,8 +17,25 @@ class CollectionProcessor extends AbstractProcessor
             throw new InvalidArgumentException('Node must be an instance of Collection');
         }
 
-        $result = true;
+        return match ($node->getType()) {
+            Collection::TYPE_AND      => $this->processShortCircuit($node, false),
+            Collection::TYPE_OR       => $this->processShortCircuit($node, true),
+            Collection::TYPE_NOT      => $this->processNot($node),
+            Collection::TYPE_AT_LEAST => $this->processAtLeast($node),
+            Collection::TYPE_EXACTLY  => $this->processExactly($node),
+            default                   => throw new InvalidArgumentException(
+                sprintf('Unsupported collection type "%s"', $node->getType()),
+            ),
+        };
+    }
 
+    /**
+     * AND semantics: short-circuits on the first false result.
+     * OR semantics:  short-circuits on the first true result.
+     */
+    private function processShortCircuit(Collection $node, bool $shortCircuitValue): mixed
+    {
+        $result = true;
         $rootNode = $node->getRoot();
 
         foreach ($node->sort()->all() as $item) {
@@ -28,23 +46,119 @@ class CollectionProcessor extends AbstractProcessor
 
             $result = $processor->process($item);
 
-            /*
-             * If the "Root" node has a result, we should stop here.
-             * It does not matter what we return; the result is already set to the "Root" node
-             */
             if ($rootNode->hasResult()) {
                 return null;
             }
 
-            if (false === $result && Collection::TYPE_AND === $node->getType()) {
-                return false;
-            }
-
-            if (true === $result && Collection::TYPE_OR === $node->getType()) {
-                return true;
+            if ($result === $shortCircuitValue) {
+                return $shortCircuitValue;
             }
         }
 
         return $result;
+    }
+
+    /**
+     * NOR semantics: returns true only if ALL children evaluate to false (none is true).
+     */
+    private function processNot(Collection $node): bool
+    {
+        $rootNode = $node->getRoot();
+
+        foreach ($node->sort()->all() as $item) {
+            $processor = $this->getProcessorByNode($item);
+            if (null === $processor) {
+                continue;
+            }
+
+            $result = $processor->process($item);
+
+            if ($rootNode->hasResult()) {
+                return false;
+            }
+
+            if (true === $result) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Returns true if at least $count children evaluate to true.
+     */
+    private function processAtLeast(Collection $node): bool
+    {
+        $count = $node->getCount();
+        if (null === $count) {
+            throw new LogicException('Collection type "atLeast" requires a "count" value');
+        }
+
+        $rootNode = $node->getRoot();
+        $trueCount = 0;
+        $items = $node->sort()->all();
+        $total = count($items);
+
+        foreach ($items as $index => $item) {
+            $processor = $this->getProcessorByNode($item);
+            if (null === $processor) {
+                continue;
+            }
+
+            $result = $processor->process($item);
+
+            if ($rootNode->hasResult()) {
+                return false;
+            }
+
+            if (true === $result) {
+                $trueCount++;
+                if ($trueCount >= $count) {
+                    return true;
+                }
+            }
+
+            // Early exit: remaining nodes cannot reach the required count
+            $remaining = $total - $index - 1;
+            if ($trueCount + $remaining < $count) {
+                return false;
+            }
+        }
+
+        return $trueCount >= $count;
+    }
+
+    /**
+     * Returns true if exactly $count children evaluate to true.
+     */
+    private function processExactly(Collection $node): bool
+    {
+        $count = $node->getCount();
+        if (null === $count) {
+            throw new LogicException('Collection type "exactly" requires a "count" value');
+        }
+
+        $rootNode = $node->getRoot();
+        $trueCount = 0;
+
+        foreach ($node->sort()->all() as $item) {
+            $processor = $this->getProcessorByNode($item);
+            if (null === $processor) {
+                continue;
+            }
+
+            $result = $processor->process($item);
+
+            if ($rootNode->hasResult()) {
+                return false;
+            }
+
+            if (true === $result) {
+                $trueCount++;
+            }
+        }
+
+        return $trueCount === $count;
     }
 }

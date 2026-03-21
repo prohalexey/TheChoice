@@ -177,7 +177,7 @@ final class NegativeScenariosTest extends TestCase
     public function testCollectionWithInvalidTypeThrowsException(): void
     {
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('"or" or "and"');
+        $this->expectExceptionMessage('"xor" given');
 
         $json = json_encode([
             'node'  => 'collection',

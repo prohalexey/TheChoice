@@ -42,6 +42,11 @@ use TheChoice\Processor\ValueProcessor;
 
 class Container implements ContainerInterface
 {
+    /** @var array<string, object> */
+    protected array $services = [];
+
+    protected array $contexts;
+
     /** @var array<class-string> */
     private array $builders = [
         ArrayBuilder::class,
@@ -90,13 +95,8 @@ class Container implements ContainerInterface
         ContextFactoryInterface::class,
     ];
 
-    /** @var array<string, object> */
-    protected array $services = [];
-
     /** @var array<string, array{shared: bool, factory: callable(): object}> */
     private array $definitions = [];
-
-    protected array $contexts;
 
     public function __construct(array $contexts)
     {

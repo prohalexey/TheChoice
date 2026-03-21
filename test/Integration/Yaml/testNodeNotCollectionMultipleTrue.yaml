@@ -1,0 +1,14 @@
+node: collection
+type: not
+nodes:
+  -
+    node: context
+    context: withdrawalCount
+    operator: equal
+    value: 1
+  -
+    node: context
+    context: hasVipStatus
+    operator: equal
+    value: true
+

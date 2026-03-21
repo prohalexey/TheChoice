@@ -195,6 +195,55 @@ final class yamlTest extends AbstractFormatIntegrationTestCase
         self::assertTrue($result);
     }
 
+    public function testNodeNotCollectionTrueTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeNotCollectionTrue.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeNotCollectionFalseTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeNotCollectionFalse.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    public function testNodeNotCollectionMultipleTrueTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeNotCollectionMultipleTrue.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeAtLeastCollectionTrueTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeAtLeastCollectionTrue.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeAtLeastCollectionFalseTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeAtLeastCollectionFalse.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertFalse($result);
+    }
+
+    public function testNodeExactlyCollectionTrueTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeExactlyCollectionTrue.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertTrue($result);
+    }
+
+    public function testNodeExactlyCollectionFalseTest(): void
+    {
+        $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testNodeExactlyCollectionFalse.yaml');
+        $result = $this->rootProcessor->process($node);
+        self::assertFalse($result);
+    }
+
     public function testCombined1Test(): void
     {
         $node = $this->parser->parseFile($this->testFilesDir . 'Yaml/testCombined1.yaml');

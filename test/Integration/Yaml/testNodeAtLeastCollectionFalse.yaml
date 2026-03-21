@@ -1,0 +1,20 @@
+node: collection
+type: atLeast
+count: 2
+nodes:
+  -
+    node: context
+    context: withdrawalCount
+    operator: equal
+    value: 0
+  -
+    node: context
+    context: visitCount
+    operator: greaterThan
+    value: 5
+  -
+    node: context
+    context: hasVipStatus
+    operator: equal
+    value: true
+
