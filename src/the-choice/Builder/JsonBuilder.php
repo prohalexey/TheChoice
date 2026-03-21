@@ -11,6 +11,8 @@ class JsonBuilder extends ArrayBuilder
 {
     public function parse(string $jsonSettings, int $maxDepth = 512, int $options = 0): Node
     {
+        $this->nodesCount = 0;
+
         if ($maxDepth < 1) {
             throw new InvalidArgumentException('Max depth must be at least 1');
         }

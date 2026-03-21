@@ -45,9 +45,6 @@ final class ContextProcessorFlushTest extends TestCase
         $node1 = $builder->parse($yaml);
         $result1 = $rootProcessor->process($node1);
 
-        // Reset builder counter so it can be reused
-        $builder->resetNodesCount();
-
         $node2 = $builder->parse($yaml);
         $result2 = $rootProcessor->process($node2);
 
@@ -70,7 +67,6 @@ final class ContextProcessorFlushTest extends TestCase
         $node1 = $builder->parse($yaml);
         $result1 = $rootProcessor->process($node1);
 
-        $builder->resetNodesCount();
         $node2 = $builder->parse($yaml);
         $result2 = $rootProcessor->process($node2);
 

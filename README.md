@@ -163,6 +163,63 @@ $rootProcessor = $container->get(RootProcessor::class);
 $result = $rootProcessor->process($node);
 ```
 
+### Rule Engine (multi-rule mode)
+
+`RuleEngine` evaluates multiple rules in a single `run()` call and returns an `EngineReport` with the result of each rule. Rules are executed in priority order (highest first).
+
+```php
+use TheChoice\Engine\RuleEngine;
+
+$engine = new RuleEngine($container);
+
+$engine->addRule('vip_discount', $jsonBuilder->parseFile('rules/vip.json'), priority: 10);
+$engine->addRule('loyal_discount', $jsonBuilder->parseFile('rules/loyal.json'), priority: 5);
+$engine->addRule('fraud_block', $jsonBuilder->parseFile('rules/fraud.json'));
+
+$report = $engine->run();
+
+// Iterate over fired rules
+foreach ($report->getFired() as $name => $ruleResult) {
+    echo "{$name}: {$ruleResult->result}\n";
+}
+
+// Check specific rule
+if ($report->hasFired('vip_discount')) {
+    $discount = $report->getResult('vip_discount')->result;
+}
+```
+
+A rule is considered **fired** when its result is neither `null` nor `false`.
+
+### Rule Registry
+
+`RuleRegistry` is a named storage for rules with tags, version, and description metadata.
+
+```php
+use TheChoice\Registry\RuleRegistry;
+
+$registry = new RuleRegistry();
+
+$registry->register(
+    name:        'vip_discount',
+    node:        $jsonBuilder->parseFile('rules/vip.json'),
+    tags:        ['discount', 'vip'],
+    version:     '2.1',
+    description: 'VIP discount: 10% of last deposit',
+    priority:    10,
+);
+
+// Lookup by name
+$entry = $registry->get('vip_discount');
+
+// Filter by tag
+$discountRules = $registry->findByTag('discount');
+
+// Load into the engine
+$engine->loadFromRegistry($registry);
+$report = $engine->run();
+```
+
 ## Container Integration
 
 ### Built-in Container (Fallback)

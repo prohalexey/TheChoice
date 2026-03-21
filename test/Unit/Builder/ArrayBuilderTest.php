@@ -56,13 +56,13 @@ final class ArrayBuilderTest extends TestCase
 
     // ─── nodesCount reset ───────────────────────────────────────────────────
 
-    public function testNodesCountResetsViaResetMethod(): void
+    public function testBuildRequiresManualResetForReuse(): void
     {
         $structure1 = ['node' => 'value', 'value' => 1];
         $result1 = $this->builder->build($structure1);
         self::assertInstanceOf(Root::class, $result1);
 
-        // Reset the counter so the builder can be reused
+        // build() does not auto-reset, so manual reset is needed
         $this->builder->resetNodesCount();
 
         $structure2 = ['node' => 'value', 'value' => 2];

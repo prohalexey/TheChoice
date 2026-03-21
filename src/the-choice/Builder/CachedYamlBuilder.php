@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TheChoice\Builder;
 
 use DateInterval;
+use Override;
 use Psr\Container\ContainerInterface;
 use Psr\SimpleCache\CacheInterface;
 use TheChoice\Node\Node;
@@ -32,7 +33,7 @@ class CachedYamlBuilder extends YamlBuilder
         $this->keyPrefix = $keyPrefix;
     }
 
-    #[\Override]
+    #[Override]
     public function parse(string $content): Node
     {
         $cached = $this->getFromCache($content);

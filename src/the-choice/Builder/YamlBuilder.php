@@ -12,6 +12,8 @@ class YamlBuilder extends ArrayBuilder
 {
     public function parse(string $content): Node
     {
+        $this->nodesCount = 0;
+
         $decoded = Yaml::parse($content);
         if (!is_array($decoded)) {
             throw new InvalidArgumentException('YAML must parse to an array');

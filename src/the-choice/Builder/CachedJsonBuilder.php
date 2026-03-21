@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TheChoice\Builder;
 
 use DateInterval;
+use Override;
 use Psr\Container\ContainerInterface;
 use Psr\SimpleCache\CacheInterface;
 use TheChoice\Node\Node;
@@ -32,7 +33,7 @@ class CachedJsonBuilder extends JsonBuilder
         $this->keyPrefix = $keyPrefix;
     }
 
-    #[\Override]
+    #[Override]
     public function parse(string $jsonSettings, int $maxDepth = 512, int $options = 0): Node
     {
         $cached = $this->getFromCache($jsonSettings);

@@ -246,14 +246,12 @@ final class NegativeScenariosTest extends TestCase
         $this->rootProcessor->process($node);
     }
 
-    // ─── Builder reuse (nodesCount reset) ───────────────────────────────
+    // ─── Builder reuse ─────────────────────────────────────────────────
 
-    public function testBuilderCanBeReusedAfterReset(): void
+    public function testBuilderCanBeReusedBetweenParseCalls(): void
     {
         $node1 = $this->jsonBuilder->parse('{"node": "value", "value": 1}');
         self::assertSame(1, $this->rootProcessor->process($node1));
-
-        $this->jsonBuilder->resetNodesCount();
 
         $node2 = $this->jsonBuilder->parse('{"node": "value", "value": 2}');
         self::assertSame(2, $this->rootProcessor->process($node2));

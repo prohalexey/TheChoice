@@ -19,7 +19,7 @@ final class CachedBuilderTest extends TestCase
     private Container $container;
 
     /** @var CacheInterface&MockObject */
-    private \PHPUnit\Framework\MockObject\MockObject $cache;
+    private MockObject $cache;
 
     protected function setUp(): void
     {
