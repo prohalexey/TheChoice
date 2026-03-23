@@ -14,7 +14,7 @@ class Context extends AbstractChildNode implements Sortable
 
     protected ?OperatorInterface $operator = null;
 
-    protected string $contextName;
+    protected ?string $contextName = null;
 
     protected int $priority = 0;
 

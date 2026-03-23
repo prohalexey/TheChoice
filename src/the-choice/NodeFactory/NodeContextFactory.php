@@ -17,7 +17,7 @@ class NodeContextFactory implements NodeFactoryInterface
 
         $node->setRoot($builder->getRoot());
 
-        if (self::nodeHasOperator($structure)) {
+        if (array_key_exists('operator', $structure)) {
             $operatorResolver = $builder->getContainer()->get(OperatorResolverInterface::class);
             if ($operatorResolver instanceof OperatorResolverInterface) {
                 $operatorType = $structure['operator'];
@@ -37,77 +37,42 @@ class NodeContextFactory implements NodeFactoryInterface
             }
         }
 
-        if (self::nodeHasContextName($structure)) {
+        if (array_key_exists('context', $structure)) {
             $contextName = $structure['context'];
             if (is_string($contextName)) {
                 $node->setContextName($contextName);
             }
         }
 
-        if (self::nodeHasDescription($structure)) {
+        if (array_key_exists('description', $structure)) {
             $description = $structure['description'];
             if (is_string($description)) {
                 $node->setDescription($description);
             }
         }
 
-        if (self::nodeHasPriority($structure)) {
+        if (array_key_exists('priority', $structure)) {
             $priority = $structure['priority'];
             if (is_numeric($priority)) {
                 $node->setPriority((int)$priority);
             }
         }
 
-        if (self::nodeHasParams($structure)) {
+        if (array_key_exists('params', $structure)) {
             $params = $structure['params'];
             if (is_array($params)) {
                 $node->setParams($params);
             }
         }
 
-        if (self::nodeHasModifiers($structure)) {
+        if (array_key_exists('modifiers', $structure)) {
             $node->setModifiers($structure['modifiers']);
         }
 
-        if (self::isNodeStoppable($structure)) {
+        if (array_key_exists('break', $structure)) {
             $node->setStoppableType(Context::STOP_IMMEDIATELY);
         }
 
         return $node;
-    }
-
-    private static function nodeHasDescription(array $structure): bool
-    {
-        return array_key_exists('description', $structure);
-    }
-
-    private static function nodeHasPriority(array $structure): bool
-    {
-        return array_key_exists('priority', $structure);
-    }
-
-    private static function nodeHasParams(array $structure): bool
-    {
-        return array_key_exists('params', $structure);
-    }
-
-    private static function nodeHasModifiers(array $structure): bool
-    {
-        return array_key_exists('modifiers', $structure);
-    }
-
-    private static function isNodeStoppable(array $structure): bool
-    {
-        return array_key_exists('break', $structure);
-    }
-
-    private static function nodeHasOperator(array $structure): bool
-    {
-        return array_key_exists('operator', $structure);
-    }
-
-    private static function nodeHasContextName(array $structure): bool
-    {
-        return array_key_exists('context', $structure);
     }
 }

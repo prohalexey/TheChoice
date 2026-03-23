@@ -21,7 +21,7 @@ class ConditionProcessor extends AbstractProcessor
         $processorIf = $this->getProcessorByNode($node->getIfNode());
         $ifResult = null !== $processorIf ? $processorIf->process($node->getIfNode()) : null;
 
-        if ($ifResult) {
+        if (true === $ifResult) {
             $processorThen = $this->getProcessorByNode($node->getThenNode());
             $result = null !== $processorThen ? $processorThen->process($node->getThenNode()) : false;
 

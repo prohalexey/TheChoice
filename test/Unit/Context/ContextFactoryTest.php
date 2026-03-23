@@ -6,6 +6,7 @@ namespace TheChoice\Tests\Unit\Context;
 
 use PHPUnit\Framework\TestCase;
 use stdClass;
+use TheChoice\Container;
 use TheChoice\Context\ContextFactory;
 use TheChoice\Context\ContextInterface;
 use TheChoice\Exception\InvalidArgumentException;
@@ -126,6 +127,56 @@ final class ContextFactoryTest extends TestCase
         );
 
         self::assertSame('world', $context->getValue());
+    }
+
+    // ─── Container-based resolution ────────────────────────────────────
+
+    public function testCreatesContextFromContainerService(): void
+    {
+        $container = new Container([]);
+        $container->registerShared(SimpleTestContext::class, static fn (): object => new SimpleTestContext());
+
+        $factory = new ContextFactory(['myCtx' => SimpleTestContext::class]);
+        $factory->setContainer($container);
+
+        $context = $factory->createContextFromContextNode(
+            $this->makeContextNode('myCtx'),
+        );
+
+        self::assertSame(42, $context->getValue());
+    }
+
+    public function testThrowsWhenContainerReturnsNonContextInterface(): void
+    {
+        $container = new Container([]);
+        $container->registerShared(stdClass::class, static fn (): object => new stdClass());
+
+        $factory = new ContextFactory(['bad' => stdClass::class]);
+        $factory->setContainer($container);
+
+        $this->expectException(InvalidArgumentException::class);
+
+        $factory->createContextFromContextNode(
+            $this->makeContextNode('bad'),
+        );
+    }
+
+    // ─── Null context name ─────────────────────────────────────────────
+
+    public function testThrowsWhenContextNameIsNull(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Context name cannot be null');
+
+        $factory = new ContextFactory(['myCtx' => SimpleTestContext::class]);
+
+        // Context node without name set (null by default after fix)
+        $root = new Root();
+        $node = new Context();
+        $node->setRoot($root);
+        // contextName is null — not calling setContextName()
+
+        $factory->createContextFromContextNode($node);
     }
 
     private function makeContextNode(string $contextName, array $params = []): Context

@@ -60,7 +60,7 @@ class ContextProcessor extends AbstractProcessor
         $this->traceCollector?->begin('Context', $traceName);
 
         $hash = [
-            $node->getContextName(),
+            $node->getContextName() ?? '',
         ];
 
         $params = $node->getParams();
@@ -85,7 +85,7 @@ class ContextProcessor extends AbstractProcessor
             $hash[] = hash('md5', serialize($modifiers));
         }
 
-        $hash = implode('', $hash);
+        $hash = implode('|', $hash);
 
         if (!isset($this->processedContext[$hash])) {
             $context = $this->contextFactory->createContextFromContextNode($node);
@@ -150,7 +150,7 @@ class ContextProcessor extends AbstractProcessor
             try {
                 $value = new StringCalc()->calculate($modifier);
             } catch (Throwable $throwable) {
-                throw new InvalidContextCalculation($throwable->getMessage());
+                throw new InvalidContextCalculation($throwable->getMessage(), previous: $throwable);
             }
 
             $vars['$context'] = $value;

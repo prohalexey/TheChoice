@@ -12,13 +12,15 @@ class NodeValueFactory implements NodeFactoryInterface
 {
     public function build(BuilderInterface $builder, array &$structure): Value
     {
-        self::validate($structure);
+        if (!array_key_exists('value', $structure)) {
+            throw new LogicException('The "value" property is absent in node type "Value"!');
+        }
 
         $node = new Value($structure['value']);
 
         $node->setRoot($builder->getRoot());
 
-        if (self::nodeHasDescription($structure)) {
+        if (array_key_exists('description', $structure)) {
             $description = $structure['description'];
             if (is_string($description)) {
                 $node->setDescription($description);
@@ -26,17 +28,5 @@ class NodeValueFactory implements NodeFactoryInterface
         }
 
         return $node;
-    }
-
-    private static function validate(array $structure): void
-    {
-        if (!array_key_exists('value', $structure)) {
-            throw new LogicException('The "value" property is absent in node type "Value"!');
-        }
-    }
-
-    private static function nodeHasDescription(array $structure): bool
-    {
-        return array_key_exists('description', $structure);
     }
 }

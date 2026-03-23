@@ -18,6 +18,7 @@ use TheChoice\Operator\OperatorResolverInterface;
 use TheChoice\Processor\ContextProcessor;
 use TheChoice\Processor\ProcessorResolverInterface;
 use TheChoice\Processor\RootProcessor;
+use TheChoice\Processor\SwitchProcessor;
 
 final class ContainerTest extends TestCase
 {
@@ -136,5 +137,33 @@ final class ContainerTest extends TestCase
 
         self::assertNotSame($defaultResolver, $resolved);
         self::assertSame($customResolver, $resolved);
+    }
+
+    public function testSwitchProcessorGetsContextFactory(): void
+    {
+        $processor = $this->container->get(SwitchProcessor::class);
+
+        $reflection = new ReflectionClass($processor);
+        $property = $reflection->getProperty('contextFactory');
+        $property->setAccessible(true);
+
+        self::assertNotNull($property->getValue($processor));
+    }
+
+    public function testHasReturnsTrueForAllDefaultInterfaces(): void
+    {
+        self::assertTrue($this->container->has(NodeFactoryResolverInterface::class));
+        self::assertTrue($this->container->has(OperatorResolverInterface::class));
+        self::assertTrue($this->container->has(ProcessorResolverInterface::class));
+        self::assertTrue($this->container->has(ContextFactoryInterface::class));
+    }
+
+    public function testGetWorksForAllDefaultInterfaces(): void
+    {
+        // has() returns true → get() must not throw
+        self::assertNotNull($this->container->get(NodeFactoryResolverInterface::class));
+        self::assertNotNull($this->container->get(OperatorResolverInterface::class));
+        self::assertNotNull($this->container->get(ProcessorResolverInterface::class));
+        self::assertNotNull($this->container->get(ContextFactoryInterface::class));
     }
 }

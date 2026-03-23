@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TheChoice\NodeFactory;
 
-use InvalidArgumentException;
 use TheChoice\Builder\BuilderInterface;
 use TheChoice\Exception\LogicException;
 use TheChoice\Node\Root;
@@ -17,14 +16,14 @@ class NodeRootFactory implements NodeFactoryInterface
 
         $builder->setRoot($rootNode);
 
-        if (self::nodeHasDescription($structure)) {
+        if (array_key_exists('description', $structure)) {
             $description = $structure['description'];
             if (is_string($description)) {
                 $rootNode->setDescription($description);
             }
         }
 
-        if (self::nodeHasStorage($structure)) {
+        if (array_key_exists('storage', $structure)) {
             $storage = $structure['storage'];
             if (is_array($storage)) {
                 foreach ($storage as $key => $value) {
@@ -35,33 +34,13 @@ class NodeRootFactory implements NodeFactoryInterface
             }
         }
 
-        if (!self::nodeHasRules($structure)) {
+        if (!array_key_exists('rules', $structure) || !is_array($structure['rules'])) {
             throw new LogicException('The "rules" property is absent in node type "Root"!');
         }
 
-        $rulesStructure = $structure['rules'];
-        if (!is_array($rulesStructure)) {
-            throw new InvalidArgumentException('Rules structure must be an array');
-        }
-
-        $rules = $builder->build($rulesStructure);
+        $rules = $builder->build($structure['rules']);
         $rootNode->setRules($rules);
 
         return $rootNode;
-    }
-
-    private static function nodeHasDescription(array $structure): bool
-    {
-        return array_key_exists('description', $structure);
-    }
-
-    private static function nodeHasStorage(array $structure): bool
-    {
-        return array_key_exists('storage', $structure);
-    }
-
-    private static function nodeHasRules(array $structure): bool
-    {
-        return array_key_exists('rules', $structure) && is_array($structure['rules']);
     }
 }

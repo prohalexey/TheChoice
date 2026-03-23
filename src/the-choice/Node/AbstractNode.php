@@ -6,7 +6,7 @@ namespace TheChoice\Node;
 
 abstract class AbstractNode implements Node
 {
-    protected string $description;
+    protected string $description = '';
 
     abstract public static function getNodeName(): string;
 

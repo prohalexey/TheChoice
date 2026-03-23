@@ -27,6 +27,9 @@ class Collection extends AbstractChildNode implements Sortable
 
     protected ?int $count = null;
 
+    /** @var null|array<Node> Lazily computed sorted copy; invalidated on add(). */
+    private ?array $sortedCache = null;
+
     public function __construct(string $type)
     {
         $allowed = [
@@ -60,6 +63,7 @@ class Collection extends AbstractChildNode implements Sortable
     public function add(Node $element): self
     {
         $this->collection[] = $element;
+        $this->sortedCache = null;
 
         return $this;
     }
@@ -93,11 +97,16 @@ class Collection extends AbstractChildNode implements Sortable
 
     /**
      * Returns a sorted copy of the collection without mutating the original order.
+     * Result is cached until a new element is added via {@see add()}.
      *
      * @return array<Node>
      */
     public function sorted(): array
     {
+        if (null !== $this->sortedCache) {
+            return $this->sortedCache;
+        }
+
         $copy = $this->collection;
 
         usort($copy, static function ($element1, $element2): int {
@@ -112,7 +121,9 @@ class Collection extends AbstractChildNode implements Sortable
             return $element1->getSortableValue() <=> $element2->getSortableValue();
         });
 
-        return $copy;
+        $this->sortedCache = $copy;
+
+        return $this->sortedCache;
     }
 
     public function getSortableValue(): int

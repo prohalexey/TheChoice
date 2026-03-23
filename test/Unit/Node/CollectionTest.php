@@ -69,4 +69,46 @@ final class CollectionTest extends TestCase
         self::assertSame($first[0]->getContextName(), $second[0]->getContextName());
         self::assertSame($first[1]->getContextName(), $second[1]->getContextName());
     }
+
+    public function testSortedReturnsCachedResultOnSecondCall(): void
+    {
+        $collection = new Collection(Collection::TYPE_AND);
+
+        $contextA = new Context();
+        $contextA->setPriority(5);
+        $contextA->setContextName('a');
+
+        $collection->add($contextA);
+
+        $first = $collection->sorted();
+        $second = $collection->sorted();
+
+        // Must be the exact same array instance (cache hit)
+        self::assertSame($first, $second);
+    }
+
+    public function testSortedCacheIsInvalidatedAfterAdd(): void
+    {
+        $collection = new Collection(Collection::TYPE_AND);
+
+        $contextA = new Context();
+        $contextA->setPriority(5);
+        $contextA->setContextName('a');
+
+        $collection->add($contextA);
+
+        $beforeAdd = $collection->sorted();
+
+        $contextB = new Context();
+        $contextB->setPriority(1);
+        $contextB->setContextName('b');
+
+        $collection->add($contextB);
+
+        $afterAdd = $collection->sorted();
+
+        // After adding a new element the cache is invalidated
+        self::assertNotSame($beforeAdd, $afterAdd);
+        self::assertCount(2, $afterAdd);
+    }
 }

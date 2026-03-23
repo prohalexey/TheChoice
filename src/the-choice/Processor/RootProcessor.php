@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use TheChoice\Node\Collection;
 use TheChoice\Node\Condition;
 use TheChoice\Node\Context;
+use TheChoice\Node\HasChildNodes;
 use TheChoice\Node\Node;
 use TheChoice\Node\Root;
 use TheChoice\Node\SwitchNode;
@@ -155,6 +156,14 @@ class RootProcessor extends AbstractProcessor
             }
 
             return;
+        }
+
+        // Allow custom node types to expose their children for the flush pass
+        // by implementing the HasChildNodes interface.
+        if ($node instanceof HasChildNodes) {
+            foreach ($node->getChildNodes() as $child) {
+                yield from $this->iterateNodes($child);
+            }
         }
     }
 }

@@ -17,7 +17,7 @@ class NodeConditionFactory implements NodeFactoryInterface
 
         $ifStructure = $structure['if'];
         $thenStructure = $structure['then'];
-        $elseStructure = self::nodeHasElseBranch($structure) ? $structure['else'] : null;
+        $elseStructure = $structure['else'] ?? null;
 
         if (!is_array($ifStructure) || !is_array($thenStructure) || (null !== $elseStructure && !is_array($elseStructure))) {
             throw new InvalidArgumentException('Node structures must be arrays');
@@ -30,14 +30,14 @@ class NodeConditionFactory implements NodeFactoryInterface
         $node = new Condition($ifNode, $thenNode, $elseNode);
         $node->setRoot($builder->getRoot());
 
-        if (self::nodeHasDescription($structure)) {
+        if (array_key_exists('description', $structure)) {
             $description = $structure['description'];
             if (is_string($description)) {
                 $node->setDescription($description);
             }
         }
 
-        if (self::nodeHasPriority($structure)) {
+        if (array_key_exists('priority', $structure)) {
             $priority = $structure['priority'];
             if (is_numeric($priority)) {
                 $node->setPriority((int)$priority);
@@ -49,30 +49,10 @@ class NodeConditionFactory implements NodeFactoryInterface
 
     private static function validate(array $structure): void
     {
-        $keysThatMustBePresent = [
-            'if',
-            'then',
-        ];
-
-        foreach ($keysThatMustBePresent as $key) {
+        foreach (['if', 'then'] as $key) {
             if (!array_key_exists($key, $structure)) {
                 throw new LogicException(sprintf('The "%s" property is absent in node type "Condition"!', $key));
             }
         }
-    }
-
-    private static function nodeHasElseBranch(array $structure): bool
-    {
-        return array_key_exists('else', $structure);
-    }
-
-    private static function nodeHasDescription(array $structure): bool
-    {
-        return array_key_exists('description', $structure);
-    }
-
-    private static function nodeHasPriority(array $structure): bool
-    {
-        return array_key_exists('priority', $structure);
     }
 }

@@ -195,6 +195,61 @@ final class OperatorsTest extends TestCase
         self::assertFalse($operator->assert($this->getContext(false)));
     }
 
+    public function testNumericInRangeWithReversedBoundaries(): void
+    {
+        // [5, 1] is reversed → range is treated as [1, 5] (min/max swap)
+        $operator = new NumericInRange()->setValue([5, 1]);
+
+        self::assertTrue($operator->assert($this->getContext(3)));
+        self::assertTrue($operator->assert($this->getContext(1)));
+        self::assertTrue($operator->assert($this->getContext(5)));
+        self::assertFalse($operator->assert($this->getContext(0)));
+        self::assertFalse($operator->assert($this->getContext(6)));
+    }
+
+    public function testMatchesRegexReturnsFalseForNonStringContext(): void
+    {
+        $operator = new MatchesRegex()->setValue('/^\d+$/');
+
+        // Context returns int, not string → assert returns false
+        self::assertFalse($operator->assert($this->getContext(123)));
+        self::assertFalse($operator->assert($this->getContext([])));
+        self::assertFalse($operator->assert($this->getNullContext()));
+    }
+
+    public function testIsInstanceOfReturnsFalseForNullContext(): void
+    {
+        $operator = new IsInstanceOf()->setValue(stdClass::class);
+
+        self::assertFalse($operator->assert($this->getNullContext()));
+    }
+
+    public function testStringContainWithEmptyNeedleAlwaysReturnsTrue(): void
+    {
+        $operator = new StringContain()->setValue('');
+
+        self::assertTrue($operator->assert($this->getContext('anything')));
+        self::assertTrue($operator->assert($this->getContext('')));
+    }
+
+    public function testStartsWithReturnsTrueForEmptyPrefix(): void
+    {
+        $operator = new StartsWith()->setValue('');
+
+        // Any string starts with empty prefix
+        self::assertTrue($operator->assert($this->getContext('anything')));
+        self::assertTrue($operator->assert($this->getContext('')));
+    }
+
+    public function testEndsWithReturnsTrueForEmptySuffix(): void
+    {
+        $operator = new EndsWith()->setValue('');
+
+        // Any string ends with empty suffix
+        self::assertTrue($operator->assert($this->getContext('anything')));
+        self::assertTrue($operator->assert($this->getContext('')));
+    }
+
     public function testIsInstanceOfTest(): void
     {
         $operator = new IsInstanceOf()->setValue(stdClass::class);

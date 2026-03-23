@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TheChoice\Exporter;
 
-use ReflectionProperty;
 use TheChoice\Exception\InvalidArgumentException;
 use TheChoice\Node\AbstractNode;
 use TheChoice\Node\Collection;
@@ -24,8 +23,6 @@ use TheChoice\Node\Value;
  */
 final class NodeSerializer
 {
-    private static ?ReflectionProperty $descriptionProp = null;
-
     /**
      * @return array<mixed>
      */
@@ -207,12 +204,9 @@ final class NodeSerializer
      */
     private function addDescription(AbstractNode $node, array &$data): void
     {
-        if (null === self::$descriptionProp) {
-            self::$descriptionProp = new ReflectionProperty(AbstractNode::class, 'description');
-        }
-
-        if (self::$descriptionProp->isInitialized($node)) {
-            $data['description'] = $node->getDescription();
+        $description = $node->getDescription();
+        if ('' !== $description) {
+            $data['description'] = $description;
         }
     }
 }
